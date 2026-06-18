@@ -1,17 +1,15 @@
 @import "tailwindcss";
 
-/* Brand palette v2 — warmer Velvet Noir */
+/* Brand palette — Electric Yellow × Black */
 :root {
-  /* Brand palette — Velvet Noir */
-  --velvet-noir: #420206;
-  --desert-gold: #edc484;
-  --off-white: #faf8fb;
-  --near-black: #1a0203;
-  --deep-black: #0f0102;
+  --velvet-noir: #000000;
+  --desert-gold: #fbed2b;
+  --off-white: #f5f5f0;
+  --near-black: #0d0d0d;
+  --deep-black: #000000;
 
-  /* Deeper tones derived from Velvet Noir (warm burgundy, not black) */
-  --velvet-deep: #2c0204;
-  --velvet-bright: #57080d;
+  --velvet-deep: #111111;
+  --velvet-bright: #1a1a1a;
 
   --background: var(--velvet-noir);
   --foreground: var(--off-white);
@@ -53,32 +51,31 @@ html::-webkit-scrollbar {
 body {
   color: var(--foreground);
   font-family: var(--font-roboto), Arial, Helvetica, sans-serif;
-  background-color: var(--velvet-noir);
+  background-color: #000000;
   background-image:
     radial-gradient(
-      ellipse 90% 70% at 75% 0%,
-      rgba(120, 40, 24, 0.5),
+      ellipse 70% 50% at 75% 0%,
+      rgba(251, 237, 43, 0.07),
       transparent 60%
     ),
     radial-gradient(
-      ellipse 80% 70% at 5% 95%,
-      rgba(87, 8, 13, 0.55),
+      ellipse 60% 50% at 5% 95%,
+      rgba(251, 237, 43, 0.05),
       transparent 65%
-    ),
-    linear-gradient(180deg, var(--velvet-bright), var(--velvet-deep));
+    );
   background-attachment: fixed;
 }
 
 /* Glassmorphism utility */
 .glass {
-  background: rgba(250, 248, 251, 0.05);
-  border: 1px solid rgba(250, 248, 251, 0.1);
+  background: rgba(245, 245, 240, 0.04);
+  border: 1px solid rgba(251, 237, 43, 0.12);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
 
 .gold-glow {
-  box-shadow: 0 0 40px rgba(237, 196, 132, 0.18);
+  box-shadow: 0 0 40px rgba(251, 237, 43, 0.2);
 }
 
 .text-balance {
@@ -92,18 +89,18 @@ body {
   justify-content: center;
   border-radius: 9999px;
   background: var(--desert-gold);
-  color: var(--velvet-noir);
+  color: #000000;
   padding: 0.75rem 1.75rem;
   font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   transition: all 0.3s ease;
-  box-shadow: 0 0 30px rgba(237, 196, 132, 0.25);
+  box-shadow: 0 0 30px rgba(251, 237, 43, 0.25);
 }
 .btn-gold:hover {
   filter: brightness(1.08);
-  box-shadow: 0 0 50px rgba(237, 196, 132, 0.45);
+  box-shadow: 0 0 50px rgba(251, 237, 43, 0.5);
 }
 
 .btn-outline {
@@ -111,7 +108,7 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  border: 1px solid rgba(250, 248, 251, 0.3);
+  border: 1px solid rgba(245, 245, 240, 0.3);
   color: var(--off-white);
   padding: 0.75rem 1.75rem;
   font-size: 0.8rem;

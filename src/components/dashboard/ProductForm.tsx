@@ -300,7 +300,7 @@ export default function ProductForm({
           <button
             type="button"
             onClick={() =>
-              setColors((prev) => [...prev, { name: "", hex: "#edc484" }])
+              setColors((prev) => [...prev, { name: "", hex: "#fbed2b" }])
             }
             className="btn-outline px-3 py-1.5 text-xs"
           >

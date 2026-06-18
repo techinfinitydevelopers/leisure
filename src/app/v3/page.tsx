@@ -30,8 +30,8 @@ export default function HomeV3() {
               { value: "4.9★", label: "Avg Rating" },
             ].map((s) => (
               <div key={s.label} className="flex flex-col items-center gap-1 text-center">
-                <span className="font-display text-3xl font-black text-[#420206] sm:text-4xl">{s.value}</span>
-                <span className="text-xs uppercase tracking-[0.18em] text-[#0f0102]/35">{s.label}</span>
+                <span className="font-display text-3xl font-black text-[#000000] sm:text-4xl">{s.value}</span>
+                <span className="text-xs uppercase tracking-[0.18em] text-[#000000]/35">{s.label}</span>
               </div>
             ))}
           </div>

@@ -32,8 +32,8 @@ export default function NavV2() {
           <nav
             className={`pointer-events-auto flex h-14 items-center justify-between rounded-full px-4 transition-all duration-500 ${
               scrolled
-                ? "border border-[rgba(237,196,132,0.25)] bg-[rgba(5,5,5,0.92)] shadow-[0_8px_40px_rgba(0,0,0,0.8)] backdrop-blur-2xl"
-                : "border border-[rgba(237,196,132,0.12)] bg-[rgba(5,5,5,0.75)] backdrop-blur-xl"
+                ? "border border-[rgba(251,237,43,0.25)] bg-[rgba(5,5,5,0.92)] shadow-[0_8px_40px_rgba(0,0,0,0.8)] backdrop-blur-2xl"
+                : "border border-[rgba(251,237,43,0.12)] bg-[rgba(5,5,5,0.75)] backdrop-blur-xl"
             }`}
           >
             <Link href="/v2" className="flex shrink-0 items-center gap-2">
@@ -53,7 +53,7 @@ export default function NavV2() {
                   <span className={`text-[0.6rem] transition-transform duration-300 ${speakersOpen ? "rotate-180" : ""}`}>▾</span>
                 </Link>
                 <div className={`absolute left-1/2 top-full -translate-x-1/2 pt-4 transition-all duration-300 ${speakersOpen ? "visible opacity-100" : "invisible -translate-y-1 opacity-0"}`}>
-                  <div className="w-64 rounded-2xl border border-[rgba(237,196,132,0.15)] bg-[rgba(5,5,5,0.95)] p-2 backdrop-blur-xl">
+                  <div className="w-64 rounded-2xl border border-[rgba(251,237,43,0.15)] bg-[rgba(5,5,5,0.95)] p-2 backdrop-blur-xl">
                     {products.map((p) => (
                       <Link key={p.slug} href={`/product/${p.slug}`} className="flex items-center justify-between rounded-xl px-4 py-2.5 transition-colors hover:bg-white/5">
                         <span className="font-display text-base tracking-wide text-white">{p.model}</span>
@@ -67,7 +67,7 @@ export default function NavV2() {
               <li><Link href="/v2" className="transition-colors hover:text-gold">About</Link></li>
             </ul>
 
-            <Link href="/shop" className="flex shrink-0 items-center gap-1.5 rounded-full bg-gold px-5 py-2 text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-[#070707] transition-all duration-300 hover:bg-gold/90 hover:shadow-[0_0_20px_rgba(237,196,132,0.45)]">
+            <Link href="/shop" className="flex shrink-0 items-center gap-1.5 rounded-full bg-gold px-5 py-2 text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-[#000000] transition-all duration-300 hover:bg-gold/90 hover:shadow-[0_0_20px_rgba(251,237,43,0.45)]">
               Shop Now
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="shrink-0"><path d="M2.5 9.5L9.5 2.5M9.5 2.5H4M9.5 2.5V8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </Link>
@@ -76,7 +76,7 @@ export default function NavV2() {
       </header>
 
       {/* Mobile */}
-      <header className={`sticky top-0 z-50 transition-all duration-500 md:hidden ${scrolled || menuOpen ? "border-b border-[rgba(237,196,132,0.12)] bg-[rgba(5,5,5,0.92)] backdrop-blur-xl" : "border-b border-transparent bg-transparent"}`}>
+      <header className={`sticky top-0 z-50 transition-all duration-500 md:hidden ${scrolled || menuOpen ? "border-b border-[rgba(251,237,43,0.12)] bg-[rgba(5,5,5,0.92)] backdrop-blur-xl" : "border-b border-transparent bg-transparent"}`}>
         <div className="flex h-16 items-center justify-between px-5">
           <Link href="/v2" className="relative z-50 flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-gold" />
@@ -95,7 +95,7 @@ export default function NavV2() {
         <div className="flex h-full flex-col justify-center gap-8 px-8">
           <Link href="/v2" className="font-display text-4xl text-white transition-colors hover:text-gold">Home</Link>
           <Link href="/shop" className="font-display text-4xl text-white transition-colors hover:text-gold">Collection</Link>
-          <div className="border-t border-[rgba(237,196,132,0.15)] pt-6">
+          <div className="border-t border-[rgba(251,237,43,0.15)] pt-6">
             <p className="mb-4 font-pinyon text-2xl text-gold">Speakers</p>
             <div className="flex flex-col gap-3">
               {products.map((p) => (

@@ -58,7 +58,7 @@ export default function TestimonialSection() {
   return (
     <section className="relative overflow-hidden py-24 sm:py-32">
       {/* Ambient glow */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_60%,rgba(237,196,132,0.06),transparent_70%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_60%,rgba(251,237,43,0.06),transparent_70%)]" />
 
       {/* Top separator line */}
       <div className="mx-auto mb-16 h-px max-w-5xl bg-gradient-to-r from-transparent via-gold/30 to-transparent" />

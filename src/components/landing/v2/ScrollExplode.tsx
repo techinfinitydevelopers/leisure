@@ -171,17 +171,17 @@ export default function ScrollExplode() {
       <div className="sticky top-0 z-[110] h-[2px] w-full bg-white/5">
         <div
           id="v2-explode-bar"
-          className="h-full w-full origin-left scale-x-0 bg-gradient-to-r from-[#c8922a] to-[#edc484]"
+          className="h-full w-full origin-left scale-x-0 bg-gradient-to-r from-[#e8d800] to-[#fbed2b]"
           style={{ willChange: "transform" }}
         />
       </div>
 
       {/* 600 vh scroll track */}
       <div ref={wrapRef} className="relative" style={{ height: `${N * 100}vh` }}>
-        <div className="sticky top-0 h-screen w-full overflow-hidden bg-[#070707]">
+        <div className="sticky top-0 h-screen w-full overflow-hidden bg-[#000000]">
 
           {/* Ambient glow */}
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_55%_55%_at_center,rgba(237,196,132,0.09),transparent_70%)]" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_55%_55%_at_center,rgba(251,237,43,0.09),transparent_70%)]" />
 
           {/* ── Speaker ─────────────────────────────────────────────────── */}
           <div
@@ -201,7 +201,7 @@ export default function ScrollExplode() {
                   opacity: i === 0 ? 1 : 0,
                   transition: "opacity 0.5s ease",
                   objectFit: "contain",
-                  filter: "drop-shadow(0 20px 60px rgba(0,0,0,0.6)) drop-shadow(0 0 40px rgba(237,196,132,0.15))",
+                  filter: "drop-shadow(0 20px 60px rgba(0,0,0,0.6)) drop-shadow(0 0 40px rgba(251,237,43,0.15))",
                 }}
                 draggable={false}
               />
@@ -233,8 +233,8 @@ export default function ScrollExplode() {
                   <div className="pointer-events-auto mt-7 flex gap-3 flex-wrap">
                     <Link
                       href="/collection"
-                      className="inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-[0.78rem] font-semibold uppercase tracking-[0.14em] text-[#070707] transition-all duration-300 hover:shadow-[0_0_28px_rgba(237,196,132,0.45)]"
-                      style={{ background: "linear-gradient(135deg,#edc484,#c8922a)" }}
+                      className="inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-[0.78rem] font-semibold uppercase tracking-[0.14em] text-[#000000] transition-all duration-300 hover:shadow-[0_0_28px_rgba(251,237,43,0.45)]"
+                      style={{ background: "linear-gradient(135deg,#fbed2b,#e8d800)" }}
                     >
                       Shop Now
                       <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
@@ -268,7 +268,7 @@ export default function ScrollExplode() {
           </div>
 
           {/* Bottom fade */}
-          <div className="pointer-events-none absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-[#070707] to-transparent" />
+          <div className="pointer-events-none absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-[#000000] to-transparent" />
         </div>
       </div>
     </>

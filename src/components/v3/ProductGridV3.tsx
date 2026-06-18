@@ -11,11 +11,11 @@ export default function ProductGridV3() {
 
         {/* Heading */}
         <div className="mb-14 text-center">
-          <p className="font-pinyon text-4xl text-[#c8922a]">The Collection</p>
-          <h2 className="mt-2 font-display text-4xl font-black uppercase tracking-tight text-[#0f0102] sm:text-5xl">
+          <p className="font-pinyon text-4xl text-[#e8d800]">The Collection</p>
+          <h2 className="mt-2 font-display text-4xl font-black uppercase tracking-tight text-[#000000] sm:text-5xl">
             Meet the Range
           </h2>
-          <p className="mx-auto mt-4 max-w-lg text-sm text-[#0f0102]/45">
+          <p className="mx-auto mt-4 max-w-lg text-sm text-[#000000]/45">
             Six speakers. One obsession. Each crafted to own its space.
           </p>
         </div>
@@ -44,7 +44,7 @@ export default function ProductGridV3() {
 
                   {saving > 0 && (
                     <span className="absolute right-4 top-4 rounded-full px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-wider text-white"
-                      style={{ background: "linear-gradient(135deg,#420206,#6b0508)" }}>
+                      style={{ background: "linear-gradient(135deg,#000000,#6b0508)" }}>
                       -{saving}%
                     </span>
                   )}
@@ -53,15 +53,15 @@ export default function ProductGridV3() {
                 {/* Info */}
                 <div className="flex flex-1 flex-col gap-3 p-5">
                   <div>
-                    <h3 className="font-display text-lg font-black uppercase tracking-wide text-[#0f0102]">{p.model}</h3>
-                    <p className="font-pinyon text-xl text-[#c8922a]">{p.tagline}</p>
+                    <h3 className="font-display text-lg font-black uppercase tracking-wide text-[#000000]">{p.model}</h3>
+                    <p className="font-pinyon text-xl text-[#e8d800]">{p.tagline}</p>
                   </div>
 
                   <div className="flex items-baseline gap-2">
-                    <span className="font-display text-xl font-bold text-[#420206]">
+                    <span className="font-display text-xl font-bold text-[#000000]">
                       ₹{p.price.toLocaleString("en-IN")}
                     </span>
-                    <span className="text-xs text-[#0f0102]/30 line-through">
+                    <span className="text-xs text-[#000000]/30 line-through">
                       ₹{p.mrp.toLocaleString("en-IN")}
                     </span>
                   </div>
@@ -69,16 +69,16 @@ export default function ProductGridV3() {
                   <div className="flex items-center gap-1.5">
                     {p.colors.map((c) => (
                       <span key={c.name} title={c.name}
-                        className="h-3.5 w-3.5 rounded-full border border-[rgba(15,1,2,0.15)]"
+                        className="h-3.5 w-3.5 rounded-full border border-[rgba(0,0,0,0.15)]"
                         style={{ backgroundColor: c.hex }} />
                     ))}
                   </div>
 
                   <div className="mt-auto flex items-center justify-between border-t border-[rgba(66,2,6,0.07)] pt-2">
-                    <span className="text-xs font-medium uppercase tracking-wider text-[#420206]/50 transition-colors duration-300 group-hover:text-[#420206]">
+                    <span className="text-xs font-medium uppercase tracking-wider text-[#000000]/50 transition-colors duration-300 group-hover:text-[#000000]">
                       View Details
                     </span>
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full border border-[rgba(66,2,6,0.2)] text-[#420206]/50 transition-all duration-300 group-hover:bg-[#420206] group-hover:text-white">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full border border-[rgba(66,2,6,0.2)] text-[#000000]/50 transition-all duration-300 group-hover:bg-[#000000] group-hover:text-white">
                       <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
                         <path d="M2.5 9.5L9.5 2.5M9.5 2.5H4M9.5 2.5V8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
@@ -94,7 +94,7 @@ export default function ProductGridV3() {
         <div className="mt-12 text-center">
           <Link href="/shop"
             className="inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-white transition-all duration-300 hover:shadow-[0_0_30px_rgba(66,2,6,0.4)]"
-            style={{ background: "linear-gradient(135deg,#420206,#6b0508)" }}>
+            style={{ background: "linear-gradient(135deg,#000000,#6b0508)" }}>
             Shop All Speakers
             <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2.5 9.5L9.5 2.5M9.5 2.5H4M9.5 2.5V8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </Link>

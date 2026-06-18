@@ -9,9 +9,9 @@ export default function ProductGridV2() {
     <section className="relative py-20 sm:py-28">
       {/* Subtle side glow */}
       <div className="pointer-events-none absolute left-0 top-1/2 h-[600px] w-[300px] -translate-y-1/2 opacity-20"
-        style={{ background: "radial-gradient(ellipse at left, rgba(237,196,132,0.3), transparent 70%)" }} />
+        style={{ background: "radial-gradient(ellipse at left, rgba(251,237,43,0.3), transparent 70%)" }} />
       <div className="pointer-events-none absolute right-0 top-1/2 h-[600px] w-[300px] -translate-y-1/2 opacity-20"
-        style={{ background: "radial-gradient(ellipse at right, rgba(237,196,132,0.3), transparent 70%)" }} />
+        style={{ background: "radial-gradient(ellipse at right, rgba(251,237,43,0.3), transparent 70%)" }} />
 
       <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
         {/* Section heading */}
@@ -31,19 +31,19 @@ export default function ProductGridV2() {
             const saving = Math.round(((p.mrp - p.price) / p.mrp) * 100);
             return (
               <Link key={p.slug} href={`/product/${p.slug}`}
-                className="group relative flex flex-col overflow-hidden rounded-3xl transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_16px_60px_rgba(237,196,132,0.12)]"
-                style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(237,196,132,0.1)" }}
+                className="group relative flex flex-col overflow-hidden rounded-3xl transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_16px_60px_rgba(251,237,43,0.12)]"
+                style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(251,237,43,0.1)" }}
               >
                 {/* Hover gold border reveal */}
                 <span className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                  style={{ boxShadow: "inset 0 0 0 1px rgba(237,196,132,0.35)" }} />
+                  style={{ boxShadow: "inset 0 0 0 1px rgba(251,237,43,0.35)" }} />
 
                 {/* Image area */}
                 <div className="relative flex h-52 items-center justify-center p-6"
-                  style={{ background: "rgba(237,196,132,0.03)" }}>
+                  style={{ background: "rgba(251,237,43,0.03)" }}>
                   {/* Background glow */}
                   <div className="absolute inset-0 rounded-t-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                    style={{ background: "radial-gradient(ellipse 60% 60% at 50% 50%, rgba(237,196,132,0.08), transparent)" }} />
+                    style={{ background: "radial-gradient(ellipse 60% 60% at 50% 50%, rgba(251,237,43,0.08), transparent)" }} />
 
                   <Image
                     src={`/products/${p.slug}.png`}
@@ -55,8 +55,8 @@ export default function ProductGridV2() {
 
                   {/* Savings badge */}
                   {saving > 0 && (
-                    <span className="absolute right-4 top-4 rounded-full px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-wider text-[#070707]"
-                      style={{ background: "linear-gradient(135deg,#edc484,#c8922a)" }}>
+                    <span className="absolute right-4 top-4 rounded-full px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-wider text-[#000000]"
+                      style={{ background: "linear-gradient(135deg,#fbed2b,#e8d800)" }}>
                       -{saving}%
                     </span>
                   )}
@@ -89,12 +89,12 @@ export default function ProductGridV2() {
                   </div>
 
                   {/* CTA row */}
-                  <div className="mt-auto flex items-center justify-between pt-2" style={{ borderTop: "1px solid rgba(237,196,132,0.08)" }}>
+                  <div className="mt-auto flex items-center justify-between pt-2" style={{ borderTop: "1px solid rgba(251,237,43,0.08)" }}>
                     <span className="text-xs font-medium uppercase tracking-wider text-gold/60 transition-colors duration-300 group-hover:text-gold">
                       View Details
                     </span>
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full transition-all duration-300 group-hover:bg-gold group-hover:text-[#070707]"
-                      style={{ border: "1px solid rgba(237,196,132,0.2)", color: "rgba(237,196,132,0.6)" }}>
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full transition-all duration-300 group-hover:bg-gold group-hover:text-[#000000]"
+                      style={{ border: "1px solid rgba(251,237,43,0.2)", color: "rgba(251,237,43,0.6)" }}>
                       <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
                         <path d="M2.5 9.5L9.5 2.5M9.5 2.5H4M9.5 2.5V8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
@@ -109,8 +109,8 @@ export default function ProductGridV2() {
         {/* View all CTA */}
         <div className="mt-12 text-center">
           <Link href="/shop"
-            className="inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-[#070707] transition-all duration-300 hover:shadow-[0_0_30px_rgba(237,196,132,0.45)]"
-            style={{ background: "linear-gradient(135deg,#edc484,#c8922a)" }}>
+            className="inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-[#000000] transition-all duration-300 hover:shadow-[0_0_30px_rgba(251,237,43,0.45)]"
+            style={{ background: "linear-gradient(135deg,#fbed2b,#e8d800)" }}>
             Shop All Speakers
             <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2.5 9.5L9.5 2.5M9.5 2.5H4M9.5 2.5V8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </Link>

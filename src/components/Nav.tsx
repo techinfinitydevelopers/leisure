@@ -35,8 +35,8 @@ export default function Nav() {
           <nav
             className={`pointer-events-auto flex h-16 items-center justify-between rounded-full px-5 transition-all duration-500 ${
               scrolled
-                ? "border border-white/10 bg-[rgba(10,1,2,0.88)] shadow-[0_8px_40px_rgba(0,0,0,0.6)] backdrop-blur-2xl"
-                : "border border-white/8 bg-[rgba(10,1,2,0.72)] shadow-[0_4px_24px_rgba(0,0,0,0.4)] backdrop-blur-xl"
+                ? "border border-white/10 bg-[rgba(0,0,0,0.88)] shadow-[0_8px_40px_rgba(0,0,0,0.6)] backdrop-blur-2xl"
+                : "border border-white/8 bg-[rgba(0,0,0,0.72)] shadow-[0_4px_24px_rgba(0,0,0,0.4)] backdrop-blur-xl"
             }`}
           >
             {/* Logo */}
@@ -113,7 +113,7 @@ export default function Nav() {
             {/* CTA pill button */}
             <Link
               href="/shop"
-              className="flex shrink-0 items-center gap-1.5 rounded-full bg-gold px-5 py-2 text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-deepblack transition-all duration-300 hover:bg-gold/90 hover:shadow-[0_0_20px_rgba(237,196,132,0.4)]"
+              className="flex shrink-0 items-center gap-1.5 rounded-full bg-gold px-5 py-2 text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-deepblack transition-all duration-300 hover:bg-gold/90 hover:shadow-[0_0_20px_rgba(251,237,43,0.4)]"
             >
               Shop Now
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="shrink-0">
@@ -128,7 +128,7 @@ export default function Nav() {
       <header
         className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 md:hidden ${
           scrolled || open
-            ? "border-b border-white/10 bg-[rgba(15,1,2,0.88)] backdrop-blur-xl"
+            ? "border-b border-white/10 bg-[rgba(0,0,0,0.88)] backdrop-blur-xl"
             : "border-b border-transparent bg-transparent"
         }`}
       >
@@ -162,7 +162,7 @@ export default function Nav() {
 
       {/* Mobile menu overlay */}
       <div
-        style={{ backgroundColor: "rgba(15,1,2,0.98)" }}
+        style={{ backgroundColor: "rgba(0,0,0,0.98)" }}
         className={`fixed inset-0 z-40 transition-all duration-500 md:hidden ${open ? "visible opacity-100" : "invisible opacity-0"}`}
       >
         <div className="flex h-full flex-col justify-center gap-8 px-8">

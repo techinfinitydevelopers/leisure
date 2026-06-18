@@ -37,7 +37,7 @@ const socials = [
   { label: "Instagram", icon: <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4.5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg> },
   { label: "Facebook",  icon: <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg> },
   { label: "LinkedIn",  icon: <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg> },
-  { label: "YouTube",   icon: <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#070707"/></svg> },
+  { label: "YouTube",   icon: <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#000000"/></svg> },
 ];
 
 export default function FooterV2() {
@@ -65,7 +65,7 @@ export default function FooterV2() {
                 <span key={delay} className="absolute inset-0 rounded-full border border-gold/25"
                   style={{ animation: `ripple-ring 2.4s ease-out ${delay}s infinite` }} />
               ))}
-              <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full border border-gold/35 bg-[rgba(237,196,132,0.06)]">
+              <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full border border-gold/35 bg-[rgba(251,237,43,0.06)]">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="text-gold">
                   <path d="M3 9v6h4l5 5V4L7 9H3z" fill="currentColor" opacity="0.9" />
                   <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z" fill="currentColor" opacity="0.7" />
@@ -83,7 +83,7 @@ export default function FooterV2() {
             <div className="flex items-center gap-3">
               {socials.map(({ label, icon }) => (
                 <a key={label} href="#" aria-label={label}
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-gold/15 text-white/50 transition-all duration-300 hover:border-gold hover:text-gold hover:shadow-[0_0_12px_rgba(237,196,132,0.35)]"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-gold/15 text-white/50 transition-all duration-300 hover:border-gold hover:text-gold hover:shadow-[0_0_12px_rgba(251,237,43,0.35)]"
                 >{icon}</a>
               ))}
             </div>
@@ -91,7 +91,7 @@ export default function FooterV2() {
 
           {/* Speakers */}
           <div>
-            <h3 className="text-[0.7rem] font-semibold uppercase tracking-[0.22em]" style={{ color: "rgba(237,196,132,0.5)" }}>Speakers</h3>
+            <h3 className="text-[0.7rem] font-semibold uppercase tracking-[0.22em]" style={{ color: "rgba(251,237,43,0.5)" }}>Speakers</h3>
             <ul className="mt-5 space-y-3">
               {products.map((p) => (
                 <li key={p.slug}>
@@ -106,7 +106,7 @@ export default function FooterV2() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-[0.7rem] font-semibold uppercase tracking-[0.22em]" style={{ color: "rgba(237,196,132,0.5)" }}>Quick Link</h3>
+            <h3 className="text-[0.7rem] font-semibold uppercase tracking-[0.22em]" style={{ color: "rgba(251,237,43,0.5)" }}>Quick Link</h3>
             <ul className="mt-5 space-y-3">
               {quickLinks.map((l) => (
                 <li key={l.label}>
@@ -121,15 +121,15 @@ export default function FooterV2() {
 
           {/* Contact */}
           <div>
-            <h3 className="text-[0.7rem] font-semibold uppercase tracking-[0.22em]" style={{ color: "rgba(237,196,132,0.5)" }}>Contact Us</h3>
+            <h3 className="text-[0.7rem] font-semibold uppercase tracking-[0.22em]" style={{ color: "rgba(251,237,43,0.5)" }}>Contact Us</h3>
             <div className="mt-5 space-y-3 text-sm text-white/65">
               <p className="font-medium text-white">Andheri (E), Mumbai 400059</p>
               <p>support@leisureaudio.in</p>
               <p>+91 98200 00000</p>
             </div>
             <div className="mt-6">
-              <p className="mb-2 text-[0.7rem] uppercase tracking-[0.18em]" style={{ color: "rgba(237,196,132,0.35)" }}>Stay in the loop</p>
-              <form className="flex items-center gap-2 border-b pb-2 transition-colors duration-300" style={{ borderColor: "rgba(237,196,132,0.15)" }}>
+              <p className="mb-2 text-[0.7rem] uppercase tracking-[0.18em]" style={{ color: "rgba(251,237,43,0.35)" }}>Stay in the loop</p>
+              <form className="flex items-center gap-2 border-b pb-2 transition-colors duration-300" style={{ borderColor: "rgba(251,237,43,0.15)" }}>
                 <input type="email" placeholder="your@email.com" className="w-full bg-transparent text-xs text-white placeholder:text-white/25 focus:outline-none" />
                 <button type="button" aria-label="Subscribe" className="shrink-0 text-gold transition-transform hover:translate-x-1">→</button>
               </form>
@@ -139,17 +139,17 @@ export default function FooterV2() {
       </div>
 
       {/* Giant LEISURE waveform */}
-      <div className="relative select-none overflow-hidden py-2" style={{ borderTop: "1px solid rgba(237,196,132,0.08)" }}>
+      <div className="relative select-none overflow-hidden py-2" style={{ borderTop: "1px solid rgba(251,237,43,0.08)" }}>
         <svg viewBox="0 0 1200 180" preserveAspectRatio="xMidYMid meet" className="w-full" style={{ height: "clamp(5rem,17vw,15rem)" }} aria-hidden>
           <defs>
             <clipPath id="leisure-clip-v2">
               <text x="600" y="158" fontSize="172" fontWeight="900" textAnchor="middle" fontFamily="'SF Pro Display','Helvetica Neue',Arial,sans-serif" letterSpacing="-3">LEISURE</text>
             </clipPath>
           </defs>
-          <text x="600" y="158" fontSize="172" fontWeight="900" textAnchor="middle" fontFamily="'SF Pro Display','Helvetica Neue',Arial,sans-serif" fill="none" stroke="rgba(237,196,132,0.1)" strokeWidth="1" letterSpacing="-3">LEISURE</text>
+          <text x="600" y="158" fontSize="172" fontWeight="900" textAnchor="middle" fontFamily="'SF Pro Display','Helvetica Neue',Arial,sans-serif" fill="none" stroke="rgba(251,237,43,0.1)" strokeWidth="1" letterSpacing="-3">LEISURE</text>
           <g clipPath="url(#leisure-clip-v2)">
             {WAVE_BARS.map((b, i) => (
-              <rect key={i} x={i * 12} y={0} width={11} height={180} fill="#edc484"
+              <rect key={i} x={i * 12} y={0} width={11} height={180} fill="#fbed2b"
                 style={{ transformBox: "fill-box" as React.CSSProperties["transformBox"], transformOrigin: "center", animation: `waveform-bar ${b.dur}s ease-in-out ${b.del}s infinite alternate` }} />
             ))}
           </g>
@@ -157,7 +157,7 @@ export default function FooterV2() {
       </div>
 
       {/* Bottom bar */}
-      <div className="px-5 py-5 sm:px-8" style={{ borderTop: "1px solid rgba(237,196,132,0.08)" }}>
+      <div className="px-5 py-5 sm:px-8" style={{ borderTop: "1px solid rgba(251,237,43,0.08)" }}>
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 text-xs sm:flex-row" style={{ color: "rgba(250,248,251,0.3)" }}>
           <p>© 2026 Leisure. All rights reserved.</p>
           <div className="flex items-center gap-1">

@@ -112,13 +112,13 @@ export default function ScrollProductSections() {
     <div className="relative h-[300px] w-[300px] lg:h-[400px] lg:w-[400px]">
       <div
         className="absolute inset-[-15%] rounded-full blur-3xl"
-        style={{ background: "radial-gradient(circle,rgba(237,196,132,0.16) 0%,transparent 65%)" }}
+        style={{ background: "radial-gradient(circle,rgba(251,237,43,0.16) 0%,transparent 65%)" }}
       />
       <Image
         src={`/products/${p.slug}.png`}
         alt={p.model}
         fill
-        className="relative z-10 object-contain drop-shadow-[0_0_50px_rgba(237,196,132,0.2)]"
+        className="relative z-10 object-contain drop-shadow-[0_0_50px_rgba(251,237,43,0.2)]"
         priority
       />
     </div>
@@ -133,15 +133,15 @@ export default function ScrollProductSections() {
       ═══════════════════════════════════════ */}
       <section
         className="relative flex min-h-screen items-center overflow-hidden"
-        style={{ backgroundColor: "#070707" }}
+        style={{ backgroundColor: "#000000" }}
       >
         <div className="pointer-events-none absolute inset-0 opacity-[0.025]"
           style={{
-            backgroundImage: "linear-gradient(rgba(237,196,132,1) 1px,transparent 1px),linear-gradient(90deg,rgba(237,196,132,1) 1px,transparent 1px)",
+            backgroundImage: "linear-gradient(rgba(251,237,43,1) 1px,transparent 1px),linear-gradient(90deg,rgba(251,237,43,1) 1px,transparent 1px)",
             backgroundSize: "80px 80px",
           }} />
         <div className="pointer-events-none absolute inset-0"
-          style={{ background: "radial-gradient(ellipse 60% 50% at 65% 45%, rgba(237,196,132,0.07), transparent)" }} />
+          style={{ background: "radial-gradient(ellipse 60% 50% at 65% 45%, rgba(251,237,43,0.07), transparent)" }} />
 
         <div className="relative z-10 mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-10 px-5 py-20 sm:px-8 lg:grid-cols-2 lg:min-h-screen lg:py-0">
 
@@ -157,7 +157,7 @@ export default function ScrollProductSections() {
               style={{ fontSize: "clamp(3rem,7vw,6.5rem)" }}>
               SOUND<br />YOUR<br />
               <span style={{
-                background: "linear-gradient(90deg,#c8922a 0%,#edc484 40%,#fff8e0 70%,#edc484 100%)",
+                background: "linear-gradient(90deg,#e8d800 0%,#fbed2b 40%,#fff8e0 70%,#fbed2b 100%)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",
@@ -169,8 +169,8 @@ export default function ScrollProductSections() {
             </p>
             <div className="flex flex-wrap gap-4">
               <Link href="/shop"
-                className="flex items-center gap-2 rounded-full px-6 py-2.5 text-[0.78rem] font-semibold uppercase tracking-wider text-[#070707]"
-                style={{ background: "linear-gradient(135deg,#edc484,#c8922a)" }}>
+                className="flex items-center gap-2 rounded-full px-6 py-2.5 text-[0.78rem] font-semibold uppercase tracking-wider text-[#000000]"
+                style={{ background: "linear-gradient(135deg,#fbed2b,#e8d800)" }}>
                 Explore
                 <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
                   <path d="M2.5 9.5L9.5 2.5M9.5 2.5H4M9.5 2.5V8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
@@ -217,7 +217,7 @@ export default function ScrollProductSections() {
       <section
         ref={sec2Ref}
         className="relative flex min-h-screen items-center overflow-hidden"
-        style={{ backgroundColor: "#070707" }}
+        style={{ backgroundColor: "#000000" }}
       >
         <div className="pointer-events-none absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-gold/15 to-transparent" />
 
@@ -238,7 +238,7 @@ export default function ScrollProductSections() {
               style={{ fontSize: "clamp(2.5rem,5vw,4.5rem)" }}>
               THE<br />
               <span style={{
-                background: "linear-gradient(90deg,#edc484,#c8922a)",
+                background: "linear-gradient(90deg,#fbed2b,#e8d800)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",
@@ -248,7 +248,7 @@ export default function ScrollProductSections() {
             <div className="grid grid-cols-2 gap-3">
               {p.specs.slice(0, 4).map((s) => (
                 <div key={s.label} className="flex flex-col rounded-2xl px-4 py-3"
-                  style={{ background: "rgba(237,196,132,0.06)", border: "1px solid rgba(237,196,132,0.12)" }}>
+                  style={{ background: "rgba(251,237,43,0.06)", border: "1px solid rgba(251,237,43,0.12)" }}>
                   <p className="text-[0.62rem] uppercase tracking-wider text-gold/55">{s.label}</p>
                   <p className="font-display text-sm font-semibold text-white">{s.value}</p>
                 </div>
@@ -259,8 +259,8 @@ export default function ScrollProductSections() {
               <span className="text-sm text-white/30 line-through">₹{p.mrp.toLocaleString("en-IN")}</span>
             </div>
             <Link href={`/product/${p.slug}`}
-              className="self-start rounded-full px-6 py-2.5 text-[0.78rem] font-semibold uppercase tracking-wider text-[#070707]"
-              style={{ background: "linear-gradient(135deg,#edc484,#c8922a)" }}>
+              className="self-start rounded-full px-6 py-2.5 text-[0.78rem] font-semibold uppercase tracking-wider text-[#000000]"
+              style={{ background: "linear-gradient(135deg,#fbed2b,#e8d800)" }}>
               View Details →
             </Link>
           </div>
@@ -275,7 +275,7 @@ export default function ScrollProductSections() {
       <section
         ref={sec3Ref}
         className="relative flex min-h-screen items-center overflow-hidden"
-        style={{ backgroundColor: "#070707" }}
+        style={{ backgroundColor: "#000000" }}
       >
         <div className="pointer-events-none absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-gold/15 to-transparent" />
 
@@ -291,7 +291,7 @@ export default function ScrollProductSections() {
               style={{ fontSize: "clamp(2.5rem,5vw,4.5rem)" }}>
               IN THE<br />
               <span style={{
-                background: "linear-gradient(90deg,#edc484,#c8922a)",
+                background: "linear-gradient(90deg,#fbed2b,#e8d800)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",
@@ -310,8 +310,8 @@ export default function ScrollProductSections() {
             </ul>
             <div className="flex flex-wrap gap-3 pt-2">
               <Link href={`/product/${p.slug}`}
-                className="rounded-full px-6 py-2.5 text-[0.78rem] font-semibold uppercase tracking-wider text-[#070707]"
-                style={{ background: "linear-gradient(135deg,#edc484,#c8922a)" }}>
+                className="rounded-full px-6 py-2.5 text-[0.78rem] font-semibold uppercase tracking-wider text-[#000000]"
+                style={{ background: "linear-gradient(135deg,#fbed2b,#e8d800)" }}>
                 Buy Now
               </Link>
               <Link href="/shop"

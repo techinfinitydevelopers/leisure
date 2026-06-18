@@ -25,7 +25,7 @@ export default function HeroV3() {
       <div className="pointer-events-none absolute inset-0"
         style={{ background: "radial-gradient(ellipse 55% 45% at 75% 50%, rgba(66,2,6,0.07) 0%, transparent 65%)" }} />
       <div className="pointer-events-none absolute inset-0"
-        style={{ background: "radial-gradient(ellipse 40% 35% at 15% 80%, rgba(200,146,42,0.06) 0%, transparent 65%)" }} />
+        style={{ background: "radial-gradient(ellipse 40% 35% at 15% 80%, rgba(232,216,0,0.06) 0%, transparent 65%)" }} />
 
       {/* Subtle dot grid */}
       <div className="pointer-events-none absolute inset-0 opacity-[0.04]"
@@ -57,8 +57,8 @@ export default function HeroV3() {
             {SPECS.map((s) => (
               <div key={s.label} className="flex flex-col rounded-2xl px-4 py-2.5"
                 style={{ background: "rgba(255,255,255,0.9)", border: "1px solid rgba(66,2,6,0.1)", boxShadow: "0 4px 20px rgba(66,2,6,0.08)" }}>
-                <span className="text-[0.65rem] uppercase tracking-[0.2em] text-[#420206]/60">{s.label}</span>
-                <span className="font-display text-base font-semibold text-[#0f0102]">{s.value}</span>
+                <span className="text-[0.65rem] uppercase tracking-[0.2em] text-[#000000]/60">{s.label}</span>
+                <span className="font-display text-base font-semibold text-[#000000]">{s.value}</span>
               </div>
             ))}
           </div>
@@ -68,31 +68,31 @@ export default function HeroV3() {
         <div className="flex flex-col gap-6">
           {/* Eyebrow */}
           <div className="flex items-center gap-3">
-            <span className="h-px w-8 bg-[#c8922a]" />
-            <span className="text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-[#c8922a]">
+            <span className="h-px w-8 bg-[#e8d800]" />
+            <span className="text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-[#e8d800]">
               Premium Wireless Audio — 2026
             </span>
           </div>
 
           {/* Headline */}
           <div>
-            <h1 className="font-display font-black uppercase leading-[0.9] tracking-tight text-[#0f0102]"
+            <h1 className="font-display font-black uppercase leading-[0.9] tracking-tight text-[#000000]"
               style={{ fontSize: "clamp(3.5rem, 8vw, 7rem)" }}>
               SOUND
               <br />
               YOUR
               <br />
-              <span style={{ color: "#420206" }}>WILD.</span>
+              <span style={{ color: "#000000" }}>WILD.</span>
             </h1>
           </div>
 
           {/* Pinyon */}
-          <p className="font-pinyon text-3xl text-[#c8922a]" style={{ lineHeight: 1.2 }}>
+          <p className="font-pinyon text-3xl text-[#e8d800]" style={{ lineHeight: 1.2 }}>
             Where Sound Becomes Art.
           </p>
 
           {/* Body */}
-          <p className="max-w-sm text-sm leading-relaxed text-[#0f0102]/55">
+          <p className="max-w-sm text-sm leading-relaxed text-[#000000]/55">
             Retro soul. Modern power. Leisure speakers are engineered for those who demand more — from their music, and from their space.
           </p>
 
@@ -100,12 +100,12 @@ export default function HeroV3() {
           <div className="flex flex-wrap items-center gap-4">
             <Link href="/shop"
               className="flex items-center gap-2 rounded-full px-7 py-3 text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-[#faf8fb] transition-all duration-300 hover:shadow-[0_0_28px_rgba(66,2,6,0.45)]"
-              style={{ background: "linear-gradient(135deg,#420206,#6b0508)" }}>
+              style={{ background: "linear-gradient(135deg,#000000,#6b0508)" }}>
               Explore Collection
               <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2.5 9.5L9.5 2.5M9.5 2.5H4M9.5 2.5V8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </Link>
             <Link href="/shop"
-              className="rounded-full px-7 py-3 text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-[#420206] transition-all duration-300 hover:bg-[rgba(66,2,6,0.06)]"
+              className="rounded-full px-7 py-3 text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-[#000000] transition-all duration-300 hover:bg-[rgba(66,2,6,0.06)]"
               style={{ border: "1.5px solid rgba(66,2,6,0.3)" }}>
               View Speakers
             </Link>
@@ -114,10 +114,10 @@ export default function HeroV3() {
           {/* Mini EQ */}
           <div className="flex items-end gap-[3px] pt-2">
             {HERO_EQ.map((b, i) => (
-              <div key={i} className="w-[4px] origin-bottom rounded-t-sm bg-[#420206]/30"
+              <div key={i} className="w-[4px] origin-bottom rounded-t-sm bg-[#000000]/30"
                 style={{ height: `${b.h}px`, animation: `eq-bar ${b.dur}s ease-in-out ${b.del}s infinite alternate` }} />
             ))}
-            <span className="ml-3 self-center text-[0.65rem] uppercase tracking-[0.2em] text-[#0f0102]/25">Live Audio</span>
+            <span className="ml-3 self-center text-[0.65rem] uppercase tracking-[0.2em] text-[#000000]/25">Live Audio</span>
           </div>
         </div>
       </div>

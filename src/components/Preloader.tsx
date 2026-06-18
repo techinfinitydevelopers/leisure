@@ -37,7 +37,7 @@ export default function Preloader() {
     <div
       className="fixed inset-0 z-[9999] flex flex-col items-center justify-center"
       style={{
-        backgroundColor: "#070707",
+        backgroundColor: "#000000",
         opacity: phase === "fade" ? 0 : 1,
         transition: "opacity 0.8s cubic-bezier(0.4,0,0.2,1)",
         pointerEvents: phase === "fade" ? "none" : "all",
@@ -50,7 +50,7 @@ export default function Preloader() {
           width: 480,
           height: 480,
           borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(237,196,132,0.10) 0%, transparent 68%)",
+          background: "radial-gradient(circle, rgba(251,237,43,0.10) 0%, transparent 68%)",
           filter: "blur(32px)",
         }}
       />
@@ -63,7 +63,7 @@ export default function Preloader() {
           style={{
             width: 80 + n * 80,
             height: 80 + n * 80,
-            border: "1px solid rgba(237,196,132,0.08)",
+            border: "1px solid rgba(251,237,43,0.08)",
             animation: `pulse-ring ${1.2 + n * 0.4}s ease-out ${n * 0.3}s infinite`,
           }}
         />
@@ -89,7 +89,7 @@ export default function Preloader() {
             style={{
               width: 4,
               height: `${b.h}px`,
-              background: "linear-gradient(to top, #c8922a 0%, #edc484 60%, #fff5d6 100%)",
+              background: "linear-gradient(to top, #e8d800 0%, #fbed2b 60%, #fff5d6 100%)",
               borderRadius: "2px 2px 0 0",
               transformOrigin: "bottom",
               animation: `eq-bar ${b.dur}s ease-in-out ${b.del}s infinite alternate`,
@@ -106,7 +106,7 @@ export default function Preloader() {
           fontSize: "0.62rem",
           letterSpacing: "0.30em",
           textTransform: "uppercase",
-          color: "rgba(237,196,132,0.40)",
+          color: "rgba(251,237,43,0.40)",
           fontFamily: "var(--font-sf, sans-serif)",
         }}
       >

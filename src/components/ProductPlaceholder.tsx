@@ -27,7 +27,7 @@ export default function ProductPlaceholder({
       {/* Soft gold radial accent */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-1/3 left-1/2 h-[120%] w-[120%] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(237,196,132,0.16),transparent_60%)]"
+        className="pointer-events-none absolute -top-1/3 left-1/2 h-[120%] w-[120%] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(251,237,43,0.16),transparent_60%)]"
       />
 
       {/* Product image */}

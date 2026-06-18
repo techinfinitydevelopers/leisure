@@ -24,7 +24,7 @@ export default function HeroV2() {
       className="relative flex min-h-screen items-center overflow-hidden"
       style={{
         background:
-          "radial-gradient(ellipse 70% 50% at 50% -5%, rgba(237,196,132,0.07) 0%, transparent 65%)",
+          "radial-gradient(ellipse 70% 50% at 50% -5%, rgba(251,237,43,0.07) 0%, transparent 65%)",
       }}
     >
       {/* Subtle grid pattern */}
@@ -32,7 +32,7 @@ export default function HeroV2() {
         className="pointer-events-none absolute inset-0 opacity-[0.025]"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(237,196,132,1) 1px, transparent 1px), linear-gradient(90deg, rgba(237,196,132,1) 1px, transparent 1px)",
+            "linear-gradient(rgba(251,237,43,1) 1px, transparent 1px), linear-gradient(90deg, rgba(251,237,43,1) 1px, transparent 1px)",
           backgroundSize: "80px 80px",
         }}
       />
@@ -59,7 +59,7 @@ export default function HeroV2() {
               <br />
               <span
                 style={{
-                  background: "linear-gradient(90deg, #c8922a 0%, #edc484 40%, #fff8e0 70%, #edc484 100%)",
+                  background: "linear-gradient(90deg, #e8d800 0%, #fbed2b 40%, #fff8e0 70%, #fbed2b 100%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
@@ -83,8 +83,8 @@ export default function HeroV2() {
           {/* CTAs */}
           <div className="flex flex-wrap items-center gap-4">
             <Link href="/shop"
-              className="flex items-center gap-2 rounded-full px-7 py-3 text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-[#070707] transition-all duration-300 hover:shadow-[0_0_28px_rgba(237,196,132,0.5)]"
-              style={{ background: "linear-gradient(135deg,#edc484,#c8922a)" }}>
+              className="flex items-center gap-2 rounded-full px-7 py-3 text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-[#000000] transition-all duration-300 hover:shadow-[0_0_28px_rgba(251,237,43,0.5)]"
+              style={{ background: "linear-gradient(135deg,#fbed2b,#e8d800)" }}>
               Explore Collection
               <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M2.5 9.5L9.5 2.5M9.5 2.5H4M9.5 2.5V8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </Link>
@@ -113,7 +113,7 @@ export default function HeroV2() {
           {/* Glow ring */}
           <div
             className="absolute h-[380px] w-[380px] rounded-full opacity-30 blur-3xl sm:h-[480px] sm:w-[480px]"
-            style={{ background: "radial-gradient(circle, rgba(237,196,132,0.6) 0%, transparent 70%)" }}
+            style={{ background: "radial-gradient(circle, rgba(251,237,43,0.6) 0%, transparent 70%)" }}
           />
 
           {/* Ripple rings */}
@@ -121,7 +121,7 @@ export default function HeroV2() {
             <span key={delay}
               className="absolute h-[300px] w-[300px] rounded-full sm:h-[400px] sm:w-[400px]"
               style={{
-                border: "1px solid rgba(237,196,132,0.18)",
+                border: "1px solid rgba(251,237,43,0.18)",
                 animation: `ripple-ring 3s ease-out ${delay}s infinite`,
               }} />
           ))}
@@ -132,7 +132,7 @@ export default function HeroV2() {
               src="/products/legend.png"
               alt="Leisure LEGEND Speaker"
               fill
-              className="object-contain drop-shadow-[0_0_60px_rgba(237,196,132,0.25)]"
+              className="object-contain drop-shadow-[0_0_60px_rgba(251,237,43,0.25)]"
               priority
             />
           </div>
@@ -142,7 +142,7 @@ export default function HeroV2() {
             {SPECS.map((s) => (
               <div key={s.label}
                 className="flex flex-col rounded-2xl px-4 py-2.5 backdrop-blur-md"
-                style={{ background: "rgba(237,196,132,0.07)", border: "1px solid rgba(237,196,132,0.18)" }}>
+                style={{ background: "rgba(251,237,43,0.07)", border: "1px solid rgba(251,237,43,0.18)" }}>
                 <span className="text-[0.65rem] uppercase tracking-[0.2em] text-gold/70">{s.label}</span>
                 <span className="font-display text-base font-semibold text-white">{s.value}</span>
               </div>

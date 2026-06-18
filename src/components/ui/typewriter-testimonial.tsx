@@ -102,8 +102,8 @@ export const TypewriterTestimonial: React.FC<ComponentProps> = ({ testimonials }
             animate={{
               boxShadow:
                 hoveredIndex === i || hasBeenHovered[i]
-                  ? "0 0 0 3px #edc484, 0 0 18px rgba(237,196,132,0.35)"
-                  : "0 0 0 2px rgba(237,196,132,0.25)",
+                  ? "0 0 0 3px #fbed2b, 0 0 18px rgba(251,237,43,0.35)"
+                  : "0 0 0 2px rgba(251,237,43,0.25)",
             }}
             transition={{ duration: 0.25 }}
           />
@@ -128,8 +128,8 @@ export const TypewriterTestimonial: React.FC<ComponentProps> = ({ testimonials }
                 <div
                   className="relative rounded-2xl px-4 py-4 shadow-2xl"
                   style={{
-                    background: "linear-gradient(135deg,#1a1008 0%,#0f0a04 100%)",
-                    border: "1px solid rgba(237,196,132,0.22)",
+                    background: "linear-gradient(135deg,#0d0d0d 0%,#000000 100%)",
+                    border: "1px solid rgba(251,237,43,0.22)",
                   }}
                 >
                   {/* Gold accent top line */}
@@ -156,9 +156,9 @@ export const TypewriterTestimonial: React.FC<ComponentProps> = ({ testimonials }
 
                   {/* Tail dots */}
                   <div className="absolute -bottom-[18px] left-1/2 flex -translate-x-1/2 flex-col items-center gap-[3px]">
-                    <div className="h-2.5 w-2.5 rounded-full bg-[#1a1008] shadow" style={{ border: "1px solid rgba(237,196,132,0.2)" }} />
-                    <div className="h-1.5 w-1.5 rounded-full bg-[#1a1008] shadow" style={{ border: "1px solid rgba(237,196,132,0.15)" }} />
-                    <div className="h-1 w-1 rounded-full bg-[#1a1008]" />
+                    <div className="h-2.5 w-2.5 rounded-full bg-[#0d0d0d] shadow" style={{ border: "1px solid rgba(251,237,43,0.2)" }} />
+                    <div className="h-1.5 w-1.5 rounded-full bg-[#0d0d0d] shadow" style={{ border: "1px solid rgba(251,237,43,0.15)" }} />
+                    <div className="h-1 w-1 rounded-full bg-[#0d0d0d]" />
                   </div>
                 </div>
               </motion.div>

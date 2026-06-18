@@ -118,13 +118,13 @@ export default function Footer() {
                 { label: "Instagram", icon: <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4.5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg> },
                 { label: "Facebook",  icon: <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg> },
                 { label: "LinkedIn",  icon: <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg> },
-                { label: "YouTube",   icon: <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#0f0102"/></svg> },
+                { label: "YouTube",   icon: <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#000000"/></svg> },
               ].map(({ label, icon }) => (
                 <a
                   key={label}
                   href="#"
                   aria-label={label}
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-offwhite/55 transition-all duration-300 hover:border-gold hover:text-gold hover:shadow-[0_0_12px_rgba(237,196,132,0.3)]"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-offwhite/55 transition-all duration-300 hover:border-gold hover:text-gold hover:shadow-[0_0_12px_rgba(251,237,43,0.3)]"
                 >
                   {icon}
                 </a>
@@ -235,7 +235,7 @@ export default function Footer() {
             textAnchor="middle"
             fontFamily="'SF Pro Display','Helvetica Neue',Arial,sans-serif"
             fill="none"
-            stroke="rgba(237,196,132,0.12)"
+            stroke="rgba(251,237,43,0.12)"
             strokeWidth="1"
             letterSpacing="-3"
           >
@@ -251,7 +251,7 @@ export default function Footer() {
                 y={180 - b.h}
                 width={10}
                 height={b.h}
-                fill="#edc484"
+                fill="#fbed2b"
                 style={{
                   transformBox: "fill-box" as React.CSSProperties["transformBox"],
                   transformOrigin: "50% 100%",

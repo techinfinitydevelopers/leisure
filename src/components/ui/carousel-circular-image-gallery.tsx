@@ -155,7 +155,7 @@ function Tabs({ items, opened, onSelect }: TabsProps) {
               cx={cx} cy={cy}
               r={R + 2}
               fill="transparent"
-              stroke={active ? "rgba(237,196,132,1)" : "rgba(237,196,132,0.45)"}
+              stroke={active ? "rgba(251,237,43,1)" : "rgba(251,237,43,0.45)"}
               strokeWidth={active ? 2 : 1.5}
               style={{ cursor: "pointer" }}
               onClick={() => onSelect(i)}
@@ -269,8 +269,8 @@ export function ImageGallery({ items }: { items: GalleryItem[] }) {
           {current.href && (
             <Link
               href={current.href}
-              className="mt-6 inline-flex items-center gap-2 rounded-full px-7 py-3 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-[#070707] transition-all duration-300 hover:shadow-[0_0_30px_rgba(237,196,132,0.4)]"
-              style={{ background: "linear-gradient(135deg,#edc484,#c8922a)" }}
+              className="mt-6 inline-flex items-center gap-2 rounded-full px-7 py-3 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-[#000000] transition-all duration-300 hover:shadow-[0_0_30px_rgba(237,196,132,0.4)]"
+              style={{ background: "linear-gradient(135deg,#fbed2b,#e8d800)" }}
             >
               View Speaker
               <svg width="11" height="11" viewBox="0 0 12 12" fill="none">

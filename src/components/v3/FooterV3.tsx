@@ -36,17 +36,17 @@ const WAVE_BARS = Array.from({ length: 100 }, (_, i) => ({
 export default function FooterV3() {
   return (
     /* Dark velvet footer contrasts the light cream body */
-    <footer className="relative overflow-hidden bg-[#1a0203]">
+    <footer className="relative overflow-hidden bg-[#0d0d0d]">
 
       {/* EQ strip — gold bars */}
       <div className="flex items-end justify-center gap-[3px] px-4 pt-10 pb-0">
         {EQ_BARS.map((b, i) => (
-          <div key={i} className="w-[5px] origin-bottom rounded-t-sm bg-[#c8922a]/70"
+          <div key={i} className="w-[5px] origin-bottom rounded-t-sm bg-[#e8d800]/70"
             style={{ height: `${b.h}px`, animation: `eq-bar ${b.dur}s ease-in-out ${b.del}s infinite alternate` }} />
         ))}
       </div>
 
-      <div className="mt-4 h-px w-full bg-gradient-to-r from-transparent via-[#c8922a]/30 to-transparent" />
+      <div className="mt-4 h-px w-full bg-gradient-to-r from-transparent via-[#e8d800]/30 to-transparent" />
 
       {/* Grid */}
       <div className="mx-auto max-w-7xl px-5 py-14 sm:px-8">
@@ -56,11 +56,11 @@ export default function FooterV3() {
           <div className="flex flex-col gap-5">
             <div className="relative flex h-16 w-16 items-center justify-center">
               {[0, 0.8, 1.6].map((delay) => (
-                <span key={delay} className="absolute inset-0 rounded-full border border-[rgba(200,146,42,0.25)]"
+                <span key={delay} className="absolute inset-0 rounded-full border border-[rgba(232,216,0,0.25)]"
                   style={{ animation: `ripple-ring 2.4s ease-out ${delay}s infinite` }} />
               ))}
-              <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full border border-[rgba(200,146,42,0.35)] bg-[rgba(200,146,42,0.08)]">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style={{ color: "#c8922a" }}>
+              <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full border border-[rgba(232,216,0,0.35)] bg-[rgba(232,216,0,0.08)]">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style={{ color: "#e8d800" }}>
                   <path d="M3 9v6h4l5 5V4L7 9H3z" fill="currentColor" opacity="0.9" />
                   <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z" fill="currentColor" opacity="0.7" />
                   <path d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" fill="currentColor" opacity="0.4" />
@@ -69,7 +69,7 @@ export default function FooterV3() {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-[#c8922a]" />
+              <span className="h-2 w-2 rounded-full bg-[#e8d800]" />
               <Image src="/brand/leisure-logo.png" alt="Leisure" width={130} height={40} className="h-7 w-auto brightness-0 invert" />
             </div>
 
@@ -84,7 +84,7 @@ export default function FooterV3() {
                 { label: "LinkedIn", d: "M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z" },
               ].map(({ label }) => (
                 <a key={label} href="#" aria-label={label}
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-[rgba(200,146,42,0.2)] text-white/45 transition-all duration-300 hover:border-[#c8922a] hover:text-[#c8922a]">
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-[rgba(232,216,0,0.2)] text-white/45 transition-all duration-300 hover:border-[#e8d800] hover:text-[#e8d800]">
                   <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24">
                     <circle cx="12" cy="12" r="4" />
                   </svg>
@@ -95,12 +95,12 @@ export default function FooterV3() {
 
           {/* Speakers */}
           <div>
-            <h3 className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-[rgba(200,146,42,0.55)]">Speakers</h3>
+            <h3 className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-[rgba(232,216,0,0.55)]">Speakers</h3>
             <ul className="mt-5 space-y-3">
               {products.map((p) => (
                 <li key={p.slug}>
-                  <Link href={`/product/${p.slug}`} className="group flex items-center gap-2 text-sm font-medium text-white/70 transition-colors hover:text-[#c8922a]">
-                    <span className="h-px w-3 bg-white/15 transition-all duration-300 group-hover:w-5 group-hover:bg-[#c8922a]" />
+                  <Link href={`/product/${p.slug}`} className="group flex items-center gap-2 text-sm font-medium text-white/70 transition-colors hover:text-[#e8d800]">
+                    <span className="h-px w-3 bg-white/15 transition-all duration-300 group-hover:w-5 group-hover:bg-[#e8d800]" />
                     {p.model}
                   </Link>
                 </li>
@@ -110,12 +110,12 @@ export default function FooterV3() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-[rgba(200,146,42,0.55)]">Quick Link</h3>
+            <h3 className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-[rgba(232,216,0,0.55)]">Quick Link</h3>
             <ul className="mt-5 space-y-3">
               {quickLinks.map((l) => (
                 <li key={l.label}>
-                  <Link href={l.href} className="group flex items-center gap-2 text-sm font-medium text-white/70 transition-colors hover:text-[#c8922a]">
-                    <span className="h-px w-3 bg-white/15 transition-all duration-300 group-hover:w-5 group-hover:bg-[#c8922a]" />
+                  <Link href={l.href} className="group flex items-center gap-2 text-sm font-medium text-white/70 transition-colors hover:text-[#e8d800]">
+                    <span className="h-px w-3 bg-white/15 transition-all duration-300 group-hover:w-5 group-hover:bg-[#e8d800]" />
                     {l.label}
                   </Link>
                 </li>
@@ -125,17 +125,17 @@ export default function FooterV3() {
 
           {/* Contact */}
           <div>
-            <h3 className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-[rgba(200,146,42,0.55)]">Contact Us</h3>
+            <h3 className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-[rgba(232,216,0,0.55)]">Contact Us</h3>
             <div className="mt-5 space-y-3 text-sm text-white/60">
               <p className="font-medium text-white">Andheri (E), Mumbai 400059</p>
               <p>support@leisureaudio.in</p>
               <p>+91 98200 00000</p>
             </div>
             <div className="mt-6">
-              <p className="mb-2 text-[0.7rem] uppercase tracking-[0.18em] text-[rgba(200,146,42,0.4)]">Stay in the loop</p>
-              <form className="flex items-center gap-2 border-b border-[rgba(200,146,42,0.2)] pb-2">
+              <p className="mb-2 text-[0.7rem] uppercase tracking-[0.18em] text-[rgba(232,216,0,0.4)]">Stay in the loop</p>
+              <form className="flex items-center gap-2 border-b border-[rgba(232,216,0,0.2)] pb-2">
                 <input type="email" placeholder="your@email.com" className="w-full bg-transparent text-xs text-white placeholder:text-white/25 focus:outline-none" />
-                <button type="button" aria-label="Subscribe" className="shrink-0 text-[#c8922a] transition-transform hover:translate-x-1">→</button>
+                <button type="button" aria-label="Subscribe" className="shrink-0 text-[#e8d800] transition-transform hover:translate-x-1">→</button>
               </form>
             </div>
           </div>
@@ -154,10 +154,10 @@ export default function FooterV3() {
           </defs>
           <text x="600" y="158" fontSize="172" fontWeight="900" textAnchor="middle"
             fontFamily="'SF Pro Display','Helvetica Neue',Arial,sans-serif"
-            fill="none" stroke="rgba(200,146,42,0.12)" strokeWidth="1" letterSpacing="-3">LEISURE</text>
+            fill="none" stroke="rgba(232,216,0,0.12)" strokeWidth="1" letterSpacing="-3">LEISURE</text>
           <g clipPath="url(#leisure-clip-v3)">
             {WAVE_BARS.map((b, i) => (
-              <rect key={i} x={i * 12} y={0} width={11} height={180} fill="#c8922a"
+              <rect key={i} x={i * 12} y={0} width={11} height={180} fill="#e8d800"
                 style={{
                   transformBox: "fill-box" as React.CSSProperties["transformBox"],
                   transformOrigin: "center",

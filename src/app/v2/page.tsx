@@ -16,7 +16,7 @@ export default function HomeV2() {
     <div
       id="v2-scroll"
       className="fixed inset-0 z-[200] overflow-y-auto"
-      style={{ backgroundColor: "#070707" }}
+      style={{ backgroundColor: "#000000" }}
     >
       <NavV2 />
       <main>
@@ -29,7 +29,7 @@ export default function HomeV2() {
         {/* Stats strip */}
         <div
           className="py-10"
-          style={{ borderTop: "1px solid rgba(237,196,132,0.08)", borderBottom: "1px solid rgba(237,196,132,0.08)" }}
+          style={{ borderTop: "1px solid rgba(251,237,43,0.08)", borderBottom: "1px solid rgba(251,237,43,0.08)" }}
         >
           <div className="mx-auto grid max-w-5xl grid-cols-2 gap-8 px-5 sm:px-8 lg:grid-cols-4">
             {[
@@ -42,7 +42,7 @@ export default function HomeV2() {
                 <span
                   className="font-display text-3xl font-black sm:text-4xl"
                   style={{
-                    background: "linear-gradient(135deg,#edc484,#c8922a)",
+                    background: "linear-gradient(135deg,#fbed2b,#e8d800)",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                     backgroundClip: "text",
@@ -58,7 +58,7 @@ export default function HomeV2() {
 
         <ProductGridV2 />
 
-        <div style={{ borderTop: "1px solid rgba(237,196,132,0.08)" }}>
+        <div style={{ borderTop: "1px solid rgba(251,237,43,0.08)" }}>
           <ProductShowcase />
         </div>
         </div>{/* /v2-products */}
