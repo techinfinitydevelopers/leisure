@@ -1,106 +1,109 @@
 @import "tailwindcss";
 
-/* Brand palette — Electric Yellow × Black */
+/* ── Brand palette: Yellow #fbed2b × Black #000000 ── */
+/* Grays are neutral utility tones only — not brand colors */
 :root {
-  --velvet-noir: #000000;
-  --desert-gold: #fbed2b;
-  --off-white: #f5f5f0;
-  --near-black: #0d0d0d;
-  --deep-black: #000000;
+  --yellow:     #fbed2b;
+  --yellow-dim: #e8d800;      /* slightly darker yellow for gradients */
+  --black:      #000000;
+  --white:      #ffffff;
 
-  --velvet-deep: #111111;
-  --velvet-bright: #1a1a1a;
+  /* Gray scale (neutral, not brand) */
+  --gray-900:   #0d0d0d;
+  --gray-800:   #141414;
+  --gray-700:   #1f1f1f;
+  --gray-600:   #2a2a2a;
+  --gray-500:   #555555;
+  --gray-400:   #888888;
+  --gray-300:   #aaaaaa;
+  --gray-100:   #e5e5e5;
 
-  --background: var(--velvet-noir);
-  --foreground: var(--off-white);
+  /* Aliases for Tailwind tokens */
+  --velvet-noir:   var(--black);
+  --desert-gold:   var(--yellow);
+  --off-white:     var(--white);
+  --near-black:    var(--gray-900);
+  --deep-black:    var(--black);
+  --velvet-deep:   var(--gray-800);
+  --velvet-bright: var(--gray-700);
+
+  --background: var(--black);
+  --foreground: var(--white);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
-  --color-velvet: var(--velvet-noir);
-  --color-gold: var(--desert-gold);
-  --color-offwhite: var(--off-white);
+  --color-velvet:    var(--velvet-noir);
+  --color-gold:      var(--desert-gold);
+  --color-offwhite:  var(--off-white);
   --color-nearblack: var(--near-black);
   --color-deepblack: var(--deep-black);
 
-  --font-sans: var(--font-roboto);
+  --font-sans:   var(--font-roboto);
   --font-display: var(--font-sf);
-  --font-script: var(--font-cormorant);
-  --font-pinyon: var(--font-pinyon);
+  --font-script:  var(--font-cormorant);
+  --font-pinyon:  var(--font-pinyon);
 }
 
-/* Lenis manages smoothing; native CSS smooth scroll would fight it. */
-html.lenis,
-html.lenis body {
-  height: auto;
-}
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
+/* ── Lenis ── */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
 
-/* Hide scrollbar for a clean, full-screen cinematic feel (still scrollable). */
-html {
-  scrollbar-width: none;
-}
-html::-webkit-scrollbar {
-  display: none;
-}
+/* ── Hide scrollbar ── */
+html { scrollbar-width: none; }
+html::-webkit-scrollbar { display: none; }
 
+/* ── Body ── */
 body {
-  color: var(--foreground);
+  color: var(--white);
   font-family: var(--font-roboto), Arial, Helvetica, sans-serif;
-  background-color: #000000;
+  background-color: var(--black);
+  /* Subtle yellow bloom top-right, cool gray shadow bottom-left */
   background-image:
-    radial-gradient(
-      ellipse 70% 50% at 75% 0%,
-      rgba(251, 237, 43, 0.07),
-      transparent 60%
-    ),
-    radial-gradient(
-      ellipse 60% 50% at 5% 95%,
-      rgba(251, 237, 43, 0.05),
-      transparent 65%
-    );
+    radial-gradient(ellipse 60% 45% at 80% 0%,   rgba(251,237,43,0.08), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 0%  100%,  rgba(255,255,255,0.03), transparent 60%);
   background-attachment: fixed;
 }
 
-/* Glassmorphism utility */
+/* ── Glass ── */
 .glass {
-  background: rgba(245, 245, 240, 0.04);
-  border: 1px solid rgba(251, 237, 43, 0.12);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(251,237,43,0.15);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
 
-.gold-glow {
-  box-shadow: 0 0 40px rgba(251, 237, 43, 0.2);
-}
+/* ── Glow helper ── */
+.gold-glow { box-shadow: 0 0 40px rgba(251,237,43,0.22); }
 
-.text-balance {
-  text-wrap: balance;
-}
+.text-balance { text-wrap: balance; }
 
-/* Buttons */
+/* ── Gradient helpers (reusable in JSX via className) ── */
+.grad-yellow   { background: linear-gradient(135deg, #fbed2b 0%, #e8d800 100%); }
+.grad-gray     { background: linear-gradient(135deg, #1f1f1f 0%, #0d0d0d 100%); }
+.grad-y-to-b   { background: linear-gradient(180deg, #fbed2b 0%, #000000 100%); }
+
+/* ── Buttons ── */
 .btn-gold {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  background: var(--desert-gold);
-  color: #000000;
+  background: var(--yellow);
+  color: var(--black);
   padding: 0.75rem 1.75rem;
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   transition: all 0.3s ease;
-  box-shadow: 0 0 30px rgba(251, 237, 43, 0.25);
+  box-shadow: 0 0 28px rgba(251,237,43,0.28);
 }
 .btn-gold:hover {
-  filter: brightness(1.08);
-  box-shadow: 0 0 50px rgba(251, 237, 43, 0.5);
+  filter: brightness(1.06);
+  box-shadow: 0 0 50px rgba(251,237,43,0.52);
 }
 
 .btn-outline {
@@ -108,8 +111,8 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  border: 1px solid rgba(245, 245, 240, 0.3);
-  color: var(--off-white);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: var(--white);
   padding: 0.75rem 1.75rem;
   font-size: 0.8rem;
   font-weight: 600;
@@ -118,8 +121,8 @@ body {
   transition: all 0.3s ease;
 }
 .btn-outline:hover {
-  border-color: var(--desert-gold);
-  color: var(--desert-gold);
+  border-color: var(--yellow);
+  color: var(--yellow);
 }
 
 /* ── Footer animations ── */
