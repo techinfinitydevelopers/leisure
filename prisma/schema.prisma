@@ -1,0 +1,31 @@
+// Prisma schema for the leisure e-commerce app
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Rich product model backing the dashboard, /shop listing, and /product/[slug].
+// Structured lists are stored as JSON strings (SQLite-safe).
+model Product {
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique
+  model       String
+  tagline     String   @default("")
+  description String   @default("")
+  price       Int      @default(0) // INR rupees
+  mrp         Int      @default(0) // INR rupees
+  stock       Int      @default(0)
+  imageUrl    String   @default("")
+  colors      String   @default("[]") // JSON: { name, hex }[]
+  specs       String   @default("[]") // JSON: { label, value }[]
+  inBox       String   @default("[]") // JSON: string[]
+  technical   String   @default("[]") // JSON: { label, value }[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

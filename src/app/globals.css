@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+/* Brand palette v2 — warmer Velvet Noir */
+:root {
+  /* Brand palette — Velvet Noir */
+  --velvet-noir: #420206;
+  --desert-gold: #edc484;
+  --off-white: #faf8fb;
+  --near-black: #1a0203;
+  --deep-black: #0f0102;
+
+  /* Deeper tones derived from Velvet Noir (warm burgundy, not black) */
+  --velvet-deep: #2c0204;
+  --velvet-bright: #57080d;
+
+  --background: var(--velvet-noir);
+  --foreground: var(--off-white);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-velvet: var(--velvet-noir);
+  --color-gold: var(--desert-gold);
+  --color-offwhite: var(--off-white);
+  --color-nearblack: var(--near-black);
+  --color-deepblack: var(--deep-black);
+
+  --font-sans: var(--font-roboto);
+  --font-display: var(--font-sf);
+  --font-script: var(--font-cormorant);
+  --font-pinyon: var(--font-pinyon);
+}
+
+/* Lenis manages smoothing; native CSS smooth scroll would fight it. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+/* Hide scrollbar for a clean, full-screen cinematic feel (still scrollable). */
+html {
+  scrollbar-width: none;
+}
+html::-webkit-scrollbar {
+  display: none;
+}
+
+body {
+  color: var(--foreground);
+  font-family: var(--font-roboto), Arial, Helvetica, sans-serif;
+  background-color: var(--velvet-noir);
+  background-image:
+    radial-gradient(
+      ellipse 90% 70% at 75% 0%,
+      rgba(120, 40, 24, 0.5),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 80% 70% at 5% 95%,
+      rgba(87, 8, 13, 0.55),
+      transparent 65%
+    ),
+    linear-gradient(180deg, var(--velvet-bright), var(--velvet-deep));
+  background-attachment: fixed;
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: rgba(250, 248, 251, 0.05);
+  border: 1px solid rgba(250, 248, 251, 0.1);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.gold-glow {
+  box-shadow: 0 0 40px rgba(237, 196, 132, 0.18);
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Buttons */
+.btn-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--desert-gold);
+  color: var(--velvet-noir);
+  padding: 0.75rem 1.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 30px rgba(237, 196, 132, 0.25);
+}
+.btn-gold:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 0 50px rgba(237, 196, 132, 0.45);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid rgba(250, 248, 251, 0.3);
+  color: var(--off-white);
+  padding: 0.75rem 1.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+.btn-outline:hover {
+  border-color: var(--desert-gold);
+  color: var(--desert-gold);
+}
+
+/* ── Footer animations ── */
+@keyframes eq-bar {
+  0%   { transform: scaleY(0.12); }
+  100% { transform: scaleY(1); }
+}
+@keyframes ripple-ring {
+  0%   { transform: scale(1);   opacity: 0.55; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+@keyframes shimmer-sweep {
+  0%   { background-position: -250% center; }
+  100% { background-position: 250% center; }
+}
+@keyframes waveform-bar {
+  0%   { transform: scaleY(0.22); }
+  100% { transform: scaleY(1); }
+}
