@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getProductBySlugDB } from "@/lib/db-products";
-import ProductPlaceholder from "@/components/ProductPlaceholder";
+import { getProduct } from "@/lib/products";
+import ProductGallery from "@/components/ProductGallery";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +43,9 @@ export default async function ProductPage({
     notFound();
   }
 
+  // Static product data has color+image metadata; DB product has pricing/specs
+  const staticProduct = getProduct(slug);
+
   const savePercent = Math.round(
     ((product.mrp - product.price) / product.mrp) * 100,
   );
@@ -56,15 +60,17 @@ export default async function ProductPage({
       </Link>
 
       {/* Hero */}
-      <section className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-stretch">
-        <div className="min-h-[420px] lg:min-h-[560px]">
-          <ProductPlaceholder
+      <section className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-start">
+        {/* Gallery — color switcher + thumbnails + main image */}
+        {staticProduct ? (
+          <ProductGallery
+            slug={slug}
             model={product.model}
-            slug={product.slug}
-            imageUrl={product.imageUrl}
-            priority
+            colors={staticProduct.colors}
           />
-        </div>
+        ) : (
+          <div className="min-h-[420px] rounded-3xl border border-white/10 bg-[#0d0d0d] lg:min-h-[560px]" />
+        )}
 
         <div className="flex flex-col justify-center">
           <h1 className="font-display text-5xl font-bold tracking-tight text-offwhite sm:text-6xl">
@@ -87,30 +93,6 @@ export default async function ProductPage({
                 Save {savePercent}%
               </span>
             )}
-          </div>
-
-          {/* Colors */}
-          <div className="mt-8">
-            <p className="font-sans text-xs uppercase tracking-[0.2em] text-offwhite/50">
-              Colors
-            </p>
-            <div className="mt-3 flex flex-wrap gap-4">
-              {product.colors.map((color) => (
-                <div
-                  key={color.name}
-                  className="group flex flex-col items-center gap-2"
-                >
-                  <span
-                    className="h-9 w-9 rounded-full ring-1 ring-offwhite/30 ring-offset-2 ring-offset-transparent transition group-hover:ring-gold"
-                    style={{ backgroundColor: color.hex }}
-                    aria-label={color.name}
-                  />
-                  <span className="font-sans text-[0.7rem] text-offwhite/50 transition group-hover:text-gold">
-                    {color.name}
-                  </span>
-                </div>
-              ))}
-            </div>
           </div>
 
           {/* CTAs */}
