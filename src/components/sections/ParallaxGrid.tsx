@@ -1,12 +1,13 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { getAllProducts } from "@/lib/products";
+import { getAllProducts, getProductImages } from "@/lib/products";
+import { useCart } from "@/context/CartContext";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -25,6 +26,19 @@ const STICKY_STEP = 12;
 
 export default function ParallaxGrid() {
   const sectionRef = useRef<HTMLElement>(null);
+  const { addItem } = useCart();
+  const [productIds, setProductIds] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    fetch("/api/products")
+      .then((r) => r.json())
+      .then((data: { id: number; slug: string }[]) => {
+        const map: Record<string, number> = {};
+        for (const p of data) map[p.slug] = p.id;
+        setProductIds(map);
+      })
+      .catch(() => {});
+  }, []);
 
   useGSAP(
     () => {
@@ -229,7 +243,22 @@ export default function ParallaxGrid() {
                       >
                         View Speaker
                       </Link>
-                      <button type="button" className="btn-outline">
+                      <button
+                        type="button"
+                        className="btn-outline"
+                        onClick={() => {
+                          const firstColor = product.colors[0];
+                          addItem({
+                            productId: productIds[product.slug] ?? 0,
+                            slug: product.slug,
+                            model: product.model,
+                            price: product.price,
+                            mrp: product.mrp,
+                            color: firstColor.name,
+                            image: getProductImages(product.slug, firstColor.folderSlug, 1)[0],
+                          });
+                        }}
+                      >
                         Add to Cart
                       </button>
                     </div>

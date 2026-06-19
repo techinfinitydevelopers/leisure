@@ -266,7 +266,21 @@ export default function Footer() {
       {/* ── Bottom bar ── */}
       <div className="border-t border-white/8 px-5 py-5 sm:px-8">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 text-xs text-offwhite/35 sm:flex-row">
-          <p>© 2026 Leisure. All rights reserved.</p>
+          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 sm:justify-start">
+            <p>© 2026 Leisure. All rights reserved.</p>
+            <span className="opacity-30">·</span>
+            <p>
+              Designed &amp; Developed by{" "}
+              <a
+                href="http://techinfinity.io/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-gold/60 transition-colors hover:text-gold"
+              >
+                TechInfinity
+              </a>
+            </p>
+          </div>
           <div className="flex items-center gap-1">
             <Link href="/" className="transition-colors hover:text-offwhite/65">Privacy Policy</Link>
             <span className="mx-1 opacity-50">·</span>

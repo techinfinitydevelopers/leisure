@@ -279,7 +279,7 @@ export default function V4Page() {
     <div
       id="v4-scroll"
       ref={scrollRef}
-      className="fixed inset-0 overflow-y-auto"
+      className="fixed inset-0 z-[100] overflow-y-auto"
       style={{
         backgroundColor: "#000000",
         fontFamily: "'SF Pro Display', system-ui, -apple-system, sans-serif",

@@ -1,15 +1,8 @@
-import Link from "next/link";
 import type { Metadata } from "next";
 import { getAllProductsDB } from "@/lib/db-products";
-import ProductPlaceholder from "@/components/ProductPlaceholder";
+import ShopProductCard from "@/components/ShopProductCard";
 
 export const dynamic = "force-dynamic";
-
-const inr = new Intl.NumberFormat("en-IN", {
-  style: "currency",
-  currency: "INR",
-  maximumFractionDigits: 0,
-});
 
 export const metadata: Metadata = {
   title: "The Collection — Leisure",
@@ -36,56 +29,17 @@ export default async function Shop() {
           const savePercent = Math.round(
             ((product.mrp - product.price) / product.mrp) * 100,
           );
-
           return (
-            <Link
+            <ShopProductCard
               key={product.slug}
-              href={`/product/${product.slug}`}
-              className="glass group flex flex-col overflow-hidden rounded-3xl p-5 transition duration-300 hover:-translate-y-2 hover:border-gold/40 hover:gold-glow"
-            >
-              <div className="h-56">
-                <ProductPlaceholder
-                  model={product.model}
-                  slug={product.slug}
-                  imageUrl={product.imageUrl}
-                />
-              </div>
-
-              <div className="mt-5 flex flex-1 flex-col">
-                <h2 className="font-display text-2xl font-bold text-offwhite">
-                  {product.model}
-                </h2>
-                <p className="font-pinyon mt-1 text-2xl text-gold">
-                  {product.tagline}
-                </p>
-
-                <div className="mt-4 flex items-end gap-3">
-                  <span className="font-display text-2xl font-bold text-gold">
-                    {inr.format(product.price)}
-                  </span>
-                  <span className="font-sans text-sm text-offwhite/40 line-through">
-                    {inr.format(product.mrp)}
-                  </span>
-                  {savePercent > 0 && (
-                    <span className="ml-auto font-sans text-xs font-semibold uppercase tracking-wider text-gold">
-                      −{savePercent}%
-                    </span>
-                  )}
-                </div>
-
-                {/* Color dots */}
-                <div className="mt-5 flex gap-2">
-                  {product.colors.map((color) => (
-                    <span
-                      key={color.name}
-                      className="h-5 w-5 rounded-full ring-1 ring-offwhite/30"
-                      style={{ backgroundColor: color.hex }}
-                      title={color.name}
-                    />
-                  ))}
-                </div>
-              </div>
-            </Link>
+              slug={product.slug}
+              model={product.model}
+              tagline={product.tagline}
+              price={product.price}
+              mrp={product.mrp}
+              savePercent={savePercent}
+              fallbackImageUrl={product.imageUrl}
+            />
           );
         })}
       </section>

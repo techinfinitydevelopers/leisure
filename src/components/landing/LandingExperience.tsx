@@ -8,6 +8,7 @@ import Lenis from "lenis";
 import ProductShowcase from "@/components/sections/ProductShowcase";
 import ParallaxGrid from "@/components/sections/ParallaxGrid";
 import TestimonialSection from "@/components/sections/TestimonialSection";
+import MarqueeBand from "@/components/sections/MarqueeBand";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -170,8 +171,10 @@ export default function LandingExperience() {
         </div>
       </div>
 
-      {/* Section 2 — branded product showcase (seamless from the video's
-          black fade-out). */}
+      {/* Marquee band — visual bridge after the video's black fade-out */}
+      <MarqueeBand />
+
+      {/* Section 2 — branded product showcase */}
       <section id="section-2" className="relative w-full">
         <ParallaxGrid />
         <ProductShowcase />

@@ -32,7 +32,7 @@ export default function ProductGallery({ slug, model, colors, activeColorIdx: co
 
   return (
     <div className="flex flex-col gap-4">
-      {/* ── Main image ── */}
+      {/* Main image */}
       <div
         className="relative isolate overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#141414] via-[#0d0d0d] to-[#000] gold-glow"
         style={{ height: "480px" }}
@@ -64,7 +64,7 @@ export default function ProductGallery({ slug, model, colors, activeColorIdx: co
         </div>
       </div>
 
-      {/* ── Thumbnails ── */}
+      {/* Thumbnails */}
       <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
         {images.map((src, i) => (
           <button
@@ -80,7 +80,7 @@ export default function ProductGallery({ slug, model, colors, activeColorIdx: co
         ))}
       </div>
 
-      {/* ── Color swatches (only shown in standalone mode, not when controlled by parent) ── */}
+      {/* Color swatches - only shown in standalone mode, not when controlled by parent */}
       {!onColorChange && <div className="flex flex-wrap items-center gap-3 pt-1">
         <span className="text-[0.7rem] uppercase tracking-[0.18em] text-white/40">Color</span>
         {colors.map((color, i) => (

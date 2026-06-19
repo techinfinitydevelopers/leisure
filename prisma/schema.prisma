@@ -56,3 +56,38 @@ model OrderItem {
   order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product   Product @relation(fields: [productId], references: [id])
 }
+
+model Coupon {
+  id          Int       @id @default(autoincrement())
+  code        String    @unique
+  type        String    @default("percent") // "percent" | "flat"
+  value       Int                           // percent (10=10%) or flat (500=₹500)
+  minOrder    Int       @default(0)
+  maxDiscount Int?                          // cap for percent type
+  usageLimit  Int?                          // null = unlimited
+  usedCount   Int       @default(0)
+  active      Boolean   @default(true)
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+model ShippingZone {
+  id        Int      @id @default(autoincrement())
+  name      String
+  states    String   @default("[]")  // JSON: string[]
+  rate      Int      @default(0)     // INR shipping cost
+  freeAbove Int?                     // free shipping above this amount
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model PaymentSetting {
+  id        Int      @id @default(autoincrement())
+  provider  String   @unique  // "razorpay" | "stripe" | "cod" | "upi"
+  label     String   @default("")
+  keyId     String   @default("")
+  keySecret String   @default("")
+  webhookSecret String @default("")
+  active    Boolean  @default(true)
+  updatedAt DateTime @updatedAt
+}
