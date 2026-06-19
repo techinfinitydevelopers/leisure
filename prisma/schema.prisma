@@ -13,19 +13,46 @@ datasource db {
 // Rich product model backing the dashboard, /shop listing, and /product/[slug].
 // Structured lists are stored as JSON strings (SQLite-safe).
 model Product {
-  id          Int      @id @default(autoincrement())
-  slug        String   @unique
+  id          Int         @id @default(autoincrement())
+  slug        String      @unique
   model       String
-  tagline     String   @default("")
-  description String   @default("")
-  price       Int      @default(0) // INR rupees
-  mrp         Int      @default(0) // INR rupees
-  stock       Int      @default(0)
-  imageUrl    String   @default("")
-  colors      String   @default("[]") // JSON: { name, hex }[]
-  specs       String   @default("[]") // JSON: { label, value }[]
-  inBox       String   @default("[]") // JSON: string[]
-  technical   String   @default("[]") // JSON: { label, value }[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  tagline     String      @default("")
+  description String      @default("")
+  price       Int         @default(0)
+  mrp         Int         @default(0)
+  stock       Int         @default(0)
+  imageUrl    String      @default("")
+  colors      String      @default("[]")
+  specs       String      @default("[]")
+  inBox       String      @default("[]")
+  technical   String      @default("[]")
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  orderItems  OrderItem[]
+}
+
+model Order {
+  id         Int         @id @default(autoincrement())
+  name       String
+  email      String
+  phone      String
+  address    String
+  city       String
+  pincode    String
+  status     String      @default("pending")
+  total      Int
+  items      OrderItem[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  color     String  @default("")
+  qty       Int     @default(1)
+  price     Int
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id])
 }

@@ -5,6 +5,8 @@ import "./globals.css";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import Preloader from "@/components/Preloader";
+import CartDrawer from "@/components/CartDrawer";
+import { CartProvider } from "@/context/CartContext";
 
 // SF Pro Display — headings / UI (Apple-modern)
 const sfpro = localFont({
@@ -57,10 +59,13 @@ export default function RootLayout({
       className={`${roboto.variable} ${sfpro.variable} ${cormorant.variable} ${pinyon.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <Preloader />
-        <Nav />
-        {children}
-        <Footer />
+        <CartProvider>
+          <Preloader />
+          <Nav />
+          <CartDrawer />
+          {children}
+          <Footer />
+        </CartProvider>
       </body>
     </html>
   );

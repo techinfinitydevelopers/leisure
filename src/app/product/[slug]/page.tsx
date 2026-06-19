@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getProductBySlugDB } from "@/lib/db-products";
 import { getProduct } from "@/lib/products";
-import ProductGallery from "@/components/ProductGallery";
+import ProductActions from "@/components/ProductActions";
 
 export const dynamic = "force-dynamic";
 
@@ -61,11 +61,14 @@ export default async function ProductPage({
 
       {/* Hero */}
       <section className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-start">
-        {/* Gallery — color switcher + thumbnails + main image */}
+        {/* Gallery + color switcher + action buttons (client component) */}
         {staticProduct ? (
-          <ProductGallery
+          <ProductActions
+            productId={product.id}
             slug={slug}
             model={product.model}
+            price={product.price}
+            mrp={product.mrp}
             colors={staticProduct.colors}
           />
         ) : (
@@ -93,16 +96,6 @@ export default async function ProductPage({
                 Save {savePercent}%
               </span>
             )}
-          </div>
-
-          {/* CTAs */}
-          <div className="mt-10 flex flex-wrap gap-4">
-            <button type="button" className="btn-gold">
-              Buy Now
-            </button>
-            <button type="button" className="btn-outline">
-              Add to Cart
-            </button>
           </div>
         </div>
       </section>

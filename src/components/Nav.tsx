@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { getAllProducts } from "@/lib/products";
+import CartIcon from "@/components/CartIcon";
 
 const products = getAllProducts();
 
@@ -110,16 +111,19 @@ export default function Nav() {
               </li>
             </ul>
 
-            {/* CTA pill button */}
-            <Link
-              href="/shop"
-              className="flex shrink-0 items-center gap-1.5 rounded-full bg-gold px-5 py-2 text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-deepblack transition-all duration-300 hover:bg-gold/90 hover:shadow-[0_0_20px_rgba(251,237,43,0.4)]"
-            >
-              Shop Now
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="shrink-0">
-                <path d="M2.5 9.5L9.5 2.5M9.5 2.5H4M9.5 2.5V8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </Link>
+            <div className="flex items-center gap-3">
+              <CartIcon />
+              {/* CTA pill button */}
+              <Link
+                href="/shop"
+                className="flex shrink-0 items-center gap-1.5 rounded-full bg-gold px-5 py-2 text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-deepblack transition-all duration-300 hover:bg-gold/90 hover:shadow-[0_0_20px_rgba(251,237,43,0.4)]"
+              >
+                Shop Now
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="shrink-0">
+                  <path d="M2.5 9.5L9.5 2.5M9.5 2.5H4M9.5 2.5V8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </Link>
+            </div>
           </nav>
         </div>
       </header>
