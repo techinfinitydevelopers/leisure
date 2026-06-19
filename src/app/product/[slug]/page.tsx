@@ -3,15 +3,9 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getProductBySlugDB } from "@/lib/db-products";
 import { getProduct } from "@/lib/products";
-import ProductActions from "@/components/ProductActions";
+import ProductHero from "@/components/ProductHero";
 
 export const dynamic = "force-dynamic";
-
-const inr = new Intl.NumberFormat("en-IN", {
-  style: "currency",
-  currency: "INR",
-  maximumFractionDigits: 0,
-});
 
 export async function generateMetadata({
   params,
@@ -59,46 +53,25 @@ export default async function ProductPage({
         ← All Speakers
       </Link>
 
-      {/* Hero */}
-      <section className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-start">
-        {/* Gallery + color switcher + action buttons (client component) */}
-        {staticProduct ? (
-          <ProductActions
-            productId={product.id}
-            slug={slug}
-            model={product.model}
-            price={product.price}
-            mrp={product.mrp}
-            colors={staticProduct.colors}
-          />
-        ) : (
-          <div className="min-h-[420px] rounded-3xl border border-white/10 bg-[#0d0d0d] lg:min-h-[560px]" />
-        )}
-
-        <div className="flex flex-col justify-center">
-          <h1 className="font-display text-5xl font-bold tracking-tight text-offwhite sm:text-6xl">
-            {product.model}
-          </h1>
-          <p className="font-pinyon mt-3 text-3xl text-gold sm:text-4xl">
-            {product.tagline}
-          </p>
-
-          {/* Price block */}
-          <div className="mt-8 flex flex-wrap items-end gap-4">
-            <span className="font-display text-4xl font-bold text-gold sm:text-5xl">
-              {inr.format(product.price)}
-            </span>
-            <span className="font-sans text-lg text-offwhite/40 line-through">
-              {inr.format(product.mrp)}
-            </span>
-            {savePercent > 0 && (
-              <span className="rounded-full border border-gold/40 px-3 py-1 font-sans text-xs font-semibold uppercase tracking-wider text-gold">
-                Save {savePercent}%
-              </span>
-            )}
+      {staticProduct ? (
+        <ProductHero
+          productId={product.id}
+          slug={slug}
+          model={product.model}
+          tagline={product.tagline}
+          price={product.price}
+          mrp={product.mrp}
+          savePercent={savePercent}
+          colors={staticProduct.colors}
+        />
+      ) : (
+        <section className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-2">
+          <div className="min-h-[420px] rounded-3xl border border-white/10 bg-[#0d0d0d]" />
+          <div>
+            <h1 className="font-display text-5xl font-bold text-offwhite">{product.model}</h1>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Overview */}
       <section className="mt-24">

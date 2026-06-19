@@ -80,8 +80,8 @@ export default function ProductGallery({ slug, model, colors, activeColorIdx: co
         ))}
       </div>
 
-      {/* ── Color swatches ── */}
-      <div className="flex flex-wrap items-center gap-3 pt-1">
+      {/* ── Color swatches (only shown in standalone mode, not when controlled by parent) ── */}
+      {!onColorChange && <div className="flex flex-wrap items-center gap-3 pt-1">
         <span className="text-[0.7rem] uppercase tracking-[0.18em] text-white/40">Color</span>
         {colors.map((color, i) => (
           <button
@@ -109,7 +109,7 @@ export default function ProductGallery({ slug, model, colors, activeColorIdx: co
             </span>
           </button>
         ))}
-      </div>
+      </div>}
     </div>
   );
 }
