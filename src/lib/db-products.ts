@@ -1,5 +1,6 @@
 // Server-only module: only imported from Server Components and route handlers.
 import { prisma } from "@/lib/prisma";
+import { products as staticProducts } from "@/lib/products";
 
 export type ProductColor = { name: string; hex: string };
 export type SpecPair = { label: string; value: string };
@@ -104,16 +105,60 @@ function inputToRow(data: ProductInput) {
   };
 }
 
+/**
+ * Build a DbProduct from the bundled static catalog. Used as a fallback so
+ * the public storefront still renders when the database is empty or
+ * unavailable (e.g. a fresh deploy where the SQLite file isn't seeded).
+ */
+function staticToDbProduct(slug: string): DbProduct | null {
+  const index = staticProducts.findIndex((p) => p.slug === slug);
+  if (index === -1) return null;
+  const p = staticProducts[index];
+  return {
+    id: index + 1,
+    slug: p.slug,
+    model: p.model,
+    tagline: p.tagline,
+    description: p.description,
+    price: p.price,
+    mrp: p.mrp,
+    stock: 99,
+    imageUrl: `/products/${p.slug}.png`,
+    colors: p.colors.map((c) => ({ name: c.name, hex: c.hex })),
+    specs: p.specs,
+    inBox: p.inBox,
+    technical: p.technical,
+    createdAt: new Date(0),
+    updatedAt: new Date(0),
+  };
+}
+
+function allStaticDbProducts(): DbProduct[] {
+  return staticProducts
+    .map((p) => staticToDbProduct(p.slug))
+    .filter((p): p is DbProduct => p !== null);
+}
+
 export async function getAllProductsDB(): Promise<DbProduct[]> {
-  const rows = await prisma.product.findMany({ orderBy: { id: "asc" } });
-  return rows.map(rowToProduct);
+  try {
+    const rows = await prisma.product.findMany({ orderBy: { id: "asc" } });
+    if (rows.length > 0) return rows.map(rowToProduct);
+  } catch {
+    // DB unavailable (e.g. unseeded deploy) — fall through to static catalog.
+  }
+  return allStaticDbProducts();
 }
 
 export async function getProductBySlugDB(
   slug: string,
 ): Promise<DbProduct | null> {
-  const row = await prisma.product.findUnique({ where: { slug } });
-  return row ? rowToProduct(row) : null;
+  try {
+    const row = await prisma.product.findUnique({ where: { slug } });
+    if (row) return rowToProduct(row);
+  } catch {
+    // DB unavailable — fall through to static catalog.
+  }
+  return staticToDbProduct(slug);
 }
 
 export async function getProductByIdDB(id: number): Promise<DbProduct | null> {
