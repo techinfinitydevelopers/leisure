@@ -83,7 +83,7 @@ export default function Nav() {
                     speakersOpen ? "visible opacity-100" : "invisible -translate-y-1 opacity-0"
                   }`}
                 >
-                  <div className="glass w-64 rounded-2xl p-2">
+                  <div className="w-64 rounded-2xl border border-white/10 bg-[#0a0a0a] p-2 shadow-[0_24px_70px_rgba(0,0,0,0.85)] backdrop-blur-2xl">
                     {products.map((p) => (
                       <Link
                         key={p.slug}
@@ -105,8 +105,14 @@ export default function Nav() {
               </li>
 
               <li>
-                <Link href="/" className="transition-colors hover:text-gold">
+                <Link href="/about" className="transition-colors hover:text-gold">
                   About
+                </Link>
+              </li>
+
+              <li>
+                <Link href="/contact" className="transition-colors hover:text-gold">
+                  Contact
                 </Link>
               </li>
             </ul>
@@ -172,6 +178,8 @@ export default function Nav() {
         <div className="flex h-full flex-col justify-center gap-8 px-8">
           <Link href="/" className="font-display text-4xl text-offwhite transition-colors hover:text-gold">Home</Link>
           <Link href="/shop" className="font-display text-4xl text-offwhite transition-colors hover:text-gold">Collection</Link>
+          <Link href="/about" className="font-display text-4xl text-offwhite transition-colors hover:text-gold">About</Link>
+          <Link href="/contact" className="font-display text-4xl text-offwhite transition-colors hover:text-gold">Contact</Link>
           <div className="border-t border-white/10 pt-6">
             <p className="mb-4 font-pinyon text-2xl text-gold">Products</p>
             <div className="flex flex-col gap-3">

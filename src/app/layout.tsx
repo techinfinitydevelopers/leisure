@@ -58,7 +58,7 @@ export default function RootLayout({
       lang="en"
       className={`${roboto.variable} ${sfpro.variable} ${cormorant.variable} ${pinyon.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <CartProvider>
           <Preloader />
           <Nav />

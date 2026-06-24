@@ -9,6 +9,7 @@ import ProductShowcase from "@/components/sections/ProductShowcase";
 import ParallaxGrid from "@/components/sections/ParallaxGrid";
 import TestimonialSection from "@/components/sections/TestimonialSection";
 import MarqueeBand from "@/components/sections/MarqueeBand";
+import RevolveShowcase from "@/components/sections/RevolveShowcase";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -173,6 +174,9 @@ export default function LandingExperience() {
 
       {/* Marquee band — visual bridge after the video's black fade-out */}
       <MarqueeBand />
+
+      {/* Revolving speaker showcase — 3 scenes: turn, recolour, swap sides */}
+      <RevolveShowcase />
 
       {/* Section 2 — branded product showcase */}
       <section id="section-2" className="relative w-full">
