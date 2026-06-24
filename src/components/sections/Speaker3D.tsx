@@ -32,9 +32,9 @@ const lerpArr = (sf: number, arr: number[]) => {
   return arr[seg] * (1 - t) + arr[seg + 1] * t;
 };
 
-const POS_X = [1.45, -1.45, 1.45];
-const POS_Y = [1.0, 0, -1.0];
-const TILT_Z = [-0.1, 0.08, -0.08];
+const POS_X = [1.55, -1.55, 1.55];
+const POS_Y = [0.85, 0, -0.85];
+const TILT_Z = [-0.09, 0.07, -0.07];
 
 function useGrilleTexture() {
   return useMemo(() => {
