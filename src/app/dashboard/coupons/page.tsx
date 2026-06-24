@@ -16,9 +16,18 @@ type Coupon = {
   createdAt: string;
 };
 
-const BLANK = {
+const BLANK: {
+  code: string;
+  type: "percent" | "flat";
+  value: string;
+  minOrder: string;
+  maxDiscount: string;
+  usageLimit: string;
+  expiresAt: string;
+  active: boolean;
+} = {
   code: "",
-  type: "percent" as const,
+  type: "percent",
   value: "",
   minOrder: "",
   maxDiscount: "",
