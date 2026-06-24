@@ -33,7 +33,7 @@ const lerpArr = (sf: number, arr: number[]) => {
 };
 
 const POS_X = [1.55, -1.55, 1.55];
-const POS_Y = [0.85, 0, -0.85];
+const POS_Y = [0.45, -0.2, -0.85];
 const TILT_Z = [-0.09, 0.07, -0.07];
 
 function useGrilleTexture() {

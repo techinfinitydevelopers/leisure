@@ -29,7 +29,7 @@ const SCENES: Scene[] = [
     title: "Crafted to move you",
     body: "Hand-tuned drivers and a sealed acoustic chamber push sound that's warm, weighted, and unmistakably alive — from the first note to the last.",
     textSide: "left",
-    vy: "37%",
+    vy: "43%",
     glow: "rgba(251,237,43,0.18)",
   },
   {
@@ -37,7 +37,7 @@ const SCENES: Scene[] = [
     title: "Turn it, own it",
     body: "Grab the strap and go. Every angle catches the light differently — pick the finish that sounds like you and take it anywhere.",
     textSide: "right",
-    vy: "50%",
+    vy: "53%",
     glow: "rgba(255,138,42,0.22)",
   },
   {
