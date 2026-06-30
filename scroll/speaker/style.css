@@ -1,0 +1,185 @@
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+
+:root {
+  --padding: 10vmin;
+  --color-background: #080810;
+  --font-size-large: 8vw;
+  --font-size-medium: 4vw;
+  --font-size-normal: 2vw;
+  --accent: #e8c87a;
+  --neon: #b06aff;
+}
+
+@media only screen and (min-width: 800px) {
+  :root { --font-size-large: 64px; --font-size-medium: 32px; --font-size-normal: 16px; }
+}
+@media only screen and (max-width: 500px) {
+  :root { --font-size-large: 40px; --font-size-medium: 20px; --font-size-normal: 14px; }
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+a    { color: var(--accent); }
+ul   { list-style: none; }
+li   { margin-top: 10px; }
+
+html, body {
+  min-height: 100%;
+  min-width: 100%;
+  font-family: 'Libre Baskerville', serif;
+  background-color: var(--color-background);
+  background-image: radial-gradient(ellipse at 30% 40%, rgba(80,20,120,0.25) 0%, transparent 60%),
+                    radial-gradient(ellipse at 80% 80%, rgba(180,100,20,0.12) 0%, transparent 50%);
+  color: #ffffff;
+  font-weight: 400;
+  font-size: var(--font-size-normal);
+  overflow-x: hidden;
+}
+
+/* ── LOADING ────────────────────────────────────────── */
+.loading {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0; left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-medium);
+  background: var(--color-background);
+  z-index: 200;
+  color: var(--accent);
+  letter-spacing: 0.15em;
+  text-shadow: 0 0 30px rgba(232,200,122,0.6);
+}
+
+/* ── CONTENT ────────────────────────────────────────── */
+.content {
+  position: relative;
+  z-index: 1;
+}
+
+.content .trigger {
+  position: absolute;
+  top: 0;
+  height: 100%;
+}
+
+.content .section {
+  position: relative;
+  padding: var(--padding);
+  --pad2: calc(var(--padding) * 2);
+  width: calc(100vw - var(--pad2));
+  height: calc(100vh - var(--pad2));
+  margin: 0 auto;
+  z-index: 2;
+}
+
+.content .section.dark  { color: #ffffff; background: transparent; }
+.content .section.right { text-align: right; }
+
+/* ── TYPOGRAPHY ─────────────────────────────────────── */
+.content h1,
+.content h2 {
+  font-size: var(--font-size-large);
+  margin: 0 0 2vmin 0;
+  font-weight: 700;
+  display: inline;
+  color: var(--accent);
+  text-shadow: 0 0 40px rgba(232,200,122,0.35);
+}
+
+.content h3 {
+  font-size: var(--font-size-medium);
+  font-weight: 400;
+  margin: 0;
+  color: #aaaaaa;
+}
+
+.content p { color: #999; margin-top: 1rem; }
+
+.scroll-cta, .credits {
+  position: absolute;
+  bottom: var(--padding);
+}
+.scroll-cta {
+  font-size: var(--font-size-medium);
+  opacity: 0;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 20px rgba(232,200,122,0.5);
+}
+.end h2    { margin-bottom: 50vh; color: #ffffff; }
+.credits   { font-size: var(--font-size-normal); color: #666; }
+
+/* ── GROUND (club floor parallax) ───────────────────── */
+.ground-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.parallax {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: -100px;
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-size: cover;
+  transform-origin: top center;
+}
+
+/* Club concert floor — shows through transparent Three.js canvas */
+.ground {
+  z-index: -1;
+  opacity: 0.55;
+  background-image: url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2000&auto=format&fit=crop');
+}
+
+/* Laser light overlay — screen blend for neon glow effect */
+.clouds {
+  z-index: 2;
+  opacity: 0.35;
+  mix-blend-mode: screen;
+  background-image: url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=2000&auto=format&fit=crop');
+}
+
+/* ── BLUEPRINT ──────────────────────────────────────── */
+.blueprint {
+  position: relative;
+  background-color: #05080f;
+  background-image:
+    linear-gradient(rgba(176,106,255,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(176,106,255,0.08) 1px, transparent 1px),
+    linear-gradient(rgba(176,106,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(176,106,255,0.03) 1px, transparent 1px);
+  background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+  background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+  background-attachment: fixed;
+}
+
+.blueprint svg {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  stroke: var(--neon);
+  pointer-events: none;
+  visibility: hidden;
+  z-index: 100;
+}
+
+#line-length, #line-wingspan, #circle-phalange {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.blueprint .dark { background: transparent; }
+
+/* ── FINALE — massive rave stage ─────────────────────────── */
+.sunset {
+  position: relative;
+  background:
+    linear-gradient(rgba(5,5,10,0.45) 0%, rgba(5,5,10,0.65) 100%),
+    url('https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?q=80&w=2000&auto=format&fit=crop')
+    no-repeat center center;
+  background-size: cover;
+  transform-origin: top center;
+}

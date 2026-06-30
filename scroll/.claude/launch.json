@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "scroll",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", ".", "-p", "5500", "--no-clipboard"],
+      "port": 5500
+    },
+    {
+      "name": "scroll1",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "New folder/scroll1", "-p", "5502", "--no-clipboard"],
+      "port": 5502
+    }
+  ]
+}
