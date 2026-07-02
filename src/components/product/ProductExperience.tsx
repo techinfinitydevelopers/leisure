@@ -1,0 +1,111 @@
+"use client";
+
+import { Suspense, useEffect, useState } from "react";
+import { Canvas } from "@react-three/fiber";
+import * as THREE from "three";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import type { ProductExperience as ProductExperienceData } from "@/lib/product-experience";
+import { ProductExperienceProvider } from "@/lib/product-experience-context";
+import { useProductScroll } from "@/lib/useProductScroll";
+import { scroll } from "@/lib/scrollStore";
+import ProductPlane from "./ProductPlane";
+import Hero from "./Hero";
+import SpinStage from "./SpinStage";
+import Overview from "./Overview";
+import ParallaxBreak from "./ParallaxBreak";
+import FeatureGrid from "./FeatureGrid";
+import SpecsSection from "./SpecsSection";
+import SpecRail from "./SpecRail";
+import SpecExplorer from "./SpecExplorer";
+import Highlights from "./Highlights";
+import LifestyleLoop from "./LifestyleLoop";
+import FeatureDeepDive from "./FeatureDeepDive";
+import TechnicalDetails from "./TechnicalDetails";
+import BoxContents from "./BoxContents";
+import FAQ from "./FAQ";
+import StickyBuyBar from "./StickyBuyBar";
+import "./product-experience.css";
+
+export default function ProductExperience({
+  product,
+}: {
+  product: ProductExperienceData;
+}) {
+  const [colorIndex, setColorIndex] = useState(0);
+  const [viewIndex, setViewIndex] = useState(0);
+
+  useProductScroll();
+
+  // Keep the shared WebGL store in sync with the selected variant.
+  useEffect(() => {
+    scroll.colorIndex = colorIndex;
+    scroll.viewIndex = viewIndex;
+  }, [colorIndex, viewIndex]);
+
+  // LifestyleLoop is part of the "made for the move" beat — gate it on products
+  // that have deep-dive content so leaner pages skip it.
+  const hasDeepDives = !!product.deepDives?.length;
+
+  // color change resets the angle back to front
+  const handleColor = (i: number) => {
+    setColorIndex(i);
+    setViewIndex(0);
+  };
+
+  const specLayout = product.perspective?.specLayout;
+
+  return (
+    <ProductExperienceProvider value={product}>
+      <div className="leisure-xp">
+        <div className="webgl-wrap" aria-hidden="true">
+          <Canvas
+            className="webgl"
+            camera={{ position: [0, 0, 6], fov: 40 }}
+            dpr={[1, 1.5]}
+            gl={{ antialias: true, alpha: true }}
+            onCreated={({ gl }) =>
+              gl.setClearColor(new THREE.Color("#000000"), 0)
+            }
+          >
+            <Suspense fallback={null}>
+              <ProductPlane
+                product={product}
+                onReady={() => setTimeout(() => ScrollTrigger.refresh(), 300)}
+                colorIndex={colorIndex}
+                viewIndex={viewIndex}
+              />
+            </Suspense>
+          </Canvas>
+        </div>
+
+        <main className="content">
+          <Hero
+            colorIndex={colorIndex}
+            viewIndex={viewIndex}
+            onColor={handleColor}
+            onView={setViewIndex}
+          />
+          <SpinStage />
+          <Overview />
+          <ParallaxBreak />
+          <FeatureGrid />
+          {specLayout === "explorer" ? (
+            <SpecExplorer />
+          ) : specLayout === "rail" ? (
+            <SpecRail />
+          ) : (
+            <SpecsSection />
+          )}
+          <Highlights />
+          {hasDeepDives && <LifestyleLoop />}
+          <FeatureDeepDive />
+          <TechnicalDetails />
+          <BoxContents />
+          <FAQ />
+        </main>
+
+        <StickyBuyBar />
+      </div>
+    </ProductExperienceProvider>
+  );
+}

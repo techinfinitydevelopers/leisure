@@ -3,9 +3,17 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getProductBySlugDB } from "@/lib/db-products";
 import { getProduct } from "@/lib/products";
+import { getProductExperience } from "@/lib/product-experience";
 import ProductHero from "@/components/ProductHero";
+import ProductExperience from "@/components/product/ProductExperience";
 
 export const dynamic = "force-dynamic";
+
+// Classic (pre-R3F) static pages, kept accessible under an alias slug even though
+// the default slug now renders the rich experience. Maps alias -> real product slug.
+const CLASSIC_ALIASES: Record<string, string> = {
+  "drift-classic": "drift",
+};
 
 export async function generateMetadata({
   params,
@@ -13,8 +21,19 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = await getProductBySlugDB(slug);
+  const aliasBase = CLASSIC_ALIASES[slug];
 
+  // Rich R3F experience carries its own marketing copy — prefer it for metadata
+  // (skipped for classic-alias slugs, which intentionally render the static page).
+  const experience = aliasBase ? null : getProductExperience(slug);
+  if (experience) {
+    return {
+      title: `Leisure ${experience.name} — ${experience.tagline}`,
+      description: experience.blurb,
+    };
+  }
+
+  const product = await getProductBySlugDB(aliasBase ?? slug);
   if (!product) {
     return { title: "Leisure — Speaker not found" };
   }
@@ -31,14 +50,28 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = await getProductBySlugDB(slug);
+
+  // Classic-alias slugs (e.g. drift-classic) intentionally bypass the experience
+  // and render the original static page using the real product's data.
+  const aliasBase = CLASSIC_ALIASES[slug];
+  const dataSlug = aliasBase ?? slug;
+
+  // If a rich scroll-animated experience exists for this slug, render it. It is
+  // self-contained (own hero, pricing, specs, 3D roaming plane) and works even
+  // for showcase-only slugs (e.g. drift2) that aren't in the commerce DB.
+  const experience = aliasBase ? null : getProductExperience(slug);
+  if (experience) {
+    return <ProductExperience product={experience} />;
+  }
+
+  const product = await getProductBySlugDB(dataSlug);
 
   if (!product) {
     notFound();
   }
 
   // Static product data has color+image metadata; DB product has pricing/specs
-  const staticProduct = getProduct(slug);
+  const staticProduct = getProduct(dataSlug);
 
   const savePercent = Math.round(
     ((product.mrp - product.price) / product.mrp) * 100,
@@ -56,7 +89,7 @@ export default async function ProductPage({
       {staticProduct ? (
         <ProductHero
           productId={product.id}
-          slug={slug}
+          slug={dataSlug}
           model={product.model}
           tagline={product.tagline}
           price={product.price}
