@@ -110,9 +110,29 @@ export default function FeatureGrid() {
     };
   }, [product]);
 
+  // Hide the roaming model entirely while the feature grid is in view.
+  useEffect(() => {
+    if (!product.featuresBackground) return;
+    const ctx = gsap.context(() => {
+      ScrollTrigger.create({
+        trigger: root.current,
+        start: "top 80%",
+        end: "bottom 20%",
+        onToggle: (self) => {
+          scroll.productHide = self.isActive ? 1 : 0;
+        },
+      });
+    }, root);
+    return () => {
+      scroll.productHide = 0;
+      ctx.revert();
+    };
+  }, [product]);
+
   if (!product.features?.length) return null;
+  const cls = product.featuresBackground ? "features features--bg" : "features";
   return (
-    <section className="features" id="features" ref={root}>
+    <section className={cls} id="features" ref={root}>
       <div className="features__grid">
         {product.features.map((f, i) => (
           <FeatureCell key={f.label} {...f} index={i} />

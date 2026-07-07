@@ -30,12 +30,31 @@ export type ProductExperience = {
   blurb: string;
   colors: ExpColor[];
   texture?: string;
+  /** Optional 3D model (glTF/GLB). When set, the roaming 3D model replaces the
+   *  2D image plane and is driven by the same scroll track. */
+  model?: string;
   perspective?: {
     heroVariant?: "split";
     specLayout?: "explorer" | "rail" | "default";
     planeH?: number;
   };
   spinStage?: { eyebrow: string; caption: string };
+  explodeStage?: { eyebrow: string; caption: string };
+  featureFocus?: { eyebrow: string; caption: string };
+  /** How the roaming model parks while the Overview section is in view:
+   *  x = viewport fraction (negative = left), ry = heading (rad), scale = size
+   *  multiplier (<1 smaller). Omit to just follow the roam track. */
+  overviewModel?: { x?: number; ry?: number; scale?: number };
+  /** Guided feature tour: on scroll the model eases through each stop's
+   *  orientation (rx/ry radians) and X position (viewport fraction, 0 = centre,
+   *  negative = left) while that stop's title/copy fades in. */
+  featureStops?: {
+    title: string;
+    copy: string;
+    rx: number;
+    ry: number;
+    x?: number;
+  }[];
   highlights?: Highlight[];
   parallax?: {
     image: string;
@@ -44,6 +63,23 @@ export type ProductExperience = {
     slideAside?: boolean;
   };
   slideAsideOnFeatures?: boolean;
+  /** Render the Feature Grid ABOVE the 3D layer with a frosted backdrop, so the
+   *  roaming model sits softly in the background behind the grid. */
+  featuresBackground?: boolean;
+  /** How the model parks while the Feature Grid is in view (x = viewport
+   *  fraction, ry = heading rad, scale = size multiplier). */
+  featuresModel?: { x?: number; ry?: number; scale?: number };
+  /** How the model parks while the Specifications section is pinned. */
+  specsModel?: { x?: number; ry?: number; scale?: number };
+  /** Deep-dive roam: model sits on the empty side of each alternating row
+   *  (x = offset magnitude, applied left/right per row). */
+  deepDiveModel?: { x?: number; ry?: number; scale?: number };
+  /** Render Technical Details as an Apple-style split-scroll: sticky spec list
+   *  on the left, the model showing a different angle per spec on the right. */
+  technicalSplit?: boolean;
+  /** Pinned finale after the FAQ: the model lands centred in an empty band
+   *  before the footer. */
+  landingStage?: { eyebrow: string; caption: string };
   track: TrackStop[];
   overview: string;
   features?: FeatureIcon[];
@@ -69,16 +105,33 @@ const drift: ProductExperience = {
     { id: "grey", name: "Grey", hex: "#b8b8b8", images: ["/products/drift/grey-drift-front.png", "/products/drift/tiltedgrey-drift-front.png"] },
   ],
   texture: "/products/drift/front.png",
+  model: "/products/drift/drift-model.glb",
+  spinStage: { eyebrow: "Every angle", caption: "See it from all sides." },
+  featureFocus: { eyebrow: "Designed around you", caption: "A closer look." },
+  overviewModel: { x: 0.36, ry: -0.6, scale: 0.62 }, // right side, turned to face right, smaller
+  featuresBackground: true, // model sits behind the feature grid (frosted backdrop)
+  featuresModel: { x: -0.32, ry: 0, scale: 0.5 }, // left, front, smaller (background)
+  specsModel: { x: -0.16, ry: 0, scale: 0.46 }, // left-of-centre + smaller, clears the right values
+  deepDiveModel: { x: 0.34, ry: 0, scale: 0.5 }, // roams to the empty side of each row
+  technicalSplit: true, // sticky spec list left, model angles per spec on the right
+  landingStage: { eyebrow: "Made for the move", caption: "That's DRIFT." },
+  // Guided tour — model rotates to each angle as its text fades in.
+  // rx/ry in radians; tune against a screenshot.
+  featureStops: [
+    { title: "Signature Sound", copy: "Analog-tuned drivers fill the room — clean highs, warm lows.", rx: 0, ry: 0, x: -0.3 }, // front grille, left
+    { title: "DOMINATOR Controls", copy: "Bass, mid, treble and volume — hand-tuned dials, right on top where you reach.", rx: 1.1, ry: 0, x: 0 }, // top view
+    { title: "Grab & Go", copy: "A leather carry strap and a rugged build made to travel with you.", rx: -0.3, ry: -0.7, x: 0.15 }, // 3/4 angle
+  ],
   perspective: { heroVariant: "split" },
+  // Horizontal roam — clean left <-> right sweeps, minimal vertical drift.
   track: [
-    { at: 0.0, x: -0.26, y: 0.0, rz: 0.0, ry: 0.0, s: 1.0, o: 1 },
-    { at: 0.08, x: -0.26, y: 0.0, rz: 0.0, ry: 0.0, s: 1.0, o: 1 },
-    { at: 0.2, x: 0.0, y: 0.06, rz: 0.05, ry: 0.15, s: 1.15, o: 1 },
-    { at: 0.4, x: -0.3, y: 0.0, rz: -0.1, ry: 0.45, s: 1.05, o: 1 },
-    { at: 0.6, x: 0.3, y: -0.05, rz: 0.1, ry: -0.45, s: 1.05, o: 1 },
-    { at: 0.78, x: 0.0, y: 0.0, rz: 0.0, ry: 0.2, s: 1.25, o: 1 },
-    { at: 0.9, x: -0.28, y: 0.04, rz: -0.06, ry: 0.3, s: 0.95, o: 1 },
-    { at: 1.0, x: 0.28, y: 0.0, rz: 0.0, ry: 0.0, s: 1.0, o: 1 },
+    { at: 0.0, x: -0.28, y: 0.0, rz: 0.0, ry: 0.0, s: 1.0, o: 1 },
+    { at: 0.08, x: -0.28, y: 0.0, rz: 0.0, ry: 0.0, s: 1.0, o: 1 }, // parked left (hero)
+    { at: 0.3, x: 0.3, y: 0.0, rz: 0.0, ry: -0.3, s: 1.05, o: 1 }, // sweep right
+    { at: 0.5, x: -0.3, y: 0.0, rz: 0.0, ry: 0.35, s: 1.05, o: 1 }, // sweep left
+    { at: 0.7, x: 0.3, y: 0.0, rz: 0.0, ry: -0.3, s: 1.05, o: 1 }, // sweep right
+    { at: 0.88, x: -0.28, y: 0.0, rz: 0.0, ry: 0.25, s: 1.0, o: 1 }, // drift left
+    { at: 1.0, x: 0.0, y: 0.0, rz: 0.0, ry: 0.0, s: 1.0, o: 1 }, // settle centre (LandingStage holds the finale)
   ],
   overview:
     "Meet the DRIFT, your ultimate everyday audio companion designed for life on the move. Compact, stylish, and incredibly lightweight, its water-resistant build seamlessly blends into your active daily routine. Experience crystal-clear sound that travels wherever you go, ensuring your favorite tracks are always by your side, rain or shine.",

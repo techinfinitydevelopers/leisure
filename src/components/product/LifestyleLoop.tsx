@@ -12,7 +12,7 @@ export default function LifestyleLoop() {
     const tween = gsap.to(el, {
       xPercent: -50,
       ease: "none",
-      duration: 22,
+      duration: 45,
       repeat: -1,
     });
     return () => {

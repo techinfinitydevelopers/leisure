@@ -27,43 +27,9 @@ const WAVE_BARS = Array.from({ length: 100 }, (_, i) => {
   };
 });
 
-// Deterministic equalizer bar data — no Math.random (avoids hydration mismatch)
-const EQ_BARS = [
-  { h: 14, dur: 0.90, del: 0.00 }, { h: 28, dur: 1.10, del: 0.06 },
-  { h: 38, dur: 0.80, del: 0.12 }, { h: 22, dur: 1.20, del: 0.18 },
-  { h: 44, dur: 0.95, del: 0.04 }, { h: 30, dur: 1.00, del: 0.10 },
-  { h: 18, dur: 0.85, del: 0.16 }, { h: 40, dur: 1.15, del: 0.02 },
-  { h: 24, dur: 0.90, del: 0.08 }, { h: 46, dur: 1.05, del: 0.14 },
-  { h: 32, dur: 0.80, del: 0.20 }, { h: 20, dur: 1.20, del: 0.06 },
-  { h: 42, dur: 0.95, del: 0.12 }, { h: 28, dur: 0.85, del: 0.18 },
-  { h: 16, dur: 1.10, del: 0.04 }, { h: 38, dur: 0.90, del: 0.10 },
-  { h: 46, dur: 1.00, del: 0.16 }, { h: 24, dur: 0.85, del: 0.02 },
-  { h: 36, dur: 1.15, del: 0.08 }, { h: 18, dur: 0.95, del: 0.14 },
-  { h: 44, dur: 0.80, del: 0.20 }, { h: 30, dur: 1.20, del: 0.06 },
-  { h: 22, dur: 0.90, del: 0.12 }, { h: 40, dur: 1.05, del: 0.18 },
-  { h: 14, dur: 0.85, del: 0.04 }, { h: 34, dur: 1.10, del: 0.10 },
-  { h: 26, dur: 0.95, del: 0.16 }, { h: 44, dur: 1.00, del: 0.02 },
-  { h: 20, dur: 0.80, del: 0.08 }, { h: 38, dur: 1.20, del: 0.14 },
-  { h: 30, dur: 0.90, del: 0.00 }, { h: 16, dur: 1.05, del: 0.06 },
-];
-
 export default function Footer() {
   return (
     <footer className="relative overflow-hidden bg-deepblack">
-
-      {/* ── Equalizer visualizer strip ── */}
-      <div className="flex items-end justify-center gap-[3px] px-4 pt-10 pb-0">
-        {EQ_BARS.map((b, i) => (
-          <div
-            key={i}
-            className="w-[5px] origin-bottom rounded-t-sm bg-gold/70"
-            style={{
-              height: `${b.h}px`,
-              animation: `eq-bar ${b.dur}s ease-in-out ${b.del}s infinite alternate`,
-            }}
-          />
-        ))}
-      </div>
 
       {/* Gold hairline */}
       <div className="mt-4 h-px w-full bg-gradient-to-r from-transparent via-gold/40 to-transparent" />

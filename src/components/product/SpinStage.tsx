@@ -28,6 +28,13 @@ export default function SpinStage() {
         onUpdate: (self) => {
           scroll.spin = self.progress;
         },
+        // release the spin once the section is gone so roam resumes
+        onLeave: () => {
+          scroll.spin = 0;
+        },
+        onLeaveBack: () => {
+          scroll.spin = 0;
+        },
       });
     }, root);
     return () => {

@@ -9,8 +9,11 @@ import { ProductExperienceProvider } from "@/lib/product-experience-context";
 import { useProductScroll } from "@/lib/useProductScroll";
 import { scroll } from "@/lib/scrollStore";
 import ProductPlane from "./ProductPlane";
+import ProductModel from "./ProductModel";
 import Hero from "./Hero";
 import SpinStage from "./SpinStage";
+import FeatureSequence from "./FeatureSequence";
+import LandingStage from "./LandingStage";
 import Overview from "./Overview";
 import ParallaxBreak from "./ParallaxBreak";
 import FeatureGrid from "./FeatureGrid";
@@ -67,13 +70,25 @@ export default function ProductExperience({
               gl.setClearColor(new THREE.Color("#000000"), 0)
             }
           >
+            {/* Lights (used by the 3D model's PBR materials; the image plane
+                uses an unlit basic material and ignores them). */}
+            <ambientLight intensity={0.8} />
+            <directionalLight position={[4, 6, 5]} intensity={1.6} />
+            <directionalLight position={[-5, 2, -3]} intensity={0.6} />
             <Suspense fallback={null}>
-              <ProductPlane
-                product={product}
-                onReady={() => setTimeout(() => ScrollTrigger.refresh(), 300)}
-                colorIndex={colorIndex}
-                viewIndex={viewIndex}
-              />
+              {product.model ? (
+                <ProductModel
+                  product={product}
+                  onReady={() => setTimeout(() => ScrollTrigger.refresh(), 300)}
+                />
+              ) : (
+                <ProductPlane
+                  product={product}
+                  onReady={() => setTimeout(() => ScrollTrigger.refresh(), 300)}
+                  colorIndex={colorIndex}
+                  viewIndex={viewIndex}
+                />
+              )}
             </Suspense>
           </Canvas>
         </div>
@@ -85,6 +100,9 @@ export default function ProductExperience({
             onColor={handleColor}
             onView={setViewIndex}
           />
+          {/* 3D model choreography: guided feature tour (rotate through angles
+              with text) → spin → then roam through the rest of the page. */}
+          {product.featureStops?.length ? <FeatureSequence /> : null}
           <SpinStage />
           <Overview />
           <ParallaxBreak />
@@ -102,6 +120,7 @@ export default function ProductExperience({
           <TechnicalDetails />
           <BoxContents />
           <FAQ />
+          {product.landingStage && <LandingStage />}
         </main>
 
         <StickyBuyBar />

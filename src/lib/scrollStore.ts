@@ -12,6 +12,17 @@ export type ScrollStore = {
   productHide: number; // 0..1, set by full-bleed parallax breaks to fade the roaming plane out
   zoom: number; // 0..1, set by a ZoomStage — dollies the plane toward the viewer
   spin: number; // 0..1, set by a SpinStage — pins the plane and rotates a full turn
+  explode: number; // 0..1, set by an ExplodeStage — separates the 3D model's parts (exploded view)
+  focus: number; // 0..1, set by the feature sequence — centers the model for the guided tour
+  focusRX: number; // target X-tilt (rad) for the model during the feature sequence
+  focusRY: number; // target Y-heading (rad) for the model during the feature sequence
+  focusX: number; // target X position (viewport fraction) during the feature sequence
+  holdCount: number; // >0 when a section wants the model parked (Overview etc.)
+  holdX: number; // target X (viewport fraction) while holdCount > 0
+  holdY: number; // target Y (viewport fraction) while held (0 = centre, negative = lower)
+  holdRY: number; // target Y-heading (rad) while held
+  holdRX: number; // target X-tilt (rad) while held
+  holdS: number; // scale multiplier while held (1 = unchanged, <1 = smaller)
   sideCount: number; // >0 when sections want the plane to SLIDE aside (stays visible)
 };
 
@@ -26,5 +37,16 @@ export const scroll: ScrollStore = {
   productHide: 0,
   zoom: 0,
   spin: 0,
+  explode: 0,
+  focus: 0,
+  focusRX: 0,
+  focusRY: 0,
+  focusX: 0,
+  holdCount: 0,
+  holdX: 0,
+  holdY: 0,
+  holdRY: 0,
+  holdRX: 0,
+  holdS: 1,
   sideCount: 0,
 };
