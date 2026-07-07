@@ -31,8 +31,10 @@ import "./product-experience.css";
 
 export default function ProductExperience({
   product,
+  productId,
 }: {
   product: ProductExperienceData;
+  productId: number;
 }) {
   const [colorIndex, setColorIndex] = useState(0);
   const [viewIndex, setViewIndex] = useState(0);
@@ -99,6 +101,7 @@ export default function ProductExperience({
             viewIndex={viewIndex}
             onColor={handleColor}
             onView={setViewIndex}
+            productId={productId}
           />
           {/* 3D model choreography: guided feature tour (rotate through angles
               with text) → spin → then roam through the rest of the page. */}
@@ -123,7 +126,7 @@ export default function ProductExperience({
           {product.landingStage && <LandingStage />}
         </main>
 
-        <StickyBuyBar />
+        <StickyBuyBar productId={productId} colorIndex={colorIndex} />
       </div>
     </ProductExperienceProvider>
   );

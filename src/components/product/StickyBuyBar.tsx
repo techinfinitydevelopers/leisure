@@ -1,12 +1,20 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type MouseEvent } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useProductExperience } from "@/lib/product-experience-context";
+import { useCart } from "@/context/CartContext";
+import { flyToCart } from "@/lib/flyToCart";
 
-export default function StickyBuyBar() {
+type Props = {
+  productId: number;
+  colorIndex: number;
+};
+
+export default function StickyBuyBar({ productId, colorIndex }: Props) {
   const product = useProductExperience();
+  const { addItem, openCart } = useCart();
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -30,6 +38,22 @@ export default function StickyBuyBar() {
 
   const fmt = (n: number) => product.currency + n.toLocaleString("en-IN");
 
+  const handleAdd = (e: MouseEvent<HTMLButtonElement>) => {
+    const color = product.colors[colorIndex] ?? product.colors[0];
+    flyToCart(color.images[0], e.currentTarget.getBoundingClientRect(), () => {
+      addItem({
+        productId,
+        slug: product.slug,
+        model: product.name,
+        price: product.price,
+        mrp: product.mrp,
+        color: color.name,
+        image: color.images[0],
+      });
+      openCart();
+    });
+  };
+
   return (
     <div className="stickybuy" ref={ref}>
       <div className="stickybuy__info">
@@ -37,7 +61,11 @@ export default function StickyBuyBar() {
         <span className="stickybuy__price">{fmt(product.price)}</span>
         <span className="stickybuy__off">{product.discountPct}% OFF</span>
       </div>
-      <button type="button" className="btn btn--primary stickybuy__btn">
+      <button
+        type="button"
+        className="btn btn--primary stickybuy__btn"
+        onClick={handleAdd}
+      >
         Add to Cart
       </button>
     </div>

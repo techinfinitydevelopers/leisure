@@ -70,6 +70,8 @@ html.lenis, html.lenis body { height: auto; }
 @media (max-width: 860px) { .hero__grid { grid-template-columns: 1fr; } }
 .hero__title { font-family: var(--display); font-size: 3rem; font-weight: 600; line-height: 1; text-transform: uppercase; letter-spacing: -0.01em; }
 .hero__sub { max-width: 42ch; margin-top: 1.4rem; font-size: clamp(1rem, 1.5vw, 1.2rem); color: var(--muted); line-height: 1.6; }
+/* keep the hero copy + Buy/Add-to-Cart above the roaming 3D model */
+.hero__info { position: relative; z-index: 31; }
 .hero__slot { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.2rem; min-height: clamp(320px, 46vh, 560px); }
 
 /* ---------- Hero angle thumbnails ---------- */

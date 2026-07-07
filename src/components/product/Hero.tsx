@@ -10,9 +10,10 @@ type HeroProps = {
   viewIndex: number;
   onColor?: (i: number) => void;
   onView?: (i: number) => void;
+  productId: number;
 };
 
-export default function Hero({ colorIndex, viewIndex, onColor, onView }: HeroProps) {
+export default function Hero({ colorIndex, viewIndex, onColor, onView, productId }: HeroProps) {
   const product = useProductExperience();
   const variant: string = product.perspective?.heroVariant ?? "split";
 
@@ -37,7 +38,7 @@ export default function Hero({ colorIndex, viewIndex, onColor, onView }: HeroPro
               value={viewIndex}
               onChange={onView}
             />
-            <BuyBar />
+            <BuyBar productId={productId} colorIndex={colorIndex} />
           </div>
         </div>
         <div className="hero__scroll">SCROLL TO EXPLORE</div>
@@ -64,7 +65,7 @@ export default function Hero({ colorIndex, viewIndex, onColor, onView }: HeroPro
           <h1 className="hero__title">{product.name}</h1>
           <p className="hero__sub">{product.blurb}</p>
           <ColorSwatches value={colorIndex} onChange={onColor} />
-          <BuyBar />
+          <BuyBar productId={productId} colorIndex={colorIndex} />
         </div>
       </div>
       <div className="hero__scroll">SCROLL TO EXPLORE</div>

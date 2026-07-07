@@ -61,7 +61,9 @@ export default async function ProductPage({
   // for showcase-only slugs (e.g. drift2) that aren't in the commerce DB.
   const experience = aliasBase ? null : getProductExperience(slug);
   if (experience) {
-    return <ProductExperience product={experience} />;
+    // resolve the commerce product id (if any) so Buy/Add-to-Cart can work
+    const db = await getProductBySlugDB(slug);
+    return <ProductExperience product={experience} productId={db?.id ?? 0} />;
   }
 
   const product = await getProductBySlugDB(dataSlug);

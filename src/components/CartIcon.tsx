@@ -9,6 +9,7 @@ export default function CartIcon() {
     <button
       onClick={openCart}
       aria-label="Open cart"
+      data-cart-icon
       className="relative flex h-9 w-9 items-center justify-center rounded-full transition-all hover:scale-110"
       style={{ border: "1px solid rgba(255,255,255,0.15)" }}
     >
