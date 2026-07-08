@@ -108,11 +108,11 @@ const drift: ProductExperience = {
   model: "/products/drift/drift-model.glb",
   spinStage: { eyebrow: "Every angle", caption: "See it from all sides." },
   featureFocus: { eyebrow: "Designed around you", caption: "A closer look." },
-  overviewModel: { x: 0.36, ry: -0.6, scale: 0.62 }, // right side, turned to face right, smaller
+  overviewModel: { x: 0.32, ry: -0.6, scale: 0.62 }, // right, closer to the copy, turned right, smaller
   featuresBackground: true, // model sits behind the feature grid (frosted backdrop)
   featuresModel: { x: -0.32, ry: 0, scale: 0.5 }, // left, front, smaller (background)
   specsModel: { x: -0.16, ry: 0, scale: 0.46 }, // left-of-centre + smaller, clears the right values
-  deepDiveModel: { x: 0.34, ry: 0, scale: 0.5 }, // roams to the empty side of each row
+  deepDiveModel: { x: 0.34, ry: 1.45, scale: 0.5 }, // roams to the empty side; ~90° so it shows its side profile
   technicalSplit: true, // sticky spec list left, model angles per spec on the right
   landingStage: { eyebrow: "Made for the move", caption: "That's DRIFT." },
   // Guided tour — model rotates to each angle as its text fades in.

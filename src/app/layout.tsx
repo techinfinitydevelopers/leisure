@@ -7,6 +7,8 @@ import Footer from "@/components/Footer";
 import Preloader from "@/components/Preloader";
 import CartDrawer from "@/components/CartDrawer";
 import { CartProvider } from "@/context/CartContext";
+import { AudioProvider } from "@/context/AudioContext";
+import FloatingSoundToggle from "@/components/FloatingSoundToggle";
 
 // SF Pro Display — headings / UI (Apple-modern)
 const sfpro = localFont({
@@ -60,11 +62,16 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <CartProvider>
-          <Preloader />
-          <Nav />
-          <CartDrawer />
-          {children}
-          <Footer />
+          <AudioProvider>
+            <Preloader />
+            <Nav />
+            <CartDrawer />
+            {children}
+            <Footer />
+            {/* sticky sound control — persists on every page; lifts above the
+                product StickyBuyBar when it appears */}
+            <FloatingSoundToggle />
+          </AudioProvider>
         </CartProvider>
       </body>
     </html>

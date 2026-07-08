@@ -38,29 +38,8 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-5 py-14 sm:px-8">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
 
-          {/* Col 1 — Brand + speaker ripple */}
+          {/* Col 1 — Brand */}
           <div className="flex flex-col gap-5">
-            {/* Speaker ripple icon */}
-            <div className="relative flex h-16 w-16 items-center justify-center">
-              {/* Ripple rings */}
-              {[0, 0.8, 1.6].map((delay) => (
-                <span
-                  key={delay}
-                  className="absolute inset-0 rounded-full border border-gold/30"
-                  style={{
-                    animation: `ripple-ring 2.4s ease-out ${delay}s infinite`,
-                  }}
-                />
-              ))}
-              {/* Speaker cone SVG */}
-              <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full border border-gold/40 bg-velvet/60">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="text-gold">
-                  <path d="M3 9v6h4l5 5V4L7 9H3z" fill="currentColor" opacity="0.9" />
-                  <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z" fill="currentColor" opacity="0.7" />
-                  <path d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" fill="currentColor" opacity="0.4" />
-                </svg>
-              </div>
-            </div>
 
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-gold" />
@@ -201,8 +180,8 @@ export default function Footer() {
             textAnchor="middle"
             fontFamily="'SF Pro Display','Helvetica Neue',Arial,sans-serif"
             fill="none"
-            stroke="rgba(251,237,43,0.12)"
-            strokeWidth="1"
+            stroke="rgba(251,237,43,0.45)"
+            strokeWidth="1.5"
             letterSpacing="-3"
           >
             LEISURE

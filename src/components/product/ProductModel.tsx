@@ -20,6 +20,9 @@ const TARGET_H = 1.7; // normalized model height in world units (smaller = small
 const BASE_RY = -Math.PI / 2 + 0.42;
 const SPREAD = 1.3; // how far (world units) parts fly apart at full explode
 const EXPLODE_S = 0.95; // steady scale while the model is centered & exploded
+const SPIN_S = 0.85; // model scale during the spin stage (smaller so caption reads)
+const FACE_K = 5.2; // how hard the model turns based on which side it's roaming
+const FACE_MAX = 1.5; // max heading (rad) at the far left/right
 const SPREAD_JITTER = 0.6; // ± variation in how far each part travels
 const TUMBLE = 0.9; // max per-part rotation (rad) at full explode
 const MAX_STAGGER = 0.35; // parts start separating across this slice of the ramp
@@ -105,6 +108,9 @@ export default function ProductModel({ product, onReady }: Props) {
   }, [scene]);
 
   // Collect materials once so we can drive opacity (reveal + parallax hide).
+  // Keep the authored transparency (only 3 blend mats) so the model renders
+  // SOLID when fully visible — permanently-transparent mats sort wrong and make
+  // the model look see-through / like the back is missing.
   const materials = useMemo(() => {
     const set = new Set<THREE.Material>();
     holder.traverse((o) => {
@@ -112,9 +118,10 @@ export default function ProductModel({ product, onReady }: Props) {
       if (Array.isArray(m)) m.forEach((mm) => set.add(mm));
       else if (m) set.add(m);
     });
-    for (const m of set) m.transparent = true;
+    for (const m of set) m.userData.baseTransparent = m.transparent;
     return [...set];
   }, [holder]);
+  const fadingRef = useRef<boolean | null>(null);
 
   useEffect(() => {
     onReady?.();
@@ -141,16 +148,27 @@ export default function ProductModel({ product, onReady }: Props) {
     focusRef.current = THREE.MathUtils.lerp(focusRef.current, scroll.focus, 0.1);
     const ex = exRef.current; // 0 assembled -> 1 fully exploded (dormant)
     const focus = focusRef.current; // 0 -> 1 into the guided feature tour
+    // intro: hidden at the very top (hero shows a still image), reveals + slides
+    // down as the user starts scrolling
+    const intro = THREE.MathUtils.clamp((p - 0.008) / 0.05, 0, 1);
+    // opacity gate: reveal on the first scroll with a SMALL, subtle fade — the
+    // product stays visible throughout (floors at ~0.6, not fully transparent)
+    const revealGate =
+      p <= 0.008 ? 0 : 0.6 + 0.4 * THREE.MathUtils.clamp((p - 0.008) / 0.03, 0, 1);
+    // face based on WHICH SIDE the model is on: roaming left -> turn front
+    // toward the centre/content (3/4 view), mirrored on the right.
+    const roamFaceRY = THREE.MathUtils.clamp(-k.x * FACE_K, -FACE_MAX, FACE_MAX);
 
     if (sp > 0.001) {
       // pinned spin: center and rotate a full turn on Y (real 3D)
       const rotY = sp * Math.PI * 2;
       g.position.x = THREE.MathUtils.lerp(g.position.x, 0, 0.12);
-      g.position.y = THREE.MathUtils.lerp(g.position.y, 0, 0.12);
+      // sit a little below centre so the "SEE IT FROM ALL SIDES" title clears it
+      g.position.y = THREE.MathUtils.lerp(g.position.y, -viewport.height * 0.15, 0.12);
       g.rotation.z = THREE.MathUtils.lerp(g.rotation.z, 0, 0.12);
       g.rotation.x = THREE.MathUtils.lerp(g.rotation.x, 0, 0.12);
       g.rotation.y = rotY;
-      const s = THREE.MathUtils.lerp(g.scale.x, k.s + 0.35, 0.12);
+      const s = THREE.MathUtils.lerp(g.scale.x, SPIN_S, 0.12);
       g.scale.setScalar(s);
     } else {
       // roam + zoom/dolly + slide-aside (mirrors ProductPlane)
@@ -184,12 +202,17 @@ export default function ProductModel({ product, onReady }: Props) {
       );
       const roamY = k.y * viewport.height * (1 - z);
       const heldY = THREE.MathUtils.lerp(roamY, scroll.holdY * viewport.height, hold);
-      const targetY = THREE.MathUtils.lerp(heldY, 0, focus);
+      // intro slide: start a little higher and drop into place as it reveals
+      const targetY =
+        THREE.MathUtils.lerp(heldY, 0, focus) + (1 - intro) * viewport.height * 0.12;
       const targetRZ =
         (k.rz + scroll.velocity * 0.0006) * (1 - z) * (1 - focus) * (1 - hold);
-      // heading: roam -> held heading -> focus heading
-      const heldRY = THREE.MathUtils.lerp(k.ry * (1 - z), scroll.holdRY, hold);
-      const targetRY = THREE.MathUtils.lerp(heldRY, scroll.focusRY, focus);
+      // heading: face roam direction -> held heading -> focus heading
+      const heldRY = THREE.MathUtils.lerp(roamFaceRY * (1 - z), scroll.holdRY, hold);
+      const roamRY = THREE.MathUtils.lerp(heldRY, scroll.focusRY, focus);
+      // on reveal (intro < 1) present a steady right-side view with a touch of
+      // front, then ease into the roam heading as the model settles in
+      const targetRY = THREE.MathUtils.lerp(-1.15, roamRY, intro);
       const heldRX = THREE.MathUtils.lerp(0, scroll.holdRX, hold);
       const targetRX = THREE.MathUtils.lerp(heldRX, scroll.focusRX, focus);
       // scale: shrink while held, dolly with zoom, steady when focused
@@ -223,7 +246,24 @@ export default function ProductModel({ product, onReady }: Props) {
     scroll.planeReveal = THREE.MathUtils.lerp(scroll.planeReveal, 1, 0.06);
     fadeRef.current = THREE.MathUtils.lerp(fadeRef.current, 1, 0.14);
     hideRef.current = THREE.MathUtils.lerp(hideRef.current, scroll.productHide, 0.1);
-    const opacity = k.o * scroll.planeReveal * fadeRef.current * (1 - hideRef.current);
+    const opacity =
+      k.o * scroll.planeReveal * fadeRef.current * (1 - hideRef.current) * revealGate;
+    // Only go transparent while actually fading; otherwise render opaque/solid
+    // (flip the flag on state change, not every frame, to avoid recompiles).
+    const fading = opacity < 0.985;
+    if (fading !== fadingRef.current) {
+      fadingRef.current = fading;
+      // when fully visible, force EVERYTHING opaque (incl. the GLB's blend mats)
+      // so the model reads solid — no see-through back
+      for (const m of materials) {
+        m.transparent = fading;
+        // keep depth writes ON even while fading so the front always occludes
+        // the back — the model blends against the bg, not against itself
+        m.depthWrite = true;
+        if (m instanceof THREE.MeshStandardMaterial) m.alphaTest = 0;
+        m.needsUpdate = true;
+      }
+    }
     for (const m of materials) m.opacity = opacity;
   });
 

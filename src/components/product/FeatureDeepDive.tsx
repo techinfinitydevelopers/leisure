@@ -33,15 +33,22 @@ function DeepDiveRow({ title, copy, index }: DeepDiveRowProps) {
     // (text-left row -> model right; flipped row -> model left).
     let st: ScrollTrigger | undefined;
     if (dm) {
+      // turn the front toward the copy: right row (model on right) shows its
+      // full side profile (dm.ry ~1.45); left row turns less to a 3/4 front so
+      // the carry-handle side doesn't dominate.
+      const mag = flipped ? (dm.ry || 1.45) * 0.55 : (dm.ry || 1.45);
+      const face = (flipped ? 1 : -1) * mag;
+      const sideX = (flipped ? -1 : 1) * (dm.x ?? 0.34);
+      const apply = () => {
+        scroll.holdX = sideX;
+        scroll.holdRY = face;
+      };
       st = ScrollTrigger.create({
         trigger: el,
-        start: "top center",
-        end: "bottom center",
-        onEnter: () => {
-          scroll.holdX = (flipped ? -1 : 1) * (dm.x ?? 0.34);
-        },
-        onEnterBack: () => {
-          scroll.holdX = (flipped ? -1 : 1) * (dm.x ?? 0.34);
+        start: "top 60%",
+        end: "bottom 40%",
+        onToggle: (self) => {
+          if (self.isActive) apply();
         },
       });
     }
@@ -81,7 +88,6 @@ export default function FeatureDeepDive() {
       onToggle: (self) => {
         if (self.isActive) {
           scroll.holdS = dm.scale ?? 1;
-          scroll.holdRY = dm.ry ?? 0;
           scroll.holdX = dm.x ?? 0.34; // default side until a row sets it
           scroll.holdCount += 1;
         } else {

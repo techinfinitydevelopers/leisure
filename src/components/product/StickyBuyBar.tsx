@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useProductExperience } from "@/lib/product-experience-context";
 import { useCart } from "@/context/CartContext";
 import { flyToCart } from "@/lib/flyToCart";
+import { setBuyBarVisible } from "@/lib/uiStore";
 
 type Props = {
   productId: number;
@@ -26,13 +27,18 @@ export default function StickyBuyBar({ productId, colorIndex }: Props) {
     const st = ScrollTrigger.create({
       trigger: "#buy",
       start: "bottom top", // hero CTA passed above the viewport
-      onEnter: () =>
-        gsap.to(el, { autoAlpha: 1, yPercent: 0, duration: 0.4, ease: "power2.out" }),
-      onLeaveBack: () =>
-        gsap.to(el, { autoAlpha: 0, yPercent: 100, duration: 0.3, ease: "power2.in" }),
+      onEnter: () => {
+        gsap.to(el, { autoAlpha: 1, yPercent: 0, duration: 0.4, ease: "power2.out" });
+        setBuyBarVisible(true);
+      },
+      onLeaveBack: () => {
+        gsap.to(el, { autoAlpha: 0, yPercent: 100, duration: 0.3, ease: "power2.in" });
+        setBuyBarVisible(false);
+      },
     });
     return () => {
       st.kill();
+      setBuyBarVisible(false);
     };
   }, []);
 

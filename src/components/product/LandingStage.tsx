@@ -21,12 +21,13 @@ export default function LandingStage() {
     // caption for the whole finale — it does not scroll up and does not fade.
     let held = false;
     const hold = () => {
+      scroll.productHide = 0; // ensure visible here (FAQ hides it just before)
       if (held) return;
       held = true;
       scroll.holdX = 0;
       scroll.holdY = -0.14; // sit a little below centre (under the caption)
       scroll.holdRY = 0;
-      scroll.holdRX = 0;
+      scroll.holdRX = 0.85; // tilt for a top-front view
       scroll.holdS = 1.0;
       scroll.holdCount += 1;
     };
