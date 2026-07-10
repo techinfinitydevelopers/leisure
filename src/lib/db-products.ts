@@ -2,7 +2,7 @@
 import { prisma } from "@/lib/prisma";
 import { products as staticProducts } from "@/lib/products";
 
-export type ProductColor = { name: string; hex: string };
+export type ProductColor = { name: string; hex: string; images?: string[] };
 export type SpecPair = { label: string; value: string };
 
 /** Product shape with parsed JSON columns, used across dashboard + public pages. */

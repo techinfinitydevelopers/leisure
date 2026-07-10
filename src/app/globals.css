@@ -142,3 +142,30 @@ body {
   0%   { transform: scaleY(0.22); }
   100% { transform: scaleY(1); }
 }
+
+/* Rich-text blog body (editor + rendered post) — restore list/link/emphasis
+   styling that Tailwind's preflight strips. */
+.blog-content ul,
+.blog-content ol {
+  margin: 0.5rem 0 0.5rem 1.75rem !important;
+  padding-left: 0.5rem !important;
+}
+.blog-content ul { list-style: disc outside !important; }
+.blog-content ol { list-style: decimal outside !important; }
+.blog-content li { display: list-item !important; margin: 0.25rem 0; }
+.blog-content p { margin: 0.75rem 0; }
+.blog-content a {
+  color: #fbed2b !important;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.blog-content b,
+.blog-content strong { font-weight: 700; }
+.blog-content i,
+.blog-content em { font-style: italic; }
+.blog-content u { text-decoration: underline; }
+.blog-content:empty::before {
+  content: "Write your post…";
+  color: rgba(255, 255, 255, 0.3);
+}

@@ -63,23 +63,54 @@ export default function ProductForm({
     }
   }
 
+  // Upload one file to the admin upload endpoint, return its public URL (or null).
+  async function uploadFile(file: File): Promise<string | null> {
+    const fd = new FormData();
+    fd.append("file", file);
+    const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+    const data = (await res.json()) as { url?: string; error?: string };
+    if (res.ok && data.url) return data.url;
+    setError(data.error ?? "Upload failed");
+    return null;
+  }
+
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
     setError("");
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/admin/upload", {
-        method: "POST",
-        body: fd,
-      });
-      const data = (await res.json()) as { url?: string; error?: string };
-      if (res.ok && data.url) {
-        setImageUrl(data.url);
-      } else {
-        setError(data.error ?? "Upload failed");
+      const url = await uploadFile(file);
+      if (url) setImageUrl(url);
+    } catch {
+      setError("Upload failed");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  }
+
+  // Upload one or more images for a specific color and append them to its list.
+  async function handleColorUpload(
+    idx: number,
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) return;
+    setUploading(true);
+    setError("");
+    try {
+      const urls: string[] = [];
+      for (const file of files) {
+        const url = await uploadFile(file);
+        if (url) urls.push(url);
+      }
+      if (urls.length > 0) {
+        setColors((prev) =>
+          prev.map((c, i) =>
+            i === idx ? { ...c, images: [...(c.images ?? []), ...urls] } : c,
+          ),
+        );
       }
     } catch {
       setError("Upload failed");
@@ -87,6 +118,16 @@ export default function ProductForm({
       setUploading(false);
       e.target.value = "";
     }
+  }
+
+  function removeColorImage(idx: number, imgIdx: number) {
+    setColors((prev) =>
+      prev.map((c, i) =>
+        i === idx
+          ? { ...c, images: (c.images ?? []).filter((_, j) => j !== imgIdx) }
+          : c,
+      ),
+    );
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -312,42 +353,90 @@ export default function ProductForm({
             <p className="text-xs text-offwhite/40">No colors added.</p>
           )}
           {colors.map((color, idx) => (
-            <div key={idx} className="flex items-center gap-3">
-              <input
-                aria-label="Color name"
-                placeholder="Name"
-                value={color.name}
-                onChange={(e) =>
-                  setColors((prev) =>
-                    prev.map((c, i) =>
-                      i === idx ? { ...c, name: e.target.value } : c,
-                    ),
-                  )
-                }
-                className={`${inputClass} flex-1`}
-              />
-              <input
-                aria-label="Color hex"
-                type="color"
-                value={color.hex}
-                onChange={(e) =>
-                  setColors((prev) =>
-                    prev.map((c, i) =>
-                      i === idx ? { ...c, hex: e.target.value } : c,
-                    ),
-                  )
-                }
-                className="h-10 w-14 shrink-0 cursor-pointer rounded-lg border border-white/10 bg-white/5"
-              />
-              <button
-                type="button"
-                onClick={() =>
-                  setColors((prev) => prev.filter((_, i) => i !== idx))
-                }
-                className="shrink-0 rounded-full border border-red-400/40 px-3 py-1.5 text-xs uppercase tracking-wide text-red-300 hover:border-red-400"
-              >
-                Remove
-              </button>
+            <div
+              key={idx}
+              className="flex flex-col gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-3"
+            >
+              <div className="flex items-center gap-3">
+                <input
+                  aria-label="Color name"
+                  placeholder="Name"
+                  value={color.name}
+                  onChange={(e) =>
+                    setColors((prev) =>
+                      prev.map((c, i) =>
+                        i === idx ? { ...c, name: e.target.value } : c,
+                      ),
+                    )
+                  }
+                  className={`${inputClass} flex-1`}
+                />
+                <input
+                  aria-label="Color hex"
+                  type="color"
+                  value={color.hex}
+                  onChange={(e) =>
+                    setColors((prev) =>
+                      prev.map((c, i) =>
+                        i === idx ? { ...c, hex: e.target.value } : c,
+                      ),
+                    )
+                  }
+                  className="h-10 w-14 shrink-0 cursor-pointer rounded-lg border border-white/10 bg-white/5"
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setColors((prev) => prev.filter((_, i) => i !== idx))
+                  }
+                  className="shrink-0 rounded-full border border-red-400/40 px-3 py-1.5 text-xs uppercase tracking-wide text-red-300 hover:border-red-400"
+                >
+                  Remove
+                </button>
+              </div>
+
+              {/* Per-color images — the experience page uses these in order:
+                  [0] = front (hero + cart), the rest are thumbnails/angles. */}
+              <div className="flex flex-wrap items-center gap-2">
+                {(color.images ?? []).map((img, imgIdx) => (
+                  <div
+                    key={imgIdx}
+                    className="group relative h-16 w-16 overflow-hidden rounded-lg border border-white/10 bg-white/5"
+                  >
+                    <Image
+                      src={img}
+                      alt={`${color.name || "color"} ${imgIdx + 1}`}
+                      width={64}
+                      height={64}
+                      className="h-16 w-16 object-contain"
+                    />
+                    <button
+                      type="button"
+                      aria-label="Remove image"
+                      onClick={() => removeColorImage(idx, imgIdx)}
+                      className="absolute right-0.5 top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-black/70 text-xs text-red-300 opacity-0 transition group-hover:opacity-100"
+                    >
+                      ×
+                    </button>
+                    {imgIdx === 0 && (
+                      <span className="absolute bottom-0 left-0 right-0 bg-black/60 text-center text-[9px] uppercase tracking-wide text-gold">
+                        front
+                      </span>
+                    )}
+                  </div>
+                ))}
+                <label className="btn-outline flex h-16 w-16 cursor-pointer items-center justify-center px-0 text-center text-[10px] leading-tight">
+                  {uploading ? "…" : "+ Add"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => handleColorUpload(idx, e)}
+                    disabled={uploading}
+                    className="hidden"
+                  />
+                </label>
+              </div>
             </div>
           ))}
         </div>

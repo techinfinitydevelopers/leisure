@@ -55,12 +55,12 @@ const navGroups: NavGroup[] = [
         ),
       },
       {
-        href: "/dashboard/products/new",
-        label: "Add Product",
+        href: "/dashboard/blogs",
+        label: "Blogs",
         icon: (
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
-            <circle cx="12" cy="12" r="9" />
-            <path d="M12 8v8M8 12h8" />
+            <path d="M4 4h11a2 2 0 0 1 2 2v13a1 1 0 0 1-1.5.87L14 19l-1.5.87a1 1 0 0 1-1 0L10 19l-1.5.87a1 1 0 0 1-1.5-.87V6a2 2 0 0 0-2-2Z" />
+            <path d="M8 8h6M8 12h6" />
           </svg>
         ),
       },

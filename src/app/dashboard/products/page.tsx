@@ -19,8 +19,8 @@ export default async function ProductsPage() {
             catalog.
           </p>
         </div>
-        <Link href="/dashboard/products/new" className="btn-gold">
-          Add Product
+        <Link href="/dashboard/products/new" className="btn-gold shrink-0">
+          + Add Product
         </Link>
       </header>
 

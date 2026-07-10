@@ -91,3 +91,16 @@ model PaymentSetting {
   active    Boolean  @default(true)
   updatedAt DateTime @updatedAt
 }
+
+model Blog {
+  id         Int      @id @default(autoincrement())
+  slug       String   @unique
+  title      String
+  excerpt    String   @default("")
+  content    String   @default("")   // plain text / markdown-lite (blank line = new paragraph)
+  coverImage String   @default("")
+  author     String   @default("Leisure")
+  published  Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}

@@ -28,6 +28,43 @@ export default function CheckoutPage() {
   const [done, setDone] = useState(false);
   const [orderId, setOrderId] = useState<number | null>(null);
 
+  // coupon
+  const [couponInput, setCouponInput] = useState("");
+  const [applied, setApplied] = useState<{ code: string; discount: number } | null>(null);
+  const [couponError, setCouponError] = useState("");
+  const [couponLoading, setCouponLoading] = useState(false);
+
+  async function applyCoupon() {
+    const code = couponInput.trim();
+    if (!code) return;
+    setCouponLoading(true);
+    setCouponError("");
+    try {
+      const res = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, subtotal: total }),
+      });
+      const data = await res.json();
+      if (res.ok && data.discount != null) {
+        setApplied({ code: data.code, discount: data.discount });
+      } else {
+        setApplied(null);
+        setCouponError(data.error ?? "Invalid coupon");
+      }
+    } catch {
+      setCouponError("Could not validate coupon");
+    } finally {
+      setCouponLoading(false);
+    }
+  }
+
+  function removeCoupon() {
+    setApplied(null);
+    setCouponInput("");
+    setCouponError("");
+  }
+
   function validate(): boolean {
     const e: Partial<FormData> = {};
     if (!form.name.trim()) e.name = "Required";
@@ -50,7 +87,8 @@ export default function CheckoutPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
-          total,
+          total: grandTotal,
+          couponCode: applied?.code ?? null,
           items: items.map((i) => ({
             productId: i.productId,
             color: i.color,
@@ -130,7 +168,8 @@ export default function CheckoutPage() {
   }
 
   const shipping = 0;
-  const grandTotal = total + shipping;
+  const discount = applied?.discount ?? 0;
+  const grandTotal = total - discount + shipping;
 
   return (
     <main className="min-h-screen px-4 py-12 sm:px-6" style={{ background: "#000" }}>
@@ -185,10 +224,51 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
+              {/* ── Coupon ── */}
+              <div className="border-t border-white/8 pt-4">
+                {applied ? (
+                  <div className="flex items-center justify-between rounded-xl px-3 py-2.5" style={{ background: "rgba(251,237,43,0.08)", border: "1px solid rgba(251,237,43,0.25)" }}>
+                    <div className="flex flex-col">
+                      <span className="text-xs font-black uppercase tracking-[0.12em]" style={{ color: "#fbed2b" }}>{applied.code}</span>
+                      <span className="text-[0.65rem] text-white/40">Coupon applied</span>
+                    </div>
+                    <button type="button" onClick={removeCoupon} className="text-[0.65rem] uppercase tracking-[0.1em] text-white/40 hover:text-red-400 transition-colors">Remove</button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex gap-2">
+                      <input
+                        value={couponInput}
+                        onChange={(e) => { setCouponInput(e.target.value.toUpperCase()); setCouponError(""); }}
+                        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); applyCoupon(); } }}
+                        placeholder="Coupon code"
+                        className="flex-1 rounded-xl px-3 py-2.5 text-sm text-white placeholder:text-white/25 outline-none uppercase tracking-[0.08em]"
+                        style={{ background: "#141414", border: "1px solid rgba(255,255,255,0.1)" }}
+                      />
+                      <button
+                        type="button"
+                        onClick={applyCoupon}
+                        disabled={couponLoading || !couponInput.trim()}
+                        className="rounded-xl px-4 text-[0.7rem] font-black uppercase tracking-[0.12em] text-black transition-all disabled:opacity-40"
+                        style={{ background: "#fbed2b" }}
+                      >
+                        {couponLoading ? "…" : "Apply"}
+                      </button>
+                    </div>
+                    {couponError && <p className="text-[0.65rem] text-red-400">{couponError}</p>}
+                  </div>
+                )}
+              </div>
+
               <div className="border-t border-white/8 pt-4 flex flex-col gap-2">
                 <div className="flex justify-between text-sm text-white/50">
                   <span>Subtotal</span><span>{inr.format(total)}</span>
                 </div>
+                {discount > 0 && (
+                  <div className="flex justify-between text-sm text-green-400">
+                    <span>Discount{applied ? ` (${applied.code})` : ""}</span><span>−{inr.format(discount)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm text-white/50">
                   <span>Shipping</span><span className="text-green-400">Free</span>
                 </div>

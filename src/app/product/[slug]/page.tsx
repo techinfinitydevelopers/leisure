@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getProductBySlugDB } from "@/lib/db-products";
 import { getProduct } from "@/lib/products";
-import { getProductExperience } from "@/lib/product-experience";
+import { getMergedExperience } from "@/lib/merge-experience";
 import ProductHero from "@/components/ProductHero";
 import ProductExperience from "@/components/product/ProductExperience";
 
@@ -25,7 +25,7 @@ export async function generateMetadata({
 
   // Rich R3F experience carries its own marketing copy — prefer it for metadata
   // (skipped for classic-alias slugs, which intentionally render the static page).
-  const experience = aliasBase ? null : getProductExperience(slug);
+  const experience = aliasBase ? null : await getMergedExperience(slug);
   if (experience) {
     return {
       title: `Leisure ${experience.name} — ${experience.tagline}`,
@@ -59,7 +59,7 @@ export default async function ProductPage({
   // If a rich scroll-animated experience exists for this slug, render it. It is
   // self-contained (own hero, pricing, specs, 3D roaming plane) and works even
   // for showcase-only slugs (e.g. drift2) that aren't in the commerce DB.
-  const experience = aliasBase ? null : getProductExperience(slug);
+  const experience = aliasBase ? null : await getMergedExperience(slug);
   if (experience) {
     // resolve the commerce product id (if any) so Buy/Add-to-Cart can work
     const db = await getProductBySlugDB(slug);

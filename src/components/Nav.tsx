@@ -105,6 +105,12 @@ export default function Nav() {
               </li>
 
               <li>
+                <Link href="/blog" className="transition-colors hover:text-gold">
+                  Blog
+                </Link>
+              </li>
+
+              <li>
                 <Link href="/about" className="transition-colors hover:text-gold">
                   About
                 </Link>
@@ -178,6 +184,7 @@ export default function Nav() {
         <div className="flex h-full flex-col justify-center gap-8 px-8">
           <Link href="/" className="font-display text-4xl text-offwhite transition-colors hover:text-gold">Home</Link>
           <Link href="/shop" className="font-display text-4xl text-offwhite transition-colors hover:text-gold">Collection</Link>
+          <Link href="/blog" className="font-display text-4xl text-offwhite transition-colors hover:text-gold">Blog</Link>
           <Link href="/about" className="font-display text-4xl text-offwhite transition-colors hover:text-gold">About</Link>
           <Link href="/contact" className="font-display text-4xl text-offwhite transition-colors hover:text-gold">Contact</Link>
           <div className="border-t border-white/10 pt-6">

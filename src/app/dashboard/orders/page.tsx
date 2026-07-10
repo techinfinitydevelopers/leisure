@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 type OrderItem = {
   id: number;
@@ -103,9 +103,8 @@ export default function OrdersPage() {
             </thead>
             <tbody>
               {orders.map((order) => (
-                <>
+                <Fragment key={order.id}>
                   <tr
-                    key={order.id}
                     className="cursor-pointer border-b border-white/5 transition-colors hover:bg-white/5"
                     onClick={() => setExpanded(expanded === order.id ? null : order.id)}
                   >
@@ -166,7 +165,7 @@ export default function OrdersPage() {
                       </td>
                     </tr>
                   )}
-                </>
+                </Fragment>
               ))}
             </tbody>
           </table>
