@@ -42,7 +42,7 @@ export default function MarqueeBand() {
         {TRACK.map((item, i) => (
           <span key={i} className="flex items-center gap-6 whitespace-nowrap">
             <span
-              className="font-display text-[0.7rem] font-bold tracking-[0.28em] uppercase"
+              className="font-globe text-[0.8rem] tracking-[0.1em] uppercase"
               style={{ color: item.accent ? "#fbed2b" : "rgba(255,255,255,0.35)" }}
             >
               {item.text}

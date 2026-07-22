@@ -86,7 +86,7 @@ html.lenis, html.lenis body { height: auto; }
 .hero__thumb.is-active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
 .hero__thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .hero__frame { position: relative; width: clamp(220px, 70%, 420px); aspect-ratio: 1 / 1; }
-.hero__still { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; will-change: opacity; }
+.hero__still { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; will-change: opacity; }
 .hero__scroll { margin-top: 2.5rem; font-size: 0.78rem; letter-spacing: 0.3em; color: var(--muted); }
 
 /* ---------- Hero: center / cinematic variant ---------- */

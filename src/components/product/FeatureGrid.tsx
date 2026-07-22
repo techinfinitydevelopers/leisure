@@ -38,6 +38,44 @@ const ICONS: Record<string, ReactNode> = {
       <circle cx="12" cy="7" r="1" />
     </>
   ),
+  // Waveform / equalizer bars — good for "signature sound" style claims.
+  sound: (
+    <>
+      <path d="M4 12h2" />
+      <path d="M8 8v8" />
+      <path d="M12 5v14" />
+      <path d="M16 8v8" />
+      <path d="M20 10v4" />
+    </>
+  ),
+  // Lightning bolt — fast charging / power.
+  bolt: <path d="M13 3L5 14h6l-1 7 8-11h-6l1-7z" />,
+  // Shield — protection / warranty / durability.
+  shield: (
+    <>
+      <path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z" />
+    </>
+  ),
+  // Ruler-like — weight / dimensions / portability.
+  weight: (
+    <>
+      <rect x="3" y="10" width="18" height="10" rx="1" />
+      <path d="M6 10V7M10 10V7M14 10V7M18 10V7" />
+    </>
+  ),
+  // Signal / stable link / connectivity range.
+  signal: (
+    <>
+      <path d="M4 18l4-6 4 3 4-8 4 11" />
+    </>
+  ),
+  // Two overlapping circles — pair / stereo / TWS.
+  pair: (
+    <>
+      <circle cx="9" cy="12" r="6" />
+      <circle cx="15" cy="12" r="6" />
+    </>
+  ),
 };
 
 type FeatureCellProps = {

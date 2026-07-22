@@ -59,7 +59,11 @@ export default function ProductModel({ product, onReady }: Props) {
     const center = new THREE.Vector3();
     box.getSize(size);
     box.getCenter(center);
-    const scale = size.y > 0 ? TARGET_H / size.y : 1;
+    // Normalise by the LARGEST dimension so a wide speaker + a tall one both
+    // fit within TARGET_H on screen. Previously we used size.y only, which
+    // made squat/wide models scale huge because their height was small.
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const scale = (maxDim > 0 ? TARGET_H / maxDim : 1) * (product.modelScale ?? 1);
 
     const holder = new THREE.Group();
     root.position.sub(center); // center the model on the origin
@@ -105,7 +109,7 @@ export default function ProductModel({ product, onReady }: Props) {
     });
 
     return { holder, parts };
-  }, [scene]);
+  }, [scene, product.modelScale]);
 
   // Collect materials once so we can drive opacity (reveal + parallax hide).
   // Keep the authored transparency (only 3 blend mats) so the model renders

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getAllProductsDB } from "@/lib/db-products";
+import { getStorefrontProducts } from "@/lib/products-source";
 import ShopProductCard from "@/components/ShopProductCard";
 
 export const dynamic = "force-dynamic";
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Shop() {
-  const products = await getAllProductsDB();
+  const products = await getStorefrontProducts();
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">

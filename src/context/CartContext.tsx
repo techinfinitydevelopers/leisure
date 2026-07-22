@@ -12,6 +12,9 @@ export type CartItem = {
   color: string;
   image: string;
   qty: number;
+  /** Shopify variant GID (present when the product came from Shopify) — required
+   *  for checkout to hand off to Shopify's hosted checkout page. */
+  variantId?: string;
 };
 
 type CartCtx = {

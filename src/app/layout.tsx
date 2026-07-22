@@ -44,6 +44,15 @@ const pinyon = Pinyon_Script({
   weight: "400",
 });
 
+// THE GLOBE — distressed/stencil display accent (personal-use license; check
+// before using in shipped commercial marketing assets)
+const globe = localFont({
+  variable: "--font-globe",
+  display: "swap",
+  src: "./fonts/TheGlobePersonalUse-Bold.ttf",
+  weight: "700",
+});
+
 export const metadata: Metadata = {
   title: "Leisure — Sound Your Wild",
   description:
@@ -58,7 +67,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${roboto.variable} ${sfpro.variable} ${cormorant.variable} ${pinyon.variable} h-full antialiased`}
+      className={`${roboto.variable} ${sfpro.variable} ${cormorant.variable} ${pinyon.variable} ${globe.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <CartProvider>

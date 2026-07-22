@@ -26,6 +26,7 @@ export default function BuyBar({ productId, colorIndex }: Props) {
     mrp: product.mrp,
     color: color.name,
     image: color.images[0],
+    variantId: color.variantId,
   });
 
   const handleAdd = (e: MouseEvent<HTMLButtonElement>) => {

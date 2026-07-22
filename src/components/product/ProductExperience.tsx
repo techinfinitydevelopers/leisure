@@ -20,7 +20,6 @@ import FeatureGrid from "./FeatureGrid";
 import SpecsSection from "./SpecsSection";
 import SpecRail from "./SpecRail";
 import SpecExplorer from "./SpecExplorer";
-import Highlights from "./Highlights";
 import LifestyleLoop from "./LifestyleLoop";
 import FeatureDeepDive from "./FeatureDeepDive";
 import TechnicalDetails from "./TechnicalDetails";
@@ -117,7 +116,6 @@ export default function ProductExperience({
           ) : (
             <SpecsSection />
           )}
-          <Highlights />
           {hasDeepDives && <LifestyleLoop />}
           <FeatureDeepDive />
           <TechnicalDetails />

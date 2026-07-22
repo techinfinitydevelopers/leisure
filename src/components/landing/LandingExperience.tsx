@@ -17,7 +17,7 @@ gsap.registerPlugin(useGSAP, ScrollTrigger);
 // slow, smooth fade to black (frames 181-193 fade too fast on their own).
 const FRAME_COUNT = 180;
 // Bump when the frames are re-exported, to bust the browser cache.
-const FRAME_VERSION = 2;
+const FRAME_VERSION = 3;
 const framePath = (i: number) =>
   `/frames/frame_${String(i).padStart(4, "0")}.jpg?v=${FRAME_VERSION}`;
 

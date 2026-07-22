@@ -27,6 +27,13 @@
   --velvet-deep:   var(--gray-800);
   --velvet-bright: var(--gray-700);
 
+  /* Gold gradient (brand kit) — distinct from the yellow "gold" alias above.
+     Available as tokens/utility for elements that want the warm brown-gold
+     look specifically, without touching existing yellow-based accents. */
+  --gold-1: #8a5a2b;
+  --gold-2: #db9658;
+  --gold-3: #eaaa7a;
+
   --background: var(--black);
   --foreground: var(--white);
 }
@@ -41,10 +48,15 @@
   --color-nearblack: var(--near-black);
   --color-deepblack: var(--deep-black);
 
+  --color-gold-1: var(--gold-1);
+  --color-gold-2: var(--gold-2);
+  --color-gold-3: var(--gold-3);
+
   --font-sans:   var(--font-roboto);
   --font-display: var(--font-sf);
   --font-script:  var(--font-cormorant);
   --font-pinyon:  var(--font-pinyon);
+  --font-globe:   var(--font-globe);
 }
 
 /* ── Lenis ── */
@@ -82,6 +94,7 @@ body {
 
 /* ── Gradient helpers (reusable in JSX via className) ── */
 .grad-yellow   { background: linear-gradient(135deg, #fbed2b 0%, #e8d800 100%); }
+.grad-gold     { background: linear-gradient(135deg, #8a5a2b 0%, #db9658 50%, #eaaa7a 100%); }
 .grad-gray     { background: linear-gradient(135deg, #1f1f1f 0%, #0d0d0d 100%); }
 .grad-y-to-b   { background: linear-gradient(180deg, #fbed2b 0%, #000000 100%); }
 

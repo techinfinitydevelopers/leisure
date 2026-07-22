@@ -10,6 +10,8 @@ export type ExpColor = {
   name: string;
   hex: string;
   images: string[]; // transparent PNG cutouts for the floating plane [front, back/tilt]
+  /** Shopify variant GID — enables headless checkout for this variant. */
+  variantId?: string;
 };
 
 export type SpecPair = { k: string; v: string };
@@ -28,11 +30,18 @@ export type ProductExperience = {
   discountPct: number;
   currency: string;
   blurb: string;
+  /** Optional rich-HTML variant of the blurb (from Shopify Description). */
+  blurbHtml?: string;
+  /** Optional marquee phrase (e.g. "SOUND THAT TRAVELS — RAIN OR SHINE"). */
+  lifestyleLoop?: string;
   colors: ExpColor[];
   texture?: string;
   /** Optional 3D model (glTF/GLB). When set, the roaming 3D model replaces the
    *  2D image plane and is driven by the same scroll track. */
   model?: string;
+  /** Optional multiplier applied on top of the auto-fit scale, for models that
+   *  should render larger/smaller than the standard normalized height. */
+  modelScale?: number;
   perspective?: {
     heroVariant?: "split";
     specLayout?: "explorer" | "rail" | "default";
@@ -194,6 +203,16 @@ const edge: ProductExperience = {
     { id: "orange", name: "Orange", hex: "#e8631a", images: ["/products/edge/orange/edge-orange-front.png", "/products/edge/orange/edge-orange-back.png"] },
   ],
   perspective: { heroVariant: "split", specLayout: "explorer" },
+  // Bespoke cinema-mode experience. Uses the shared GLB roam infrastructure
+  // but drives it through EDGE-specific choreography (see /edge/EdgeExperience).
+  model: "/products/edge/edge-model.glb",
+  modelScale: 1.35,
+  landingStage: { eyebrow: "Cinematic by design", caption: "That's EDGE." },
+  featureStops: [
+    { title: "Twin Drivers", copy: "Two 15W main drivers keep vocals and mids crystal-clear.", rx: 0.05, ry: -0.35, x: -0.3 },
+    { title: "Twin Tweeters", copy: "Twin 10W tweeters add air to every high — cymbals, strings, breath.", rx: 0.15, ry: 0.4, x: 0.3 },
+    { title: "5-in-1 Inputs", copy: "Bluetooth, AUX, USB, TWS, Optical — every source connects.", rx: -0.6, ry: 0, x: 0 },
+  ],
   spinStage: { eyebrow: "Every angle", caption: "See it from all sides." },
   highlights: [
     { value: "50W", label: "Total Output" },
@@ -330,10 +349,82 @@ const drift2: ProductExperience = {
   ],
 };
 
+// Dominator reuses DRIFT's scroll choreography while carrying its own copy +
+// GLB. Marketing content is expected to come from Shopify metafields; the
+// values below are just static fallbacks used when a field isn't populated.
+const dominator: ProductExperience = {
+  slug: "dominator",
+  name: "DOMINATOR",
+  tagline: "Built to Dominate.",
+  price: 25900,
+  mrp: 32999,
+  discountPct: 22,
+  currency: "₹",
+  blurb:
+    "Massive, bone-shaking sound engineered for the ultimate party. Dual wireless mics, flagship power, built to dominate any room.",
+  colors: [
+    { id: "black", name: "Black", hex: "#000000", images: ["/products/dominator/black/1.jpg", "/products/dominator/black/2.jpg", "/products/dominator/black/3.jpg"] },
+    { id: "grey", name: "Grey", hex: "#b8b8b8", images: ["/products/dominator/light-grey/1.jpg", "/products/dominator/light-grey/2.jpg", "/products/dominator/light-grey/3.jpg"] },
+  ],
+  model: "/products/dominator/dominator-model.glb",
+  spinStage: drift.spinStage,
+  featureFocus: drift.featureFocus,
+  overviewModel: drift.overviewModel,
+  featuresBackground: drift.featuresBackground,
+  featuresModel: drift.featuresModel,
+  specsModel: drift.specsModel,
+  deepDiveModel: drift.deepDiveModel,
+  technicalSplit: drift.technicalSplit,
+  landingStage: { eyebrow: "Turn it up", caption: "That's DOMINATOR." },
+  featureStops: drift.featureStops,
+  perspective: { heroVariant: "split" },
+  track: drift.track,
+  overview:
+    "Command the ultimate party with the Leisure Dominator, our flagship powerhouse engineered for massive, bone-shaking sound. Designed to deliver a true club-level audio experience, it features dual wireless microphones to handle the most epic, all-night performances.",
+  features: [
+    { icon: "sound", label: "Flagship Power", sub: "100W + 10W×2 + 20W×2" },
+    { icon: "battery", label: "20 000 mAh", sub: "All-night ready" },
+    { icon: "bluetooth", label: "5-in-1 Inputs", sub: "BT / AUX / USB / MIC / TWS" },
+  ],
+  specs: [
+    { k: "Battery Capacity", v: "20000 mAh" },
+    { k: "Output Power", v: "100W + 10W×2 + 20W×2" },
+    { k: "Connectivity", v: "BT / AUX / USB / MIC / TWS" },
+    { k: "Playtime", v: "9 hours" },
+    { k: "Charging Time", v: "3:30 hours" },
+    { k: "Charging Input", v: "DC 20V 2A 40W" },
+  ],
+  deepDives: [
+    { title: "Club-level sound", copy: "A 6.5-inch bass driver plus twin tweeters push room-filling audio that stays clean even at party volume." },
+    { title: "Dual wireless mics", copy: "Two included wireless microphones turn the Dominator into an instant PA — hosting, karaoke, or the mic drop." },
+    { title: "All-night stamina", copy: "20 000 mAh keeps the party going for 9 hours between charges — no cables in sight." },
+  ],
+  technical: [
+    { k: "Frequency Response", v: "45Hz – 20KHz" },
+    { k: "Input Sensitivity", v: "600mV" },
+    { k: "Driver Size", v: "2× treble + 6.5 inch bass" },
+    { k: "Product Weight", v: "4.08 Kg" },
+    { k: "Product Size", v: "338×180×240 mm" },
+  ],
+  box: [
+    { name: "DOMINATOR Speaker", note: "The main event." },
+    { name: "Wireless Microphone × 2", note: "For dual-mic performance." },
+    { name: "AUX Cable", note: "Wired backup." },
+    { name: "Power Adaptor", note: "DC 20V 2A." },
+    { name: "Warranty Card", note: "12-month coverage." },
+  ],
+  faq: [
+    { q: "How loud does the Dominator go?", a: "With 100W of primary power plus 40W of tweeters/mids, it comfortably fills large rooms and outdoor gatherings without distortion." },
+    { q: "Do the wireless mics work out of the box?", a: "Yes — pair them via the MIC input; both mics are ready to use with no separate receiver required." },
+    { q: "What's the battery life?", a: "About 9 hours of playtime at moderate volume from the 20 000 mAh battery." },
+  ],
+};
+
 export const PRODUCT_EXPERIENCES: Record<string, ProductExperience> = {
   drift,
   edge,
   drift2,
+  dominator,
 };
 
 export function getProductExperience(slug: string): ProductExperience | null {

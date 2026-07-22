@@ -1,165 +1,59 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
+import { createShopifyCheckout } from "@/lib/shopify-checkout";
 
-const inr = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
-
-type FormData = {
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
-  city: string;
-  pincode: string;
-};
-
-const EMPTY: FormData = { name: "", email: "", phone: "", address: "", city: "", pincode: "" };
+const inr = new Intl.NumberFormat("en-IN", {
+  style: "currency",
+  currency: "INR",
+  maximumFractionDigits: 0,
+});
 
 export default function CheckoutPage() {
-  const { items, total, clearCart } = useCart();
-  const router = useRouter();
-  const [form, setForm] = useState<FormData>(EMPTY);
-  const [errors, setErrors] = useState<Partial<FormData>>({});
-  const [submitting, setSubmitting] = useState(false);
-  const [done, setDone] = useState(false);
-  const [orderId, setOrderId] = useState<number | null>(null);
+  const { items, total } = useCart();
+  const [redirecting, setRedirecting] = useState(false);
+  const [error, setError] = useState("");
 
-  // coupon
-  const [couponInput, setCouponInput] = useState("");
-  const [applied, setApplied] = useState<{ code: string; discount: number } | null>(null);
-  const [couponError, setCouponError] = useState("");
-  const [couponLoading, setCouponLoading] = useState(false);
+  const hasLocalOnlyItems = items.some((i) => !i.variantId);
 
-  async function applyCoupon() {
-    const code = couponInput.trim();
-    if (!code) return;
-    setCouponLoading(true);
-    setCouponError("");
+  async function handleCheckout() {
+    setError("");
+    setRedirecting(true);
     try {
-      const res = await fetch("/api/coupons/validate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code, subtotal: total }),
-      });
-      const data = await res.json();
-      if (res.ok && data.discount != null) {
-        setApplied({ code: data.code, discount: data.discount });
-      } else {
-        setApplied(null);
-        setCouponError(data.error ?? "Invalid coupon");
+      const lines = items
+        .filter((i) => !!i.variantId)
+        .map((i) => ({ variantId: i.variantId!, quantity: i.qty }));
+      if (lines.length === 0) {
+        throw new Error(
+          "None of the items in your cart are available for Shopify checkout yet. Please add these products in Shopify first.",
+        );
       }
-    } catch {
-      setCouponError("Could not validate coupon");
-    } finally {
-      setCouponLoading(false);
+      const url = await createShopifyCheckout(lines);
+      window.location.href = url;
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Checkout failed. Please try again.");
+      setRedirecting(false);
     }
-  }
-
-  function removeCoupon() {
-    setApplied(null);
-    setCouponInput("");
-    setCouponError("");
-  }
-
-  function validate(): boolean {
-    const e: Partial<FormData> = {};
-    if (!form.name.trim()) e.name = "Required";
-    if (!form.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) e.email = "Valid email required";
-    if (!form.phone.match(/^\+?[0-9]{10,13}$/)) e.phone = "Valid phone required";
-    if (!form.address.trim()) e.address = "Required";
-    if (!form.city.trim()) e.city = "Required";
-    if (!form.pincode.match(/^[0-9]{6}$/)) e.pincode = "6-digit pincode required";
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!validate()) return;
-    setSubmitting(true);
-    try {
-      const res = await fetch("/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          total: grandTotal,
-          couponCode: applied?.code ?? null,
-          items: items.map((i) => ({
-            productId: i.productId,
-            color: i.color,
-            qty: i.qty,
-            price: i.price,
-          })),
-        }),
-      });
-      if (!res.ok) throw new Error("Failed");
-      const { id } = await res.json();
-      setOrderId(id);
-      clearCart();
-      setDone(true);
-    } catch {
-      alert("Something went wrong. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  function field(key: keyof FormData, label: string, type = "text", placeholder = "") {
-    return (
-      <div className="flex flex-col gap-1.5">
-        <label className="text-[0.68rem] uppercase tracking-[0.16em] text-white/50">{label}</label>
-        <input
-          type={type}
-          value={form[key]}
-          onChange={(ev) => setForm((p) => ({ ...p, [key]: ev.target.value }))}
-          placeholder={placeholder}
-          className="rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/25 outline-none transition-all"
-          style={{
-            background: "#141414",
-            border: errors[key] ? "1px solid #ef4444" : "1px solid rgba(255,255,255,0.1)",
-          }}
-          onFocus={(ev) => (ev.currentTarget.style.borderColor = "#fbed2b")}
-          onBlur={(ev) => (ev.currentTarget.style.borderColor = errors[key] ? "#ef4444" : "rgba(255,255,255,0.1)")}
-        />
-        {errors[key] && <p className="text-[0.65rem] text-red-400">{errors[key]}</p>}
-      </div>
-    );
-  }
-
-  if (done) {
-    return (
-      <main className="min-h-screen flex items-center justify-center px-4" style={{ background: "#000" }}>
-        <div className="max-w-md w-full text-center flex flex-col items-center gap-6">
-          <div className="w-20 h-20 rounded-full flex items-center justify-center text-3xl" style={{ background: "#fbed2b" }}>
-            ✓
-          </div>
-          <h1 className="text-3xl font-black text-white tracking-tight">Order Placed!</h1>
-          <p className="text-white/50 text-sm leading-relaxed">
-            Thank you, <span className="text-white font-semibold">{form.name}</span>! Your order #{orderId} has been received. We&apos;ll reach out on <span className="text-white font-semibold">{form.phone}</span> to confirm.
-          </p>
-          <Link
-            href="/shop"
-            className="rounded-full px-8 py-3 text-[0.78rem] font-black uppercase tracking-[0.16em] text-black transition-all hover:scale-105"
-            style={{ background: "#fbed2b" }}
-          >
-            Continue Shopping
-          </Link>
-        </div>
-      </main>
-    );
   }
 
   if (items.length === 0) {
     return (
-      <main className="min-h-screen flex items-center justify-center px-4" style={{ background: "#000" }}>
+      <main
+        className="min-h-screen flex items-center justify-center px-4"
+        style={{ background: "#000" }}
+      >
         <div className="text-center flex flex-col items-center gap-5">
-          <p className="text-white/40 text-sm uppercase tracking-[0.14em]">Your cart is empty</p>
-          <Link href="/shop" className="text-[0.78rem] uppercase tracking-[0.14em] font-bold transition-colors" style={{ color: "#fbed2b" }}>
+          <p className="text-white/40 text-sm uppercase tracking-[0.14em]">
+            Your cart is empty
+          </p>
+          <Link
+            href="/shop"
+            className="text-[0.78rem] uppercase tracking-[0.14em] font-bold transition-colors"
+            style={{ color: "#fbed2b" }}
+          >
             Browse Products →
           </Link>
         </div>
@@ -167,122 +61,108 @@ export default function CheckoutPage() {
     );
   }
 
-  const shipping = 0;
-  const discount = applied?.discount ?? 0;
-  const grandTotal = total - discount + shipping;
-
   return (
     <main className="min-h-screen px-4 py-12 sm:px-6" style={{ background: "#000" }}>
-      <div className="mx-auto max-w-5xl">
-        <Link href="/shop" className="text-sm text-white/40 hover:text-white/70 transition-colors">← Back to shop</Link>
-        <h1 className="mt-6 text-4xl font-black text-white tracking-tight">Checkout</h1>
+      <div className="mx-auto max-w-2xl">
+        <Link
+          href="/shop"
+          className="text-sm text-white/40 hover:text-white/70 transition-colors"
+        >
+          ← Back to shop
+        </Link>
+        <h1 className="mt-6 text-4xl font-black text-white tracking-tight">
+          Review your order
+        </h1>
+        <p className="mt-2 text-sm text-white/50">
+          You&apos;ll be redirected to secure checkout to enter delivery details, apply
+          discount codes, and complete payment.
+        </p>
 
-        <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_400px]">
-          {/* ── Form ── */}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-            <div className="rounded-2xl p-6 sm:p-8 flex flex-col gap-5" style={{ background: "#0d0d0d", border: "1px solid rgba(255,255,255,0.07)" }}>
-              <h2 className="text-sm font-black uppercase tracking-[0.16em] text-white/60">Delivery Details</h2>
-              {field("name", "Full Name", "text", "Rahul Sharma")}
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                {field("email", "Email", "email", "you@email.com")}
-                {field("phone", "Phone", "tel", "+91 98765 43210")}
+        {error && (
+          <p
+            className="mt-6 rounded-xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-300"
+            role="alert"
+          >
+            {error}
+          </p>
+        )}
+
+        {hasLocalOnlyItems && !error && (
+          <p
+            className="mt-6 rounded-xl border border-yellow-400/40 bg-yellow-500/10 px-4 py-3 text-xs text-yellow-200"
+            role="alert"
+          >
+            Some items in your cart aren&apos;t set up in Shopify yet — only the items marked as available below will be checked out. Add the remaining products in Shopify to include them.
+          </p>
+        )}
+
+        <div
+          className="mt-8 rounded-2xl p-6 flex flex-col gap-4"
+          style={{ background: "#0d0d0d", border: "1px solid rgba(255,255,255,0.07)" }}
+        >
+          <h2 className="text-sm font-black uppercase tracking-[0.16em] text-white/60">
+            Order Summary
+          </h2>
+
+          <div className="flex flex-col gap-3">
+            {items.map((item) => (
+              <div key={item.id} className="flex gap-3 items-center">
+                <div
+                  className="relative h-14 w-14 flex-shrink-0 rounded-lg overflow-hidden"
+                  style={{ background: "#1a1a1a" }}
+                >
+                  <Image
+                    src={item.image}
+                    alt={item.model}
+                    fill
+                    className="object-contain p-1"
+                    sizes="56px"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-white text-sm font-bold truncate">{item.model}</p>
+                  <p className="text-white/40 text-[0.65rem] uppercase tracking-[0.1em]">
+                    {item.color} × {item.qty}
+                    {!item.variantId && (
+                      <span className="ml-2 text-yellow-400">not available</span>
+                    )}
+                  </p>
+                </div>
+                <p
+                  className="text-sm font-bold flex-shrink-0"
+                  style={{ color: "#fbed2b" }}
+                >
+                  {inr.format(item.price * item.qty)}
+                </p>
               </div>
-              {field("address", "Address", "text", "123, MG Road, Apt 4B")}
-              <div className="grid grid-cols-2 gap-5">
-                {field("city", "City", "text", "Mumbai")}
-                {field("pincode", "Pincode", "text", "400001")}
-              </div>
+            ))}
+          </div>
+
+          <div className="border-t border-white/8 pt-4 flex flex-col gap-2">
+            <div className="flex justify-between text-sm text-white/50">
+              <span>Subtotal</span>
+              <span>{inr.format(total)}</span>
             </div>
-
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full rounded-full py-4 text-[0.82rem] font-black uppercase tracking-[0.18em] text-black transition-all hover:scale-[1.01] hover:shadow-[0_0_40px_rgba(251,237,43,0.35)] disabled:opacity-60 disabled:cursor-not-allowed"
-              style={{ background: "#fbed2b" }}
-            >
-              {submitting ? "Placing Order…" : `Place Order — ${inr.format(grandTotal)}`}
-            </button>
-          </form>
-
-          {/* ── Order summary ── */}
-          <div className="flex flex-col gap-4">
-            <div className="rounded-2xl p-6 flex flex-col gap-4" style={{ background: "#0d0d0d", border: "1px solid rgba(255,255,255,0.07)" }}>
-              <h2 className="text-sm font-black uppercase tracking-[0.16em] text-white/60">Order Summary</h2>
-
-              <div className="flex flex-col gap-3">
-                {items.map((item) => (
-                  <div key={item.id} className="flex gap-3 items-center">
-                    <div className="relative h-14 w-14 flex-shrink-0 rounded-lg overflow-hidden" style={{ background: "#1a1a1a" }}>
-                      <Image src={item.image} alt={item.model} fill className="object-contain p-1" sizes="56px" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-white text-sm font-bold truncate">{item.model}</p>
-                      <p className="text-white/40 text-[0.65rem] uppercase tracking-[0.1em]">{item.color} × {item.qty}</p>
-                    </div>
-                    <p className="text-sm font-bold flex-shrink-0" style={{ color: "#fbed2b" }}>{inr.format(item.price * item.qty)}</p>
-                  </div>
-                ))}
-              </div>
-
-              {/* ── Coupon ── */}
-              <div className="border-t border-white/8 pt-4">
-                {applied ? (
-                  <div className="flex items-center justify-between rounded-xl px-3 py-2.5" style={{ background: "rgba(251,237,43,0.08)", border: "1px solid rgba(251,237,43,0.25)" }}>
-                    <div className="flex flex-col">
-                      <span className="text-xs font-black uppercase tracking-[0.12em]" style={{ color: "#fbed2b" }}>{applied.code}</span>
-                      <span className="text-[0.65rem] text-white/40">Coupon applied</span>
-                    </div>
-                    <button type="button" onClick={removeCoupon} className="text-[0.65rem] uppercase tracking-[0.1em] text-white/40 hover:text-red-400 transition-colors">Remove</button>
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-2">
-                    <div className="flex gap-2">
-                      <input
-                        value={couponInput}
-                        onChange={(e) => { setCouponInput(e.target.value.toUpperCase()); setCouponError(""); }}
-                        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); applyCoupon(); } }}
-                        placeholder="Coupon code"
-                        className="flex-1 rounded-xl px-3 py-2.5 text-sm text-white placeholder:text-white/25 outline-none uppercase tracking-[0.08em]"
-                        style={{ background: "#141414", border: "1px solid rgba(255,255,255,0.1)" }}
-                      />
-                      <button
-                        type="button"
-                        onClick={applyCoupon}
-                        disabled={couponLoading || !couponInput.trim()}
-                        className="rounded-xl px-4 text-[0.7rem] font-black uppercase tracking-[0.12em] text-black transition-all disabled:opacity-40"
-                        style={{ background: "#fbed2b" }}
-                      >
-                        {couponLoading ? "…" : "Apply"}
-                      </button>
-                    </div>
-                    {couponError && <p className="text-[0.65rem] text-red-400">{couponError}</p>}
-                  </div>
-                )}
-              </div>
-
-              <div className="border-t border-white/8 pt-4 flex flex-col gap-2">
-                <div className="flex justify-between text-sm text-white/50">
-                  <span>Subtotal</span><span>{inr.format(total)}</span>
-                </div>
-                {discount > 0 && (
-                  <div className="flex justify-between text-sm text-green-400">
-                    <span>Discount{applied ? ` (${applied.code})` : ""}</span><span>−{inr.format(discount)}</span>
-                  </div>
-                )}
-                <div className="flex justify-between text-sm text-white/50">
-                  <span>Shipping</span><span className="text-green-400">Free</span>
-                </div>
-                <div className="flex justify-between text-base font-black text-white mt-1">
-                  <span>Total</span><span style={{ color: "#fbed2b" }}>{inr.format(grandTotal)}</span>
-                </div>
-              </div>
+            <div className="flex justify-between text-sm text-white/50">
+              <span>Shipping & taxes</span>
+              <span>Calculated at checkout</span>
             </div>
-
-            <p className="text-center text-[0.65rem] text-white/25 leading-relaxed">
-              Orders confirmed via phone call · Free shipping across India · 1-year warranty
-            </p>
           </div>
         </div>
+
+        <button
+          type="button"
+          onClick={handleCheckout}
+          disabled={redirecting}
+          className="mt-8 w-full rounded-full py-4 text-[0.82rem] font-black uppercase tracking-[0.18em] text-black transition-all hover:scale-[1.01] hover:shadow-[0_0_40px_rgba(251,237,43,0.35)] disabled:opacity-60 disabled:cursor-not-allowed"
+          style={{ background: "#fbed2b" }}
+        >
+          {redirecting ? "Redirecting to checkout…" : "Continue to Secure Checkout"}
+        </button>
+
+        <p className="mt-4 text-center text-[0.65rem] text-white/25 leading-relaxed">
+          Secure checkout by Shopify · Apply discount codes on the next page · 1-year warranty
+        </p>
       </div>
     </main>
   );

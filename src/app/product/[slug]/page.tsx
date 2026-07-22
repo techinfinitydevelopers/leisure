@@ -4,8 +4,10 @@ import type { Metadata } from "next";
 import { getProductBySlugDB } from "@/lib/db-products";
 import { getProduct } from "@/lib/products";
 import { getMergedExperience } from "@/lib/merge-experience";
+import { getStorefrontProductBySlug } from "@/lib/products-source";
 import ProductHero from "@/components/ProductHero";
 import ProductExperience from "@/components/product/ProductExperience";
+import EdgeExperience from "@/components/product/edge/EdgeExperience";
 
 export const dynamic = "force-dynamic";
 
@@ -33,7 +35,7 @@ export async function generateMetadata({
     };
   }
 
-  const product = await getProductBySlugDB(aliasBase ?? slug);
+  const product = await getStorefrontProductBySlug(aliasBase ?? slug);
   if (!product) {
     return { title: "Leisure — Speaker not found" };
   }
@@ -61,12 +63,17 @@ export default async function ProductPage({
   // for showcase-only slugs (e.g. drift2) that aren't in the commerce DB.
   const experience = aliasBase ? null : await getMergedExperience(slug);
   if (experience) {
-    // resolve the commerce product id (if any) so Buy/Add-to-Cart can work
-    const db = await getProductBySlugDB(slug);
+    // resolve the commerce product id (Shopify first, then DB) so cart works
+    const db = await getStorefrontProductBySlug(slug);
+    // EDGE has its own bespoke cinema-mode layout; other rich slugs use the
+    // shared ProductExperience component.
+    if (slug === "edge") {
+      return <EdgeExperience product={experience} productId={db?.id ?? 0} />;
+    }
     return <ProductExperience product={experience} productId={db?.id ?? 0} />;
   }
 
-  const product = await getProductBySlugDB(dataSlug);
+  const product = await getStorefrontProductBySlug(dataSlug);
 
   if (!product) {
     notFound();

@@ -106,7 +106,7 @@ function GalleryImage({ item, id, total, open, inPlace, onInPlace }: GalleryImag
           href={item.url}
           width={W}
           height={H}
-          preserveAspectRatio="xMidYMid slice"
+          preserveAspectRatio="xMidYMid meet"
         />
       </g>
     </svg>
@@ -208,25 +208,22 @@ export function ImageGallery({ items }: { items: GalleryItem[] }) {
   const current = items[opened];
 
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col items-center">
-      {/* Stage + flanking buttons */}
-      <div className="relative flex w-full items-center justify-center">
+    <div className="flex w-full flex-col items-center">
+      {/* Stage row */}
+      <div className="relative flex w-full items-center justify-center" style={{ aspectRatio: "1200 / 320" }}>
 
         {/* Prev */}
         <button
           type="button" onClick={prev} disabled={disabled} aria-label="Previous"
-          className="absolute left-0 top-1/2 z-[101] flex h-14 w-14 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 border border-white/20 backdrop-blur-sm text-white transition-all duration-300 hover:bg-gold/20 hover:border-gold/40 hover:scale-105 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="absolute left-6 top-1/2 z-[101] flex h-14 w-14 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 border border-white/20 backdrop-blur-sm text-white transition-all duration-300 hover:bg-gold/20 hover:border-gold/40 hover:scale-105 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M15 18l-6-6 6-6" />
           </svg>
         </button>
 
-        {/* Square stage */}
-        <div
-          className="relative overflow-hidden rounded-[20px] shadow-[0_2.8px_2.2px_rgba(0,0,0,0.07),0_6.7px_5.3px_rgba(0,0,0,0.05),0_100px_80px_rgba(0,0,0,0.12)]"
-          style={{ width: "min(80vmin, 560px)", height: "min(80vmin, 560px)" }}
-        >
+        {/* Full-width stage */}
+        <div className="relative h-full w-full overflow-hidden">
           {items.map((item, i) => (
             <GalleryImage
               key={item.url + i}
@@ -246,7 +243,7 @@ export function ImageGallery({ items }: { items: GalleryItem[] }) {
         {/* Next */}
         <button
           type="button" onClick={next} disabled={disabled} aria-label="Next"
-          className="absolute right-0 top-1/2 z-[101] flex h-14 w-14 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 border border-white/20 backdrop-blur-sm text-white transition-all duration-300 hover:bg-gold/20 hover:border-gold/40 hover:scale-105 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="absolute right-6 top-1/2 z-[101] flex h-14 w-14 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 border border-white/20 backdrop-blur-sm text-white transition-all duration-300 hover:bg-gold/20 hover:border-gold/40 hover:scale-105 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 18l6-6-6-6" />
@@ -254,9 +251,9 @@ export function ImageGallery({ items }: { items: GalleryItem[] }) {
         </button>
       </div>
 
-      {/* Caption */}
+      {/* Caption — below the image, not overlapping it */}
       {current && (
-        <div className="mt-10 flex flex-col items-center text-center">
+        <div className="flex flex-col items-center px-6 pt-10 text-center">
           {current.subtitle && (
             <p className="font-pinyon text-2xl text-gold sm:text-3xl">{current.subtitle}</p>
           )}

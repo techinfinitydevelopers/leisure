@@ -102,7 +102,14 @@ export default function Hero({ colorIndex, viewIndex, onColor, onView, productId
         <div className="hero__info">
           <span className="eyebrow">{product.tagline}</span>
           <h1 className="hero__title">{product.name}</h1>
-          <p className="hero__sub">{product.blurb}</p>
+          {product.blurbHtml ? (
+            <div
+              className="hero__sub blog-content"
+              dangerouslySetInnerHTML={{ __html: product.blurbHtml }}
+            />
+          ) : (
+            <p className="hero__sub">{product.blurb}</p>
+          )}
           <ColorSwatches value={colorIndex} onChange={onColor} />
           <BuyBar productId={productId} colorIndex={colorIndex} />
         </div>

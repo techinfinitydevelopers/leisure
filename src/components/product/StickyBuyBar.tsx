@@ -55,6 +55,7 @@ export default function StickyBuyBar({ productId, colorIndex }: Props) {
         mrp: product.mrp,
         color: color.name,
         image: color.images[0],
+        variantId: color.variantId,
       });
       openCart();
     });

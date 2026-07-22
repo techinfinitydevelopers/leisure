@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { scroll } from "@/lib/scrollStore";
+import { useProductExperience } from "@/lib/product-experience-context";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -51,7 +52,12 @@ export default function LifestyleLoop() {
     };
   }, []);
 
-  const phrase = "SOUND THAT TRAVELS — RAIN OR SHINE — ";
+  // Marquee text comes from the `custom.lifestyle_loop` metafield when set,
+  // otherwise falls back to a sensible default. Trailing " — " keeps the wrap
+  // clean when the phrase repeats.
+  const product = useProductExperience();
+  const raw = (product.lifestyleLoop || "SOUND THAT TRAVELS — RAIN OR SHINE").trim();
+  const phrase = raw.endsWith("—") ? `${raw} ` : `${raw} — `;
 
   return (
     <section className="loop" id="loop" aria-hidden="true" ref={rootRef}>

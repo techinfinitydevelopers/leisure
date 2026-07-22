@@ -2,7 +2,13 @@
 import { prisma } from "@/lib/prisma";
 import { products as staticProducts } from "@/lib/products";
 
-export type ProductColor = { name: string; hex: string; images?: string[] };
+export type ProductColor = {
+  name: string;
+  hex: string;
+  images?: string[];
+  /** Shopify variant GID (e.g. "gid://shopify/ProductVariant/…") for checkout. */
+  variantId?: string;
+};
 export type SpecPair = { label: string; value: string };
 
 /** Product shape with parsed JSON columns, used across dashboard + public pages. */
@@ -12,6 +18,19 @@ export type DbProduct = {
   model: string;
   tagline: string;
   description: string;
+  /** Optional rich-HTML description (set by the Shopify adapter). */
+  descriptionHtml?: string;
+  /** Optional editorial "overview" copy (e.g. from a Shopify metafield). */
+  overview?: string;
+  /** Optional marketing extras sourced from Shopify metafields. */
+  highlights?: string[];
+  faq?: { q: string; a: string }[];
+  deepDives?: { title: string; copy: string }[];
+  features?: { icon?: string; label: string; sub?: string }[];
+  landingEyebrow?: string;
+  landingCaption?: string;
+  /** Marquee text under the deep-dive section ("Sound that travels — ..."). */
+  lifestyleLoop?: string;
   price: number; // INR rupees
   mrp: number; // INR rupees
   stock: number;

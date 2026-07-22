@@ -3,7 +3,7 @@
 // (track, deep-dives, feature stops, 3D model, parallax) stays in the static file.
 import { getProductExperience } from "@/lib/product-experience";
 import type { ProductExperience, ExpColor } from "@/lib/product-experience";
-import { getProductBySlugDB } from "@/lib/db-products";
+import { getStorefrontProductBySlug } from "@/lib/products-source";
 
 function slugifyId(name: string, i: number): string {
   const s = name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -22,7 +22,7 @@ export async function getMergedExperience(
   const base = getProductExperience(slug);
   if (!base) return null;
 
-  const db = await getProductBySlugDB(slug);
+  const db = await getStorefrontProductBySlug(slug);
   if (!db) return base;
 
   // colors + per-color images from the DB; fall back to the static cutouts when
@@ -39,6 +39,7 @@ export async function getMergedExperience(
             name: c.name,
             hex: c.hex,
             images,
+            variantId: c.variantId,
           };
         })
       : base.colors;
@@ -53,7 +54,8 @@ export async function getMergedExperience(
     name: db.model || base.name,
     tagline: db.tagline || base.tagline,
     blurb: db.description || base.blurb,
-    overview: db.description || base.overview,
+    blurbHtml: db.descriptionHtml || base.blurbHtml,
+    overview: db.overview || db.description || base.overview,
     price: db.price || base.price,
     mrp: db.mrp || base.mrp,
     discountPct,
@@ -70,5 +72,37 @@ export async function getMergedExperience(
       db.inBox.length > 0
         ? db.inBox.map((name) => ({ name, note: "" }))
         : base.box,
+    // Optional marketing extras from Shopify metafields — only override when
+    // the metafield actually has values, so static content isn't wiped out.
+    // Highlights: comma-separated entries in the metafield support an optional
+    // "value | label" split (e.g. "10W | Power" -> value=10W label=Power).
+    highlights:
+      db.highlights && db.highlights.length > 0
+        ? db.highlights.map((raw) => {
+            const parts = raw.split(/\s*\|\s*/);
+            return parts.length > 1
+              ? { value: parts[0], label: parts.slice(1).join(" | ") }
+              : { value: raw, label: "" };
+          })
+        : base.highlights,
+    faq: db.faq && db.faq.length > 0 ? db.faq : base.faq,
+    deepDives:
+      db.deepDives && db.deepDives.length > 0 ? db.deepDives : base.deepDives,
+    features:
+      db.features && db.features.length > 0
+        ? db.features.map((f) => ({
+            icon: f.icon ?? "sparkle",
+            label: f.label,
+            sub: f.sub ?? "",
+          }))
+        : base.features,
+    landingStage:
+      db.landingEyebrow || db.landingCaption
+        ? {
+            eyebrow: db.landingEyebrow ?? base.landingStage?.eyebrow ?? "",
+            caption: db.landingCaption ?? base.landingStage?.caption ?? "",
+          }
+        : base.landingStage,
+    lifestyleLoop: db.lifestyleLoop || base.lifestyleLoop,
   };
 }
