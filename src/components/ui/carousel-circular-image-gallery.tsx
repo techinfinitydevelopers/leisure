@@ -16,24 +16,24 @@ export type GalleryItem = {
 };
 
 // ── Geometry (matches original) ───────────────────────────────────────────────
-const GAP    = 10;
-const R      = 7;      // tab dot radius
-const SCALE  = 700;    // how far the "full reveal" circle extends
-const W      = 400;
-const H      = 400;
-const DUR    = 0.4;
-const BIG    = R * SCALE; // 4900 — radius that covers the whole canvas
+const GAP = 10;
+const R   = 7;      // tab dot radius
+const W   = 400;
+const H   = 400;
 
 function tabX(id: number, total: number) {
   return W / 2 - (total * (R * 2 + GAP) - GAP) / 2 + id * (R * 2 + GAP);
 }
 
-// Clip-circle positions
-const posSmall     = (id: number, total: number) => ({ cx: tabX(id, total), cy: H - 30, r: R });
-const posSmallAbove = (id: number, total: number) => ({ cx: tabX(id, total), cy: H / 2,  r: R * 2 });
-const posCenter    = ()                            => ({ cx: W / 2,           cy: H / 2,  r: R * 7 });
-const posEnd       = ()                            => ({ cx: W / 2 - BIG,     cy: H / 2,  r: BIG });
-const posStart     = ()                            => ({ cx: W / 2 + BIG,     cy: H / 2,  r: BIG });
+// Minimal cross-fade + parallax drift: no clip-path masking at all — each
+// image is a plain full-frame layer, and the transition is just opacity +
+// a small scale/vertical drift. Understated, premium feel (Apple-style),
+// GPU-cheap (transform + opacity only).
+const DRIFT      = 14;   // px the incoming/outgoing image travels vertically
+const SCALE_IN   = 1.05; // incoming starts slightly zoomed in, settles to 1
+const SCALE_OUT  = 0.96; // outgoing settles slightly zoomed out as it fades
+const FADE_IN_DUR  = 0.5;
+const FADE_OUT_DUR = 0.4;
 
 // ── Individual image layer ─────────────────────────────────────────────────────
 interface GalleryImageProps {
@@ -41,48 +41,53 @@ interface GalleryImageProps {
   id: number;
   total: number;
   open: boolean;
-  inPlace: boolean;
   onInPlace: (id: number) => void;
 }
 
-function GalleryImage({ item, id, total, open, inPlace, onInPlace }: GalleryImageProps) {
-  const clipRef   = useRef<SVGCircleElement>(null);
+function GalleryImage({ item, id, total, open, onInPlace }: GalleryImageProps) {
+  const groupRef  = useRef<SVGGElement>(null);
   const firstLoad = useRef(true);
 
   useEffect(() => {
-    const el = clipRef.current;
+    const el = groupRef.current;
     if (!el) return;
 
-    const fl    = firstLoad.current;
+    const fl = firstLoad.current;
     firstLoad.current = false;
 
-    const flipDur    = fl ? 0 : DUR;
-    const upDur      = fl ? 0 : 0.2;
-    const bounceDur  = fl ? 0.01 : 1;
-    const closeDelay = fl ? 0 : flipDur + upDur;
+    if (fl) {
+      // First render: snap straight to final state, no animation.
+      gsap.set(el, { opacity: open ? 1 : 0, y: 0, scale: 1 });
+      if (open) onInPlace(id);
+      return;
+    }
 
     if (open) {
-      gsap.timeline()
-        .set(el,  { attr: posSmall(id, total) })
-        .to(el,   { attr: posCenter(),          duration: upDur,   ease: "power3.inOut" })
-        .to(el,   {
-          attr: posEnd(),
-          duration: flipDur,
-          ease: "power4.in",
+      gsap.fromTo(
+        el,
+        { opacity: 0, y: DRIFT, scale: SCALE_IN },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: FADE_IN_DUR,
+          ease: "power2.out",
+          transformOrigin: "center",
           onComplete: () => onInPlace(id),
-        });
+        }
+      );
     } else {
-      gsap.timeline({ overwrite: true })
-        .set(el, { attr: posStart() })
-        .to(el,  { attr: posCenter(),          delay: closeDelay, duration: flipDur,   ease: "power4.out" })
-        .to(el,  { attr: posSmallAbove(id, total), duration: bounceDur * 0.3, ease: "power2.out" })
-        .to(el,  { attr: posSmall(id, total),  duration: bounceDur * 0.7, ease: "bounce.out" });
+      gsap.to(el, {
+        opacity: 0,
+        y: -DRIFT,
+        scale: SCALE_OUT,
+        duration: FADE_OUT_DUR,
+        ease: "power2.in",
+        transformOrigin: "center",
+      });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
-
-  const clipId   = `cl-circle-${id}`;
-  const squareId = `cl-square-${id}`;
 
   return (
     <svg
@@ -91,17 +96,9 @@ function GalleryImage({ item, id, total, open, inPlace, onInPlace }: GalleryImag
       viewBox={`0 0 ${W} ${H}`}
       preserveAspectRatio="xMidYMid slice"
       className="absolute inset-0 h-full w-full"
-      style={{ zIndex: inPlace ? id : total + 1 }}
+      style={{ zIndex: open ? total + 1 : id }}
     >
-      <defs>
-        <clipPath id={clipId}>
-          <circle ref={clipRef} cx={0} cy={0} r={R} />
-        </clipPath>
-        <clipPath id={squareId}>
-          <rect width={W} height={H} />
-        </clipPath>
-      </defs>
-      <g clipPath={`url(#${inPlace ? squareId : clipId})`}>
+      <g ref={groupRef}>
         <image
           href={item.url}
           width={W}
@@ -229,7 +226,6 @@ export function ImageGallery({ items }: { items: GalleryItem[] }) {
               key={item.url + i}
               item={item} id={i} total={items.length}
               open={opened === i}
-              inPlace={inPlace === i}
               onInPlace={onInPlace}
             />
           ))}

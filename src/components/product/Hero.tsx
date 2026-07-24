@@ -7,6 +7,7 @@ import { useProductExperience } from "@/lib/product-experience-context";
 import ColorSwatches from "./ColorSwatches";
 import Thumbnails from "./Thumbnails";
 import BuyBar from "./BuyBar";
+import ZoomImage from "./ZoomImage";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -80,11 +81,9 @@ export default function Hero({ colorIndex, viewIndex, onColor, onView, productId
       <div className="hero__grid">
         {/* framed grid slot — still image at rest; the 3D model reveals here on scroll */}
         <div className="hero__slot">
-          <div className="hero__frame" aria-hidden="true">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              ref={stillRef}
-              className="hero__still"
+          <div className="hero__frame">
+            <ZoomImage
+              imgRef={stillRef}
               src={
                 product.colors[colorIndex].images[viewIndex] ??
                 product.colors[colorIndex].images[0]

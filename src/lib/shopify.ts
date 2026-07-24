@@ -123,7 +123,10 @@ const PRODUCT_FRAGMENT = `
     tags
     availableForSale
     featuredImage { url altText }
-    images(first: 10) { edges { node { url altText } } }
+    # High enough to cover every colour variant's full image set (e.g. 2
+    # colours x 6 images = 12) — was 10, which silently truncated later
+    # variants' images once a product had enough colours/photos combined.
+    images(first: 50) { edges { node { url altText } } }
     priceRange { minVariantPrice { amount currencyCode } }
     compareAtPriceRange { minVariantPrice { amount currencyCode } }
     options { name values }

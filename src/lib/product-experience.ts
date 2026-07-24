@@ -39,9 +39,17 @@ export type ProductExperience = {
   /** Optional 3D model (glTF/GLB). When set, the roaming 3D model replaces the
    *  2D image plane and is driven by the same scroll track. */
   model?: string;
+  /** No GLB yet for this product — skip the roaming/explode 2D-plane
+   *  animation entirely (still shows the static hero image + swatches).
+   *  Remove this flag once `model` is set. */
+  skipPlaneAnimation?: boolean;
   /** Optional multiplier applied on top of the auto-fit scale, for models that
    *  should render larger/smaller than the standard normalized height. */
   modelScale?: number;
+  /** Override the shared base heading (radians) so THIS model's branded
+   *  front faces the camera at rest. Only needed when a GLB's authored
+   *  front axis differs from the rest (e.g. a re-exported/replacement model). */
+  modelBaseRy?: number;
   perspective?: {
     heroVariant?: "split";
     specLayout?: "explorer" | "rail" | "default";
@@ -115,12 +123,13 @@ const drift: ProductExperience = {
   ],
   texture: "/products/drift/front.png",
   model: "/products/drift/drift-model.glb",
+  modelBaseRy: 0,
   spinStage: { eyebrow: "Every angle", caption: "See it from all sides." },
   featureFocus: { eyebrow: "Designed around you", caption: "A closer look." },
   overviewModel: { x: 0.32, ry: -0.6, scale: 0.62 }, // right, closer to the copy, turned right, smaller
   featuresBackground: true, // model sits behind the feature grid (frosted backdrop)
   featuresModel: { x: -0.32, ry: 0, scale: 0.5 }, // left, front, smaller (background)
-  specsModel: { x: -0.16, ry: 0, scale: 0.46 }, // left-of-centre + smaller, clears the right values
+  specsModel: { x: 0.04, ry: 0, scale: 0.4 }, // parked in the empty gap between the spec labels and values (list scrolls past underneath, so it must clear BOTH columns, not just the right one)
   deepDiveModel: { x: 0.34, ry: 1.45, scale: 0.5 }, // roams to the empty side; ~90° so it shows its side profile
   technicalSplit: true, // sticky spec list left, model angles per spec on the right
   landingStage: { eyebrow: "Made for the move", caption: "That's DRIFT." },
@@ -207,6 +216,11 @@ const edge: ProductExperience = {
   // but drives it through EDGE-specific choreography (see /edge/EdgeExperience).
   model: "/products/edge/edge-model.glb",
   modelScale: 1.35,
+  // Explicit, independent value (was silently falling back to the shared
+  // BASE_RY default before) — verified this facing is correct for EDGE's
+  // GLB via screenshots, now locked in so it can't drift if the shared
+  // default is ever retuned for another product.
+  modelBaseRy: -Math.PI / 2 + 0.42,
   landingStage: { eyebrow: "Cinematic by design", caption: "That's EDGE." },
   featureStops: [
     { title: "Twin Drivers", copy: "Two 15W main drivers keep vocals and mids crystal-clear.", rx: 0.05, ry: -0.35, x: -0.3 },
@@ -367,18 +381,39 @@ const dominator: ProductExperience = {
     { id: "grey", name: "Grey", hex: "#b8b8b8", images: ["/products/dominator/light-grey/1.jpg", "/products/dominator/light-grey/2.jpg", "/products/dominator/light-grey/3.jpg"] },
   ],
   model: "/products/dominator/dominator-model.glb",
-  spinStage: drift.spinStage,
-  featureFocus: drift.featureFocus,
-  overviewModel: drift.overviewModel,
-  featuresBackground: drift.featuresBackground,
-  featuresModel: drift.featuresModel,
-  specsModel: drift.specsModel,
-  deepDiveModel: drift.deepDiveModel,
-  technicalSplit: drift.technicalSplit,
+  // DOMINATOR is a big, deep box (338x180x240mm — much deeper front-to-back
+  // than DRIFT's 128x49x93mm), so it needs its own facing + scale-fit tuning
+  // rather than reusing DRIFT's. Independent literal values below (not
+  // references) so retuning one product never silently moves the other.
+  // NOTE: re-tuned 2026-07-24 after swapping in a new GLB — its authored front
+  // axis differs from the previous model (was showing the left side panel at
+  // ry:0 instead of the front grille).
+  modelBaseRy: 0,
+  modelScale: 1,
+  spinStage: { eyebrow: "Every angle", caption: "See it from all sides." },
+  featureFocus: { eyebrow: "Designed around you", caption: "A closer look." },
+  overviewModel: { x: 0.32, ry: -0.6, scale: 0.5 }, // right, closer to the copy, turned right, smaller
+  featuresBackground: true, // model sits behind the feature grid (frosted backdrop)
+  featuresModel: { x: -0.32, ry: 0, scale: 0.4 }, // left, front, smaller (background) — sized down for the deeper box
+  specsModel: { x: 0.0, ry: 0, scale: 0.32 }, // parked in the empty gap between the spec labels and values (list scrolls past underneath, so it must clear BOTH columns, not just the right one)
+  deepDiveModel: { x: 0.34, ry: 1.45, scale: 0.4 }, // roams to the empty side; ~90° so it shows its side profile
+  technicalSplit: true, // sticky spec list left, model angles per spec on the right
   landingStage: { eyebrow: "Turn it up", caption: "That's DOMINATOR." },
-  featureStops: drift.featureStops,
+  featureStops: [
+    { title: "Signature Sound", copy: "Analog-tuned drivers fill the room — clean highs, warm lows.", rx: 0, ry: 0, x: -0.3 },
+    { title: "DOMINATOR Controls", copy: "Bass, mid, treble and volume — hand-tuned dials, right on top where you reach.", rx: 1.1, ry: 0, x: 0 },
+    { title: "Grab & Go", copy: "A leather carry strap and a rugged build made to travel with you.", rx: -0.3, ry: -0.7, x: 0.15 },
+  ],
   perspective: { heroVariant: "split" },
-  track: drift.track,
+  track: [
+    { at: 0.0, x: -0.28, y: 0.0, rz: 0.0, ry: 0.0, s: 1.0, o: 1 },
+    { at: 0.08, x: -0.28, y: 0.0, rz: 0.0, ry: 0.0, s: 1.0, o: 1 }, // parked left (hero)
+    { at: 0.3, x: 0.3, y: 0.0, rz: 0.0, ry: -0.3, s: 1.05, o: 1 }, // sweep right
+    { at: 0.5, x: -0.3, y: 0.0, rz: 0.0, ry: 0.35, s: 1.05, o: 1 }, // sweep left
+    { at: 0.7, x: 0.3, y: 0.0, rz: 0.0, ry: -0.3, s: 1.05, o: 1 }, // sweep right
+    { at: 0.88, x: -0.28, y: 0.0, rz: 0.0, ry: 0.25, s: 1.0, o: 1 }, // drift left
+    { at: 1.0, x: 0.0, y: 0.0, rz: 0.0, ry: 0.0, s: 1.0, o: 1 }, // settle centre (LandingStage holds the finale)
+  ],
   overview:
     "Command the ultimate party with the Leisure Dominator, our flagship powerhouse engineered for massive, bone-shaking sound. Designed to deliver a true club-level audio experience, it features dual wireless microphones to handle the most epic, all-night performances.",
   features: [
@@ -420,11 +455,283 @@ const dominator: ProductExperience = {
   ],
 };
 
+// CORE/LEGEND/ELEVATE have no GLB yet (public/products/{slug}/ only has 2D
+// color photography), so `model` is intentionally left unset — the page falls
+// back to the 2D ProductPlane. modelBaseRy/modelScale and the stage-placement
+// fields (overviewModel etc.) are still filled in with independent literal
+// values per user request, so they're already separate and ready the moment a
+// GLB is dropped in — just add `model: "/products/{slug}/{slug}-model.glb"`.
+// NOTE: ProductPlane.tsx does not read holdX/holdY/holdS, so overviewModel/
+// featuresModel/specsModel/deepDiveModel/featureStops are inert until a GLB
+// model is set — harmless placeholders for now. Feature/deep-dive copy below
+// is derived from the real specs (products.ts), not fabricated — worth a
+// copy review before shipping.
+const core: ProductExperience = {
+  slug: "core",
+  name: "CORE",
+  tagline: "Power Meets Precision.",
+  price: 9900,
+  mrp: 15999,
+  discountPct: 38,
+  currency: "₹",
+  blurb:
+    "The Leisure Core is where beautiful home decor and powerful, room-filling acoustics live in perfect harmony. Engineered to deliver a refined balance of strong bass and crystal-clear highs, this elegant centerpiece creates an immersive listening experience.",
+  colors: [
+    { id: "black", name: "Black", hex: "#1c1c1c", images: ["/products/core/black/1.jpg", "/products/core/black/2.jpg"] },
+    { id: "brown", name: "Brown", hex: "#5a3b28", images: ["/products/core/brown/1.jpg", "/products/core/brown/2.jpg"] },
+    { id: "white", name: "White", hex: "#f3efe6", images: ["/products/core/white/1.jpg", "/products/core/white/2.jpg"] },
+    { id: "green", name: "Green", hex: "#2f4a3a", images: ["/products/core/green/1.jpg", "/products/core/green/2.jpg"] },
+  ],
+  // No GLB yet — placeholder values, independent per product, ready to use once one is added.
+  modelBaseRy: -Math.PI / 2 + 0.42,
+  modelScale: 1,
+  skipPlaneAnimation: true,
+  spinStage: { eyebrow: "Every angle", caption: "See it from all sides." },
+  featureFocus: { eyebrow: "Designed around you", caption: "A closer look." },
+  overviewModel: { x: 0.32, ry: -0.6, scale: 0.6 },
+  featuresBackground: true,
+  featuresModel: { x: -0.32, ry: 0, scale: 0.48 },
+  specsModel: { x: 0.04, ry: 0, scale: 0.38 },
+  deepDiveModel: { x: 0.34, ry: 1.45, scale: 0.46 },
+  technicalSplit: true,
+  landingStage: { eyebrow: "Power meets precision", caption: "That's CORE." },
+  featureStops: [
+    { title: "Room-Filling Sound", copy: "40W + dual 10W tweeters deliver deep, room-filling sound.", rx: 0, ry: 0, x: -0.3 },
+    { title: "CORE Controls", copy: "Bass, mid, treble and volume — tactile controls right where you need them.", rx: 1.1, ry: 0, x: 0 },
+    { title: "Home-Ready Design", copy: "A refined silhouette built to complement any room, wherever you set it down.", rx: -0.3, ry: -0.7, x: 0.15 },
+  ],
+  perspective: { heroVariant: "split" },
+  track: [
+    { at: 0.0, x: -0.28, y: 0.0, rz: 0.0, ry: 0.0, s: 1.0, o: 1 },
+    { at: 0.08, x: -0.28, y: 0.0, rz: 0.0, ry: 0.0, s: 1.0, o: 1 },
+    { at: 0.3, x: 0.3, y: 0.0, rz: 0.0, ry: -0.3, s: 1.05, o: 1 },
+    { at: 0.5, x: -0.3, y: 0.0, rz: 0.0, ry: 0.35, s: 1.05, o: 1 },
+    { at: 0.7, x: 0.3, y: 0.0, rz: 0.0, ry: -0.3, s: 1.05, o: 1 },
+    { at: 0.88, x: -0.28, y: 0.0, rz: 0.0, ry: 0.25, s: 1.0, o: 1 },
+    { at: 1.0, x: 0.0, y: 0.0, rz: 0.0, ry: 0.0, s: 1.0, o: 1 },
+  ],
+  overview:
+    "Meet the CORE, where beautiful home decor and powerful, room-filling acoustics live in perfect harmony. Engineered to deliver a refined balance of strong bass and crystal-clear highs, it effortlessly brings premium design and soul-soothing performance together to elevate any space.",
+  features: [
+    { icon: "sound", label: "40W + 10W×2", sub: "Hybrid drivers" },
+    { icon: "battery", label: "10,000 mAh", sub: "10 hours playtime" },
+    { icon: "bluetooth", label: "BT / AUX / USB / TWS", sub: "Connect anything" },
+    { icon: "bolt", label: "Fast Charge", sub: "3:30 hrs full charge" },
+  ],
+  specs: [
+    { k: "Battery Capacity", v: "10000 mAh" },
+    { k: "Output Power", v: "40W + 10W×2" },
+    { k: "Connectivity", v: "BT / AUX / USB / TWS" },
+    { k: "Playtime", v: "10 hours" },
+    { k: "Charging Time", v: "3:30 hours" },
+    { k: "Charging Input", v: "DC 20V 2A 40W" },
+  ],
+  deepDives: [
+    { title: "Balanced acoustics", copy: "A 40W main driver plus dual 10W tweeters balance deep bass with crystal-clear highs." },
+    { title: "Connect anything", copy: "Bluetooth, AUX, USB and TWS pairing — link two COREs for stereo sound across the room." },
+    { title: "Built to last", copy: "10 hours of playtime and a fast 3:30-hour recharge keep the music going." },
+  ],
+  technical: [
+    { k: "Frequency Response", v: "20Hz – 20KHz" },
+    { k: "Input Sensitivity", v: "600mV" },
+    { k: "Driver Size", v: "2× treble + 4 inch bass" },
+    { k: "Product Weight", v: "2.31 Kg" },
+    { k: "Product Size", v: "260×152×166 mm" },
+  ],
+  box: [
+    { name: "CORE Speaker", note: "The main event." },
+    { name: "AUX Cable", note: "Wired backup." },
+    { name: "Warranty Card", note: "12-month coverage." },
+    { name: "Power Adaptor", note: "DC 20V 2A." },
+  ],
+  faq: [
+    { q: "How long does the battery last?", a: "About 10 hours of playtime from the 10,000 mAh battery, depending on volume." },
+    { q: "Can I connect two CORE speakers together?", a: "Yes — pair two units via TWS for synced stereo sound across the room." },
+    { q: "Is there a warranty?", a: "Yes — CORE comes with 12-month coverage. Keep the included warranty card for your records." },
+  ],
+};
+
+const legend: ProductExperience = {
+  slug: "legend",
+  name: "LEGEND",
+  tagline: "Unleash the Legend.",
+  price: 13900,
+  mrp: 19999,
+  discountPct: 30,
+  currency: "₹",
+  blurb:
+    "Discover the LEGEND, our perfectly balanced masterpiece designed for those who love to perform. Featuring a built-in handle for effortless carrying and an included wireless microphone, you can easily take your epic karaoke nights anywhere.",
+  colors: [
+    { id: "black", name: "Black", hex: "#1c1c1c", images: ["/products/legend/black/1.jpg", "/products/legend/black/2.jpg"] },
+    { id: "brown", name: "Brown", hex: "#5a3b28", images: ["/products/legend/brown/1.jpg", "/products/legend/brown/2.jpg"] },
+    { id: "green", name: "Green", hex: "#2f4a3a", images: ["/products/legend/green/1.jpg", "/products/legend/green/2.jpg"] },
+    { id: "white", name: "White", hex: "#f3efe6", images: ["/products/legend/white/1.jpg", "/products/legend/white/2.jpg"] },
+    { id: "orange", name: "Orange", hex: "#c1502e", images: ["/products/legend/orange/1.jpg", "/products/legend/orange/2.jpg"] },
+  ],
+  // No GLB yet — placeholder values, independent per product, ready to use once one is added.
+  modelBaseRy: -Math.PI / 2 + 0.42,
+  modelScale: 1,
+  skipPlaneAnimation: true,
+  spinStage: { eyebrow: "Every angle", caption: "See it from all sides." },
+  featureFocus: { eyebrow: "Designed around you", caption: "A closer look." },
+  overviewModel: { x: 0.32, ry: -0.6, scale: 0.58 },
+  featuresBackground: true,
+  featuresModel: { x: -0.32, ry: 0, scale: 0.46 },
+  specsModel: { x: 0.04, ry: 0, scale: 0.36 },
+  deepDiveModel: { x: 0.34, ry: 1.45, scale: 0.44 },
+  technicalSplit: true,
+  landingStage: { eyebrow: "Take the stage", caption: "That's LEGEND." },
+  featureStops: [
+    { title: "Signature Sound", copy: "A 30W driver plus dual 10W tweeters fill any room with clean, punchy sound.", rx: 0, ry: 0, x: -0.3 },
+    { title: "LEGEND Controls", copy: "Bass, mid, treble and volume dials, plus a mic input, right on top.", rx: 1.1, ry: 0, x: 0 },
+    { title: "Grab & Go", copy: "A built-in handle makes it easy to carry your karaoke setup anywhere.", rx: -0.3, ry: -0.7, x: 0.15 },
+  ],
+  perspective: { heroVariant: "split" },
+  track: [
+    { at: 0.0, x: -0.28, y: 0.0, rz: 0.0, ry: 0.0, s: 1.0, o: 1 },
+    { at: 0.08, x: -0.28, y: 0.0, rz: 0.0, ry: 0.0, s: 1.0, o: 1 },
+    { at: 0.3, x: 0.3, y: 0.0, rz: 0.0, ry: -0.3, s: 1.05, o: 1 },
+    { at: 0.5, x: -0.3, y: 0.0, rz: 0.0, ry: 0.35, s: 1.05, o: 1 },
+    { at: 0.7, x: 0.3, y: 0.0, rz: 0.0, ry: -0.3, s: 1.05, o: 1 },
+    { at: 0.88, x: -0.28, y: 0.0, rz: 0.0, ry: 0.25, s: 1.0, o: 1 },
+    { at: 1.0, x: 0.0, y: 0.0, rz: 0.0, ry: 0.0, s: 1.0, o: 1 },
+  ],
+  overview:
+    "Discover the LEGEND, our perfectly balanced masterpiece designed for those who love to perform. Featuring a built-in handle for effortless carrying and an included wireless microphone, gather your friends and be the absolute star of your own party.",
+  features: [
+    { icon: "sound", label: "30W + 10W×2", sub: "Hybrid drivers" },
+    { icon: "battery", label: "10,000 mAh", sub: "Up to 9 hours" },
+    { icon: "bluetooth", label: "BT/AUX/USB/MIC/TWS", sub: "5-in-1 inputs" },
+    { icon: "bolt", label: "Fast Charge", sub: "2 hrs full charge" },
+  ],
+  specs: [
+    { k: "Battery Capacity", v: "10000 mAh" },
+    { k: "Output Power", v: "30W + 10W×2" },
+    { k: "Connectivity", v: "BT / AUX / USB / MIC / TWS" },
+    { k: "Playtime", v: "Up to 9 hours" },
+    { k: "Charging Time", v: "2 hours" },
+    { k: "Charging Input", v: "DC 20V 2A 40W" },
+  ],
+  deepDives: [
+    { title: "Room-filling sound", copy: "A 30W main driver plus twin tweeters balance punchy bass with clear vocals — built for karaoke nights." },
+    { title: "Wireless mic included", copy: "One wireless microphone turns any gathering into a live show — no extra gear needed." },
+    { title: "All-night ready", copy: "Up to 9 hours of playtime and a 2-hour fast charge keep the party going." },
+  ],
+  technical: [
+    { k: "Frequency Response", v: "20Hz – 20KHz" },
+    { k: "Input Sensitivity", v: "600mV" },
+    { k: "Driver Size", v: "2× treble + 4 inch bass" },
+    { k: "Product Weight", v: "2.56 Kg" },
+    { k: "Product Size", v: "262×150×176 mm" },
+  ],
+  box: [
+    { name: "LEGEND Speaker", note: "The main event." },
+    { name: "Wireless Microphone", note: "For instant karaoke." },
+    { name: "AUX Cable", note: "Wired backup." },
+    { name: "Warranty Card", note: "12-month coverage." },
+    { name: "Power Adaptor", note: "DC 20V 2A." },
+  ],
+  faq: [
+    { q: "Does the wireless mic work out of the box?", a: "Yes — pair it via the MIC input; it's ready to use with no separate receiver required." },
+    { q: "How long does the battery last?", a: "Up to 9 hours of playtime from the 10,000 mAh battery, depending on volume." },
+    { q: "Is there a warranty?", a: "Yes — LEGEND comes with 12-month coverage. Keep the included warranty card for your records." },
+  ],
+};
+
+const elevate: ProductExperience = {
+  slug: "elevate",
+  name: "ELEVATE",
+  tagline: "Double the Energy.",
+  price: 17900,
+  mrp: 24999,
+  discountPct: 28,
+  currency: "₹",
+  blurb:
+    "Take your entertainment to new heights with the ELEVATE, designed for those who love to host and perform. Delivering powerful, thumping sound with exceptional clarity, it transforms any space into a live concert experience.",
+  colors: [
+    { id: "black", name: "Black", hex: "#1c1c1c", images: ["/products/elevate/black/1.jpg", "/products/elevate/black/2.jpg"] },
+    { id: "brown", name: "Brown", hex: "#5a3b28", images: ["/products/elevate/brown/1.jpg", "/products/elevate/brown/2.jpg"] },
+    { id: "orange", name: "Orange", hex: "#c1502e", images: ["/products/elevate/orange/1.jpg", "/products/elevate/orange/2.jpg"] },
+  ],
+  // No GLB yet — placeholder values, independent per product, ready to use once one is added.
+  modelBaseRy: -Math.PI / 2 + 0.42,
+  modelScale: 1,
+  skipPlaneAnimation: true,
+  spinStage: { eyebrow: "Every angle", caption: "See it from all sides." },
+  featureFocus: { eyebrow: "Designed around you", caption: "A closer look." },
+  overviewModel: { x: 0.32, ry: -0.6, scale: 0.55 },
+  featuresBackground: true,
+  featuresModel: { x: -0.32, ry: 0, scale: 0.44 },
+  specsModel: { x: 0.04, ry: 0, scale: 0.34 },
+  deepDiveModel: { x: 0.34, ry: 1.45, scale: 0.42 },
+  technicalSplit: true,
+  landingStage: { eyebrow: "Raise the energy", caption: "That's ELEVATE." },
+  featureStops: [
+    { title: "Signature Sound", copy: "A 50W driver plus dual 10W tweeters deliver powerful, thumping sound.", rx: 0, ry: 0, x: -0.3 },
+    { title: "ELEVATE Controls", copy: "Bass, mid, treble and volume dials, plus dual mic inputs, right on top.", rx: 1.1, ry: 0, x: 0 },
+    { title: "Grab & Go", copy: "A rugged, tour-ready build made to power every performance.", rx: -0.3, ry: -0.7, x: 0.15 },
+  ],
+  perspective: { heroVariant: "split" },
+  track: [
+    { at: 0.0, x: -0.28, y: 0.0, rz: 0.0, ry: 0.0, s: 1.0, o: 1 },
+    { at: 0.08, x: -0.28, y: 0.0, rz: 0.0, ry: 0.0, s: 1.0, o: 1 },
+    { at: 0.3, x: 0.3, y: 0.0, rz: 0.0, ry: -0.3, s: 1.05, o: 1 },
+    { at: 0.5, x: -0.3, y: 0.0, rz: 0.0, ry: 0.35, s: 1.05, o: 1 },
+    { at: 0.7, x: 0.3, y: 0.0, rz: 0.0, ry: -0.3, s: 1.05, o: 1 },
+    { at: 0.88, x: -0.28, y: 0.0, rz: 0.0, ry: 0.25, s: 1.0, o: 1 },
+    { at: 1.0, x: 0.0, y: 0.0, rz: 0.0, ry: 0.0, s: 1.0, o: 1 },
+  ],
+  overview:
+    "Take your entertainment to new heights with the ELEVATE, designed for those who love to host and perform. Equipped with dual wireless microphones, it enables seamless duets and dynamic performances, making every gathering more energetic and unforgettable.",
+  features: [
+    { icon: "sound", label: "50W + 10W×2", sub: "Hybrid drivers" },
+    { icon: "battery", label: "10,000 mAh", sub: "8 hours playtime" },
+    { icon: "bluetooth", label: "BT/AUX/USB/MIC/TWS", sub: "5-in-1 inputs" },
+    { icon: "bolt", label: "100W Peak", sub: "Peak power" },
+  ],
+  specs: [
+    { k: "Battery Capacity", v: "10000 mAh" },
+    { k: "Output Power", v: "50W + 10W×2" },
+    { k: "Connectivity", v: "BT / AUX / USB / MIC / TWS" },
+    { k: "Playtime", v: "8 hours" },
+    { k: "Charging Time", v: "2:30 hours" },
+    { k: "Peak Power", v: "100 W" },
+    { k: "Charging Input", v: "DC 20V 2A 40W" },
+  ],
+  deepDives: [
+    { title: "Concert-level sound", copy: "A 50W main driver plus twin tweeters push powerful, clear sound built to fill any space." },
+    { title: "Dual wireless mics", copy: "Two included wireless microphones turn ELEVATE into an instant duet-ready PA." },
+    { title: "All-night stamina", copy: "8 hours of playtime and a 2:30-hour fast charge keep every set going." },
+  ],
+  technical: [
+    { k: "Frequency Response", v: "20Hz – 20KHz" },
+    { k: "Input Sensitivity", v: "600mV" },
+    { k: "Driver Size", v: "2× treble + 5.35 inch bass" },
+    { k: "Product Weight", v: "2.72 Kg" },
+    { k: "Product Size", v: "213×148×310 mm" },
+  ],
+  box: [
+    { name: "ELEVATE Speaker", note: "The main event." },
+    { name: "Wireless Microphone × 2", note: "For duet performances." },
+    { name: "AUX Cable", note: "Wired backup." },
+    { name: "Warranty Card", note: "12-month coverage." },
+    { name: "Power Adaptor", note: "DC 20V 2A." },
+  ],
+  faq: [
+    { q: "How loud does ELEVATE go?", a: "With 50W of primary power plus 20W of tweeters and a 100W peak, it comfortably fills large rooms without distortion." },
+    { q: "Do the wireless mics work out of the box?", a: "Yes — pair them via the MIC input; both mics are ready to use with no separate receiver required." },
+    { q: "What's the battery life?", a: "About 8 hours of playtime at moderate volume from the 10,000 mAh battery." },
+  ],
+};
+
 export const PRODUCT_EXPERIENCES: Record<string, ProductExperience> = {
   drift,
   edge,
   drift2,
   dominator,
+  core,
+  legend,
+  elevate,
 };
 
 export function getProductExperience(slug: string): ProductExperience | null {

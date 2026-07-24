@@ -68,7 +68,7 @@ html.lenis, html.lenis body { height: auto; }
   gap: clamp(2rem, 6vw, 5rem); align-items: center; flex: 1;
 }
 @media (max-width: 860px) { .hero__grid { grid-template-columns: 1fr; } }
-.hero__title { font-family: var(--display); font-size: 3rem; font-weight: 600; line-height: 1; text-transform: uppercase; letter-spacing: -0.01em; }
+.hero__title { font-family: var(--font-globe), var(--display); font-size: 3rem; font-weight: 600; line-height: 1; text-transform: uppercase; letter-spacing: 0.01em; }
 .hero__sub { max-width: 42ch; margin-top: 1.4rem; font-size: clamp(1rem, 1.5vw, 1.2rem); color: var(--muted); line-height: 1.6; }
 /* keep the hero copy + Buy/Add-to-Cart above the roaming 3D model */
 .hero__info { position: relative; z-index: 31; }
@@ -88,6 +88,42 @@ html.lenis, html.lenis body { height: auto; }
 .hero__frame { position: relative; width: clamp(220px, 70%, 420px); aspect-ratio: 1 / 1; }
 .hero__still { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; will-change: opacity; }
 .hero__scroll { margin-top: 2.5rem; font-size: 0.78rem; letter-spacing: 0.3em; color: var(--muted); }
+
+/* Amazon/Myntra-style magnifier — lens follows the cursor over the hero
+   image, a zoomed crop shows in a panel beside it. Hover-capable pointers
+   only: on touch devices this never activates and the plain image shows. */
+/* No overflow:hidden here — the zoom panel is a child positioned OUTSIDE
+   these bounds (to the right) and would get clipped by it. The lens itself
+   is clamped in JS so it never visually overflows the frame anyway. */
+.zoom-frame { position: relative; width: 100%; height: 100%; }
+@media (hover: hover) and (pointer: fine) {
+  .zoom-frame { cursor: zoom-in; }
+  .zoom-lens {
+    position: absolute;
+    border: 1px solid var(--accent);
+    background: rgba(251, 237, 43, 0.15);
+    pointer-events: none;
+    z-index: 5;
+  }
+  .zoom-panel {
+    position: absolute;
+    top: 0;
+    left: calc(100% + 1.5rem);
+    width: 100%;
+    height: 100%;
+    border-radius: 1.25rem;
+    border: 1px solid var(--line);
+    background-color: var(--nearblack, #0a0a0a);
+    background-repeat: no-repeat;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    z-index: 50;
+  }
+  /* Not enough room beside the image below this width — skip the side panel. */
+  @media (max-width: 1180px) {
+    .zoom-panel { display: none; }
+  }
+}
 
 /* ---------- Hero: center / cinematic variant ---------- */
 .hero--center { text-align: center; }

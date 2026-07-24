@@ -82,7 +82,7 @@ export default function ProductExperience({
                   product={product}
                   onReady={() => setTimeout(() => ScrollTrigger.refresh(), 300)}
                 />
-              ) : (
+              ) : product.skipPlaneAnimation ? null : (
                 <ProductPlane
                   product={product}
                   onReady={() => setTimeout(() => ScrollTrigger.refresh(), 300)}

@@ -117,12 +117,13 @@ export default function LandingExperience() {
         scrollTrigger: {
           trigger: container,
           start: "top top",
-          end: "80% bottom",
+          end: "92% bottom",
           scrub: 1,
         },
       });
 
-      // Last ~20%: a slow, smooth fade to black over the held hero shot.
+      // Last ~8%: a quick fade to black over the held hero shot (was 20% —
+      // that left a long dead black-screen scroll before the next section).
       const fadeTween = gsap.fromTo(
         fade,
         { opacity: 0 },
@@ -131,7 +132,7 @@ export default function LandingExperience() {
           ease: "power1.inOut",
           scrollTrigger: {
             trigger: container,
-            start: "80% bottom",
+            start: "92% bottom",
             end: "bottom bottom",
             scrub: 1,
           },
@@ -160,8 +161,10 @@ export default function LandingExperience() {
   return (
     <>
       {/* Tall scroll track: more height = slower, smoother per-scroll scrub.
-          The video scrubs to its end (fully black) right as this ends. */}
-      <div ref={containerRef} className="relative h-[1000vh] w-full bg-black">
+          The video scrubs to its end (fully black) right as this ends.
+          Reduced from 1000vh — the tail fade-to-black was taking too long
+          to scroll through before the next section appeared. */}
+      <div ref={containerRef} className="relative h-[800vh] w-full bg-black">
         <div className="sticky top-0 h-screen w-full overflow-hidden">
           <canvas ref={canvasRef} className="block h-full w-full" />
           {/* Smooth fade-to-black overlay (driven by scroll, last ~20%). */}

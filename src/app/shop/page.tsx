@@ -15,7 +15,7 @@ export default async function Shop() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
-      <header className="mb-16 text-center">
+      <header className="mt-5 mb-16 text-center">
         <h1 className="font-display text-5xl font-bold tracking-tight text-offwhite sm:text-6xl">
           The Collection
         </h1>
@@ -24,7 +24,7 @@ export default async function Shop() {
         </p>
       </header>
 
-      <section className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      <section className="grid grid-cols-1 gap-18 sm:grid-cols-2 lg:grid-cols-3">
         {products.map((product) => {
           const savePercent = Math.round(
             ((product.mrp - product.price) / product.mrp) * 100,
@@ -38,6 +38,7 @@ export default async function Shop() {
               price={product.price}
               mrp={product.mrp}
               savePercent={savePercent}
+              colors={product.colors}
               fallbackImageUrl={product.imageUrl}
             />
           );

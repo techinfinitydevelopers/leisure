@@ -45,3 +45,8 @@ next-env.d.ts
 # prisma sqlite local db
 prisma/*.db
 prisma/*.db-journal
+
+
+dominator-model-old.glb
+dominator-model-prev.glb
+drift-model-old.glb 

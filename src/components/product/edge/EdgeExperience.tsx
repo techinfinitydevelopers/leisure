@@ -10,7 +10,7 @@ import { scroll } from "@/lib/scrollStore";
 import ProductModel from "../ProductModel";
 import ProductPlane from "../ProductPlane";
 import StickyBuyBar from "../StickyBuyBar";
-import EdgeHero from "./EdgeHero";
+import Hero from "../Hero";
 import {
   EdgeStatRibbon,
   EdgeSpin,
@@ -23,6 +23,7 @@ import {
   EdgeFAQGrid,
   EdgeCtaBand,
 } from "./EdgeSections";
+import "../product-experience.css";
 import "./edge-experience.css";
 
 // Bespoke experience for EDGE. Uses the shared WebGL layer + ProductModel so
@@ -57,7 +58,7 @@ export default function EdgeExperience({
 
   return (
     <ProductExperienceProvider value={product}>
-      <div className="edge-xp">
+      <div className="edge-xp leisure-xp">
         <div className="webgl-wrap" aria-hidden="true">
           <Canvas
             className="webgl"
@@ -84,7 +85,13 @@ export default function EdgeExperience({
         </div>
 
         <main>
-          <EdgeHero productId={productId} colorIndex={colorIndex} onColor={handleColor} />
+          <Hero
+            colorIndex={colorIndex}
+            viewIndex={viewIndex}
+            onColor={handleColor}
+            onView={setViewIndex}
+            productId={productId}
+          />
           <EdgeStatRibbon />
           <EdgeSpin />
           <EdgeFeatureTour />

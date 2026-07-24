@@ -68,7 +68,7 @@ export default function ProductModel({ product, onReady }: Props) {
     const holder = new THREE.Group();
     root.position.sub(center); // center the model on the origin
     holder.scale.setScalar(scale);
-    holder.rotation.y = BASE_RY;
+    holder.rotation.y = product.modelBaseRy ?? BASE_RY;
     holder.add(root);
     holder.updateWorldMatrix(true, true);
 
@@ -109,7 +109,7 @@ export default function ProductModel({ product, onReady }: Props) {
     });
 
     return { holder, parts };
-  }, [scene, product.modelScale]);
+  }, [scene, product.modelScale, product.modelBaseRy]);
 
   // Collect materials once so we can drive opacity (reveal + parallax hide).
   // Keep the authored transparency (only 3 blend mats) so the model renders

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { getProduct, getProductImages, PRODUCT_IMAGE_COUNTS } from "@/lib/products";
+import type { ProductColor } from "@/lib/db-products";
 
 const inr = new Intl.NumberFormat("en-IN", {
   style: "currency",
@@ -18,6 +18,8 @@ type Props = {
   price: number;
   mrp: number;
   savePercent: number;
+  /** Colors + per-color images, sourced from Shopify (falls back to the local DB). */
+  colors: ProductColor[];
   fallbackImageUrl: string;
 };
 
@@ -28,23 +30,20 @@ export default function ShopProductCard({
   price,
   mrp,
   savePercent,
+  colors,
   fallbackImageUrl,
 }: Props) {
   const [activeIdx, setActiveIdx] = useState(0);
 
-  // Static product has folderSlug needed for image paths
-  const staticProduct = getProduct(slug);
-  const colors = staticProduct?.colors ?? [];
   const activeColor = colors[activeIdx];
-
-  const imageSrc = activeColor
-    ? getProductImages(slug, activeColor.folderSlug, PRODUCT_IMAGE_COUNTS[slug]?.[activeColor.folderSlug] ?? 1)[0]
-    : (fallbackImageUrl || `/products/${slug}.png`);
+  // A color may not have its own images yet (e.g. not uploaded in Shopify) —
+  // fall back to the product's default image rather than showing nothing.
+  const imageSrc = activeColor?.images?.[0] || fallbackImageUrl || `/products/${slug}.png`;
 
   return (
     <Link
       href={`/product/${slug}`}
-      className="glass group flex flex-col overflow-hidden rounded-3xl p-5 transition duration-300 hover:-translate-y-2 hover:border-gold/40 hover:gold-glow"
+      className="glass group flex w-[300px] flex-col overflow-hidden rounded-3xl p-5 transition duration-300 hover:-translate-y-2 hover:border-gold/40 hover:gold-glow"
     >
       {/* Image panel */}
       <div className="h-56">
