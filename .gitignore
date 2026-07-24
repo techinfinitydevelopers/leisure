@@ -46,6 +46,7 @@ next-env.d.ts
 prisma/*.db
 prisma/*.db-journal
 
+public/frames_old_backup/
 
 dominator-model-old.glb
 dominator-model-prev.glb
