@@ -98,7 +98,7 @@ export default function NavV3() {
           <Link href="/v3" className="font-display text-4xl text-[#000000] transition-colors hover:text-[#000000]">Home</Link>
           <Link href="/shop" className="font-display text-4xl text-[#000000] transition-colors hover:text-[#000000]">Collection</Link>
           <div className="border-t border-[rgba(66,2,6,0.15)] pt-6">
-            <p className="mb-4 font-pinyon text-2xl text-[#e8d800]">Speakers</p>
+            <p className="mb-4 font-pinyon text-xl text-[#e8d800]">Speakers</p>
             <div className="flex flex-col gap-3">
               {products.map((p) => (
                 <Link key={p.slug} href={`/product/${p.slug}`} className="flex items-center justify-between text-[#000000]/80 transition-colors hover:text-[#000000]">

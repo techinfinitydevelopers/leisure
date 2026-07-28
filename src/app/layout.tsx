@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Cormorant, Pinyon_Script } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import Nav from "@/components/Nav";
@@ -32,16 +31,27 @@ const roboto = localFont({
   weight: "100 900",
 });
 
-const cormorant = Cormorant({
-  variable: "--font-cormorant",
-  subsets: ["latin"],
-  style: ["normal", "italic"],
-});
-
-const pinyon = Pinyon_Script({
+// Albra Trial Grotesk — replaces Pinyon Script (removed) as the accent/tagline
+// font. Kept on the `--font-pinyon` variable name so all existing
+// `font-pinyon` usages (taglines, "Leisure" wordmark, etc.) pick it up with no
+// per-file changes.
+const pinyon = localFont({
   variable: "--font-pinyon",
-  subsets: ["latin"],
-  weight: "400",
+  display: "swap",
+  src: [
+    { path: "./fonts/albra/Albra-Trial-Grotesk-Light.otf", weight: "300", style: "normal" },
+    { path: "./fonts/albra/Albra-Trial-Grotesk-Light-Italic.otf", weight: "300", style: "italic" },
+    { path: "./fonts/albra/Albra-Trial-Grotesk-Regular.otf", weight: "400", style: "normal" },
+    { path: "./fonts/albra/Albra-Trial-Grotesk-Regular-Italic.otf", weight: "400", style: "italic" },
+    { path: "./fonts/albra/Albra-Trial-Grotesk-Medium.otf", weight: "500", style: "normal" },
+    { path: "./fonts/albra/Albra-Trial-Grotesk-Medium-Italic.otf", weight: "500", style: "italic" },
+    { path: "./fonts/albra/Albra-Trial-Grotesk-Semi.otf", weight: "600", style: "normal" },
+    { path: "./fonts/albra/Albra-Trial-Grotesk-Semi-Italic.otf", weight: "600", style: "italic" },
+    { path: "./fonts/albra/Albra-Trial-Grotesk-Bold.otf", weight: "700", style: "normal" },
+    { path: "./fonts/albra/Albra-Trial-Grotesk-Bold-Italic.otf", weight: "700", style: "italic" },
+    { path: "./fonts/albra/Albra-Trial-Grotesk-Black.otf", weight: "900", style: "normal" },
+    { path: "./fonts/albra/Albra-Trial-Grotesk-Black-Italic.otf", weight: "900", style: "italic" },
+  ],
 });
 
 // THE GLOBE — distressed/stencil display accent (personal-use license; check
@@ -67,7 +77,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${roboto.variable} ${sfpro.variable} ${cormorant.variable} ${pinyon.variable} ${globe.variable} h-full antialiased`}
+      className={`${roboto.variable} ${sfpro.variable} ${pinyon.variable} ${globe.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <CartProvider>

@@ -188,7 +188,7 @@ export default function Nav() {
           <Link href="/about" className="font-display text-4xl text-offwhite transition-colors hover:text-gold">About</Link>
           <Link href="/contact" className="font-display text-4xl text-offwhite transition-colors hover:text-gold">Contact</Link>
           <div className="border-t border-white/10 pt-6">
-            <p className="mb-4 font-pinyon text-2xl text-gold">Products</p>
+            <p className="mb-4 font-pinyon text-xl text-gold">Products</p>
             <div className="flex flex-col gap-3">
               {products.map((p) => (
                 <Link

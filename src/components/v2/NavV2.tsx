@@ -96,7 +96,7 @@ export default function NavV2() {
           <Link href="/v2" className="font-display text-4xl text-white transition-colors hover:text-gold">Home</Link>
           <Link href="/shop" className="font-display text-4xl text-white transition-colors hover:text-gold">Collection</Link>
           <div className="border-t border-[rgba(251,237,43,0.15)] pt-6">
-            <p className="mb-4 font-pinyon text-2xl text-gold">Speakers</p>
+            <p className="mb-4 font-pinyon text-xl text-gold">Speakers</p>
             <div className="flex flex-col gap-3">
               {products.map((p) => (
                 <Link key={p.slug} href={`/product/${p.slug}`} className="flex items-center justify-between text-white/80 transition-colors hover:text-gold">

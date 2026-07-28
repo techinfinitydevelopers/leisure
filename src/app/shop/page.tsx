@@ -19,7 +19,7 @@ export default async function Shop() {
         <h1 className="font-display text-5xl font-bold tracking-tight text-offwhite sm:text-6xl">
           The Collection
         </h1>
-        <p className="font-pinyon mt-3 text-4xl text-gold sm:text-5xl">
+        <p className="font-pinyon mt-3 text-3xl text-gold sm:text-4xl">
           Sound Your Wild.
         </p>
       </header>

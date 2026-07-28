@@ -25,15 +25,16 @@ function tabX(id: number, total: number) {
   return W / 2 - (total * (R * 2 + GAP) - GAP) / 2 + id * (R * 2 + GAP);
 }
 
-// Minimal cross-fade + parallax drift: no clip-path masking at all — each
-// image is a plain full-frame layer, and the transition is just opacity +
-// a small scale/vertical drift. Understated, premium feel (Apple-style),
-// GPU-cheap (transform + opacity only).
-const DRIFT      = 14;   // px the incoming/outgoing image travels vertically
-const SCALE_IN   = 1.05; // incoming starts slightly zoomed in, settles to 1
-const SCALE_OUT  = 0.96; // outgoing settles slightly zoomed out as it fades
-const FADE_IN_DUR  = 0.5;
-const FADE_OUT_DUR = 0.4;
+// Depth push (iOS-style): the incoming image enters from the direction edge
+// while shrinking down from a slightly-zoomed-in "closer" scale to normal —
+// the outgoing image simultaneously recedes (scales down further, partial
+// parallax shift in the same direction) as if sliding away behind it.
+const PUSH_DUR        = 0.65;
+const PUSH_IN_EASE    = "power3.out";
+const PUSH_OUT_EASE   = "power3.in";
+const SCALE_IN_START  = 1.18; // incoming starts "closer" (zoomed in), settles to 1
+const SCALE_OUT_END   = 0.86; // outgoing shrinks as it recedes
+const PARALLAX_OUT_PCT = 28;  // % of its own width the outgoing shifts out
 
 // ── Individual image layer ─────────────────────────────────────────────────────
 interface GalleryImageProps {
@@ -41,15 +42,16 @@ interface GalleryImageProps {
   id: number;
   total: number;
   open: boolean;
+  dir: 1 | -1;
   onInPlace: (id: number) => void;
 }
 
-function GalleryImage({ item, id, total, open, onInPlace }: GalleryImageProps) {
-  const groupRef  = useRef<SVGGElement>(null);
+function GalleryImage({ item, id, total, open, dir, onInPlace }: GalleryImageProps) {
+  const elRef     = useRef<HTMLDivElement>(null);
   const firstLoad = useRef(true);
 
   useEffect(() => {
-    const el = groupRef.current;
+    const el = elRef.current;
     if (!el) return;
 
     const fl = firstLoad.current;
@@ -57,7 +59,7 @@ function GalleryImage({ item, id, total, open, onInPlace }: GalleryImageProps) {
 
     if (fl) {
       // First render: snap straight to final state, no animation.
-      gsap.set(el, { opacity: open ? 1 : 0, y: 0, scale: 1 });
+      gsap.set(el, { xPercent: 0, scale: 1 });
       if (open) onInPlace(id);
       return;
     }
@@ -65,48 +67,38 @@ function GalleryImage({ item, id, total, open, onInPlace }: GalleryImageProps) {
     if (open) {
       gsap.fromTo(
         el,
-        { opacity: 0, y: DRIFT, scale: SCALE_IN },
+        { xPercent: dir >= 0 ? 100 : -100, scale: SCALE_IN_START },
         {
-          opacity: 1,
-          y: 0,
+          xPercent: 0,
           scale: 1,
-          duration: FADE_IN_DUR,
-          ease: "power2.out",
-          transformOrigin: "center",
+          duration: PUSH_DUR,
+          ease: PUSH_IN_EASE,
           onComplete: () => onInPlace(id),
         }
       );
     } else {
       gsap.to(el, {
-        opacity: 0,
-        y: -DRIFT,
-        scale: SCALE_OUT,
-        duration: FADE_OUT_DUR,
-        ease: "power2.in",
-        transformOrigin: "center",
+        xPercent: dir >= 0 ? -PARALLAX_OUT_PCT : PARALLAX_OUT_PCT,
+        scale: SCALE_OUT_END,
+        duration: PUSH_DUR,
+        ease: PUSH_OUT_EASE,
       });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      xmlnsXlink="http://www.w3.org/1999/xlink"
-      viewBox={`0 0 ${W} ${H}`}
-      preserveAspectRatio="xMidYMid slice"
-      className="absolute inset-0 h-full w-full"
-      style={{ zIndex: open ? total + 1 : id }}
-    >
-      <g ref={groupRef}>
-        <image
-          href={item.url}
-          width={W}
-          height={H}
-          preserveAspectRatio="xMidYMid meet"
-        />
-      </g>
-    </svg>
+    <div
+      ref={elRef}
+      className="absolute inset-0"
+      style={{
+        zIndex: open ? total + 1 : id,
+        backgroundImage: `url(${item.url})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        transformOrigin: "center center",
+      }}
+    />
   );
 }
 
@@ -179,18 +171,28 @@ export function ImageGallery({ items }: { items: GalleryItem[] }) {
   const [opened,   setOpened]   = useState(0);
   const [inPlace,  setInPlace]  = useState(0);
   const [disabled, setDisabled] = useState(false);
+  const [dir, setDir] = useState<1 | -1>(1);
   const autoRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const onClick  = (i: number) => { if (!disabled) setOpened(i); };
+  const onClick = (i: number) => {
+    if (disabled || i === opened) return;
+    const total = items.length;
+    const forward = (i - opened + total) % total;
+    const backward = (opened - i + total) % total;
+    setDir(forward <= backward ? 1 : -1);
+    setOpened(i);
+  };
   const onInPlace = (i: number) => setInPlace(i);
 
-  const next = useCallback(() =>
-    setOpened((c) => (c + 1 >= items.length ? 0 : c + 1)),
-  [items.length]);
+  const next = useCallback(() => {
+    setDir(1);
+    setOpened((c) => (c + 1 >= items.length ? 0 : c + 1));
+  }, [items.length]);
 
-  const prev = useCallback(() =>
-    setOpened((c) => (c - 1 < 0 ? items.length - 1 : c - 1)),
-  [items.length]);
+  const prev = useCallback(() => {
+    setDir(-1);
+    setOpened((c) => (c - 1 < 0 ? items.length - 1 : c - 1));
+  }, [items.length]);
 
   useEffect(() => setDisabled(true),  [opened]);
   useEffect(() => setDisabled(false), [inPlace]);
@@ -226,6 +228,7 @@ export function ImageGallery({ items }: { items: GalleryItem[] }) {
               key={item.url + i}
               item={item} id={i} total={items.length}
               open={opened === i}
+              dir={dir}
               onInPlace={onInPlace}
             />
           ))}
@@ -251,7 +254,7 @@ export function ImageGallery({ items }: { items: GalleryItem[] }) {
       {current && (
         <div className="flex flex-col items-center px-6 pt-10 text-center">
           {current.subtitle && (
-            <p className="font-pinyon text-2xl text-gold sm:text-3xl">{current.subtitle}</p>
+            <p className="font-pinyon text-xl text-gold sm:text-2xl">{current.subtitle}</p>
           )}
           <h3 className="mt-1 font-display text-3xl font-semibold text-offwhite sm:text-4xl">
             {current.title}

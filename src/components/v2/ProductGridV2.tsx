@@ -16,7 +16,7 @@ export default function ProductGridV2() {
       <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
         {/* Section heading */}
         <div className="mb-14 text-center">
-          <p className="font-pinyon text-4xl text-gold">The Collection</p>
+          <p className="font-pinyon text-3xl text-gold">The Collection</p>
           <h2 className="mt-2 font-display text-4xl font-black uppercase tracking-tight text-white sm:text-5xl">
             Meet the Range
           </h2>
@@ -66,7 +66,7 @@ export default function ProductGridV2() {
                 <div className="flex flex-1 flex-col gap-3 p-5">
                   <div>
                     <h3 className="font-display text-lg font-black uppercase tracking-wide text-white">{p.model}</h3>
-                    <p className="font-pinyon text-xl text-gold/80">{p.tagline}</p>
+                    <p className="font-pinyon text-lg text-gold/80">{p.tagline}</p>
                   </div>
 
                   {/* Price */}

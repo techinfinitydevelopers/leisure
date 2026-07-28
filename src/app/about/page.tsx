@@ -52,7 +52,7 @@ export default function About() {
           </h1>
         </Reveal>
         <Reveal delay={0.1}>
-          <p className="font-pinyon mt-5 text-4xl text-gold sm:text-5xl">
+          <p className="font-pinyon mt-5 text-3xl text-gold sm:text-4xl">
             Sound Your Wild.
           </p>
         </Reveal>
@@ -132,7 +132,7 @@ export default function About() {
                     />
                   ))}
                 </div>
-                <p className="font-pinyon text-5xl text-gold">Feel every beat.</p>
+                <p className="font-pinyon text-4xl text-gold">Feel every beat.</p>
               </div>
             </div>
           </Reveal>

@@ -194,7 +194,7 @@ export default async function ProductPage({
 
       {/* Footer CTA band */}
       <section className="mt-28 flex flex-col items-center justify-center gap-6 rounded-3xl border border-offwhite/10 bg-gradient-to-br from-velvet via-nearblack to-deepblack py-20 text-center gold-glow">
-        <p className="font-pinyon text-5xl text-gold sm:text-6xl">
+        <p className="font-pinyon text-4xl text-gold sm:text-5xl">
           Sound Your Wild.
         </p>
         <Link href="/shop" className="btn-outline">

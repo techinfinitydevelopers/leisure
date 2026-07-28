@@ -54,7 +54,6 @@
 
   --font-sans:   var(--font-roboto);
   --font-display: var(--font-sf);
-  --font-script:  var(--font-cormorant);
   --font-pinyon:  var(--font-pinyon);
   --font-globe:   var(--font-globe);
 }
@@ -89,6 +88,9 @@ body {
 
 /* ── Glow helper ── */
 .gold-glow { box-shadow: 0 0 40px rgba(251,237,43,0.22); }
+
+/* Accent/tagline font (Albra, replacing Pinyon Script) — always italic */
+.font-pinyon { font-style: italic; }
 
 .text-balance { text-wrap: balance; }
 

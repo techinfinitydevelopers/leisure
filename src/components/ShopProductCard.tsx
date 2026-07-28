@@ -66,7 +66,7 @@ export default function ShopProductCard({
       {/* Info */}
       <div className="mt-5 flex flex-1 flex-col">
         <h2 className="font-display text-2xl font-bold text-offwhite">{model}</h2>
-        <p className="font-pinyon mt-1 text-2xl text-gold">{tagline}</p>
+        <p className="font-pinyon mt-1 text-xl text-gold">{tagline}</p>
 
         <div className="mt-4 flex items-end gap-3">
           <span className="font-display text-2xl font-bold text-gold">{inr.format(price)}</span>

@@ -87,7 +87,7 @@ export default function HeroV3() {
           </div>
 
           {/* Pinyon */}
-          <p className="font-pinyon text-3xl text-[#e8d800]" style={{ lineHeight: 1.2 }}>
+          <p className="font-pinyon text-2xl text-[#e8d800]" style={{ lineHeight: 1.2 }}>
             Where Sound Becomes Art.
           </p>
 

@@ -56,17 +56,17 @@ Declared in `src/app/layout.tsx`, tokens in `src/app/globals.css` `@theme inline
 - Existing codebase quirk: the Tailwind `gold` token/utility (`text-gold`, `.gold-glow`, `btn-gold`, etc.) is actually **an alias for Yellow**, not a literal gold color — this predates the brand kit and is used everywhere (buttons, glows, prices).
 - New **Gold gradient** from brand kit (`#8a5a2b → #db9658 → #eaaa7a`) added as **separate, additive tokens** — does NOT replace the yellow "gold": `--gold-1/2/3` CSS vars, `bg-gold-1/2/3` Tailwind utilities, `.grad-gold` class. Available for future use, not yet applied anywhere.
 
-## 3D models (GLB)
-- `public/products/dominator/dominator-model.glb` — **compressed 924MB → 20.6MB** via `gltf-transform optimize --compress draco --texture-size 1024 --texture-compress webp` (Draco chosen over Meshopt because drei's `useGLTF` supports Draco decoding out of the box with no extra loader setup).
-- `public/products/drift/drift-model.glb` — replaced 2026-07-24, now 31.3MB (was 48.7MB, backed up as `drift-model-old.glb`). Needed a per-product `modelBaseRy` override (see build log) — new export's front axis differs from other models.
-- `public/products/dominator/dominator-model.glb` — replaced again 2026-07-24, now 33.6MB. Previous compressed version kept as `dominator-model-prev.glb` (20.6MB); the original pre-compression backup `dominator-model-old.glb` (48.7MB) untouched. New model's bbox aspect ratio matches the old one almost exactly (y/x, z/x within 1%), so no `modelBaseRy`/scale changes were needed — verified clean across intro/spin/specs/technical sections.
-- `public/products/edge/edge-model.glb` — real EDGE model, 87MB (under GitHub's 100MB limit but above its 50MB warning threshold — consider compressing later too).
-- `src/components/product/ProductModel.tsx`: model scale normalizes by the **largest** bounding-box dimension (not just height) so wide/tall models both fit consistently. Per-product `modelScale` multiplier field added to `product-experience.ts` (e.g. EDGE = `1.35`) for fine-tuning individual model size without affecting others.
+## 3D models (GLB) — current state (2026-07-24)
+- **Drift, Edge, Dominator** have live GLBs wired (`model:` set in `product-experience.ts`). **Core, Legend, Elevate** do not yet — those pages use the 2D `ProductPlane` fallback for the hero image only (roaming/explode animation explicitly disabled via `skipPlaneAnimation: true`, see build log "cont'd 11").
+- `dominator-model.glb` — currently 33.6MB (swapped twice: 924MB→20.6MB Draco compression, then a full user-supplied replacement to 33.6MB). Backups on disk: `dominator-model-prev.glb` (20.6MB, previous compressed version), `dominator-model-old.glb` (48.7MB, original pre-compression — **gitignored**, not tracked).
+- `drift-model.glb` — currently 31.3MB (was 48.7MB). Backup `drift-model-old.glb` on disk, **gitignored**.
+- `edge-model.glb` — 87MB, untouched/uncompressed (under GitHub's 100MB limit but above the 50MB warning threshold — consider compressing later).
+- **Untracked, not yet wired into code**: `public/products/core/Core.glb` (26.6MB) and `public/products/elevate/Elevate.glb` (40.8MB) appeared in the working tree 2026-07-24 (user-added, not yet mentioned/confirmed in chat). To activate: add `model: "/products/core/Core.glb"` (and same pattern for elevate) to their `product-experience.ts` entries, remove `skipPlaneAnimation`, then verify facing (`modelBaseRy`) the same way Drift/Dominator's swaps were verified — **do not assume facing is correct just because bbox proportions look similar** (bit us once on Dominator's second GLB swap).
+- `src/components/product/ProductModel.tsx`: model scale normalizes by the **largest** bounding-box dimension (not just height). Every product with a GLB has its own explicit `modelBaseRy` (facing) + `modelScale` (size) — no shared/implicit values, verified via grep to have zero cross-product references.
 
 ## EDGE product page — status
-- User **rejected** the bespoke "cinema-mode" EDGE experience (v1 static sections, v2 model-driven choreography) — "mujhe edge product k sections hi pasand nahi aaye".
-- Code still routes `slug === "edge"` → `EdgeExperience` component (`src/components/product/edge/`), but this is effectively stale/unwanted.
-- User said "bilkul naya design try karo" but has **not yet provided reference material** (screenshot/URL/description). This is a **pending/blocked task** — do not build further until reference is given.
+- Originally a bespoke "cinema-mode" experience (full-bleed hero, giant overlapping title text) that the user rejected — since fixed: as of 2026-07-24, EDGE's **hero now matches DRIFT's shared layout** (`Hero.tsx`, split variant) — see build log "cont'd 10". The rest of the page (`EdgeExperience.tsx`) still has its own bespoke bespoke sections (`EdgeSections.tsx`: stat ribbon, spin, feature tour, colours stack, anatomy, deep-dive mag, specs marquee, box strip, FAQ grid, CTA band) — those were NOT touched and remain as-is.
+- Known unfixed issue in that bespoke code: `EdgeColoursStack` (`EdgeSections.tsx` ~L200) hardcodes model position `scroll.holdX = i % 2 === 0 ? -0.28 : 0.28`, which overlaps the "04 WHITE" colour-finish heading — low priority, flagged not fixed.
 
 ## Home page (`/`) — sections top to bottom
 1. Preloader, Nav (global, from `layout.tsx`)
@@ -85,11 +85,17 @@ Declared in `src/app/layout.tsx`, tokens in `src/app/globals.css` `@theme inline
 - `npm run dev` for `leisure-web` sometimes needs manual restart (`cd leisure-web && npm run dev &`, log to `/tmp/leisure-web-dev.log`) since the launch.json-based `preview_start` requires a path inside project root — leisure-web is a sibling folder, so `preview_start` by name doesn't work for it; use Bash + `preview_start({url})` for the browser pane instead.
 
 ## Feedback / working agreements
-- **Never commit or push unless explicitly asked.** (Confirmed explicit ask happened once — commit `b8c1918` pushed to `main` on 2026-07-22.)
+- **Never commit or push unless explicitly asked.** Confirmed twice: commit `b8c1918` pushed to `main` on 2026-07-22; commit `1413786` created (but user said NOT to push yet) on 2026-07-24 — **check with user before pushing this one**.
+- When asked for "git commands", give/prepare them (or run if asked) but confirm before the actual `push` step specifically — user has explicitly declined to push same-session before.
 - User communicates in Hinglish; keep responses concise, direct, no filler.
 - When large binary assets (GLBs) risk exceeding GitHub's 100MB hard limit, compress first (Draco via `gltf-transform`) rather than attempting Git LFS unless asked.
+- Don't commit throwaway backup files (`*-old.glb`, `*-prev.glb`, `frames_old_backup/`) — add to `.gitignore` instead (user did this proactively on 2026-07-24 for the GLB backups).
 
 ## Build log
+
+### 2026-07-24 (cont'd 14)
+- `/shop` header (`shop/page.tsx`): added `mt-5`.
+- Committed all of today's session work as `1413786` ("Add per-product 3D model tuning, Shopify image fixes, and UI polish") — **not pushed**, user explicitly said hold off. Excluded from the commit: GLB backups (now gitignored by user), `frames_old_backup/`, and the untracked `Core.glb`/`Elevate.glb` (not wired into code yet — see 3D models section).
 
 ### 2026-07-24 (cont'd 13)
 - `/shop` grid: gap `gap-8 → gap-18` (`src/app/shop/page.tsx`), card width fixed at `w-[300px]` (`ShopProductCard.tsx` root `<Link>`). Tailwind v4's spacing utilities are formula-generated (`n * 0.25rem`), so `gap-18` works without any config change. Verified card width measures exactly 300px in the DOM.

@@ -129,7 +129,7 @@ export default function ParallaxGrid() {
 
       {/* Header */}
       <div className="relative z-10 mx-auto mb-20 flex max-w-2xl flex-col items-center text-center sm:mb-28">
-        <p className="font-pinyon text-3xl text-gold sm:text-4xl">The Range</p>
+        <p className="font-pinyon text-2xl text-gold sm:text-3xl">The Range</p>
         <h2 className="mt-2 font-display text-4xl font-semibold tracking-tight text-offwhite sm:text-5xl">
           Six Ways to Sound Wild
         </h2>
@@ -200,7 +200,7 @@ export default function ParallaxGrid() {
                         {product.model}
                       </Link>
                     </h3>
-                    <p className="relative mt-2 font-pinyon text-4xl leading-none text-gold sm:text-5xl">
+                    <p className="relative mt-2 font-pinyon text-3xl leading-none text-gold sm:text-4xl">
                       {product.tagline}
                     </p>
 

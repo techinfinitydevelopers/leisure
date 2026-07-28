@@ -54,7 +54,7 @@ export default function ProductHero({ productId, slug, model, tagline, price, mr
         <h1 className="font-display text-5xl font-bold tracking-tight text-offwhite sm:text-6xl">
           {model}
         </h1>
-        <p className="font-pinyon mt-3 text-3xl text-gold sm:text-4xl">{tagline}</p>
+        <p className="font-pinyon mt-3 text-2xl text-gold sm:text-3xl">{tagline}</p>
 
         {/* Price */}
         <div className="mt-8 flex flex-wrap items-end gap-4">

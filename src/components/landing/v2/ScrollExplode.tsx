@@ -222,7 +222,7 @@ export default function ScrollExplode() {
               style={{ opacity: 0, transform: "translateY(22px)", willChange: "opacity, transform" }}
             >
               <div className="max-w-xs sm:max-w-sm">
-                <p className="font-pinyon text-2xl text-gold mb-1 sm:text-3xl">Leisure</p>
+                <p className="font-pinyon text-xl text-gold mb-1 sm:text-2xl">Leisure</p>
                 <h2 className="font-display text-3xl font-semibold text-white/92 leading-tight sm:text-4xl lg:text-5xl">
                   {s.headline}
                 </h2>

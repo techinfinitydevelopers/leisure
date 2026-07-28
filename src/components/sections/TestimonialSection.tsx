@@ -72,7 +72,7 @@ export default function TestimonialSection() {
           viewport={{ once: true, margin: "-80px" }}
           className="mb-4 text-center"
         >
-          <p className="font-pinyon text-3xl text-gold/80 sm:text-4xl">The Verdict</p>
+          <p className="font-pinyon text-2xl text-gold/80 sm:text-3xl">The Verdict</p>
           <h2 className="mt-1 font-display text-3xl font-semibold tracking-tight text-offwhite sm:text-4xl lg:text-5xl">
             Real People. Real Sound.
           </h2>

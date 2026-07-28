@@ -163,7 +163,7 @@ export default function ScrollProductSections() {
                 backgroundClip: "text",
               }}>WILD.</span>
             </h1>
-            <p className="font-pinyon text-3xl text-gold/90">Where Sound Becomes Art.</p>
+            <p className="font-pinyon text-2xl text-gold/90">Where Sound Becomes Art.</p>
             <p className="max-w-sm text-sm leading-relaxed text-white/50">
               Retro soul. Modern power. Leisure speakers engineered for those who demand more.
             </p>
@@ -244,7 +244,7 @@ export default function ScrollProductSections() {
                 backgroundClip: "text",
               }}>{p.model}</span>
             </h2>
-            <p className="font-pinyon text-2xl text-gold/80">{p.tagline}</p>
+            <p className="font-pinyon text-xl text-gold/80">{p.tagline}</p>
             <div className="grid grid-cols-2 gap-3">
               {p.specs.slice(0, 4).map((s) => (
                 <div key={s.label} className="flex flex-col rounded-2xl px-4 py-3"
@@ -297,7 +297,7 @@ export default function ScrollProductSections() {
                 backgroundClip: "text",
               }}>BOX</span>
             </h2>
-            <p className="font-pinyon text-2xl text-gold/80">Everything You Need.</p>
+            <p className="font-pinyon text-xl text-gold/80">Everything You Need.</p>
             <ul className="flex flex-col gap-3">
               {p.inBox.map((item) => (
                 <li key={item} className="flex items-center gap-3 text-sm text-white/65">

@@ -49,7 +49,7 @@ export default function LoginPage() {
             priority
             className="h-10 w-auto"
           />
-          <p className="font-pinyon mt-4 text-3xl text-gold">Admin Access</p>
+          <p className="font-pinyon mt-4 text-2xl text-gold">Admin Access</p>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">

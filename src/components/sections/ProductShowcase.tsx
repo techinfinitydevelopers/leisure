@@ -16,13 +16,13 @@ const items: GalleryItem[] = getAllProducts().map((p) => ({
 
 export default function ProductShowcase() {
   return (
-    <section className="relative flex w-full flex-col items-center py-24 sm:py-32">
+    <section className="relative flex w-full flex-col items-center pt-24 pb-8 sm:pt-32 sm:pb-12">
       {/* Subtle velvet lift so it reads as a deliberate section after the
           video's black fade above. */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black via-velvet/80 to-transparent" />
 
       <div className="relative z-10 mb-14 flex flex-col items-center px-6 text-center">
-        <p className="font-pinyon text-3xl text-gold sm:text-4xl">
+        <p className="font-pinyon text-2xl text-gold sm:text-3xl">
           The Collection
         </p>
         <h2 className="mt-2 font-display text-4xl font-semibold tracking-tight text-offwhite sm:text-5xl">

@@ -48,7 +48,7 @@ export default function Contact() {
           </h1>
         </Reveal>
         <Reveal delay={0.1}>
-          <p className="font-pinyon mt-4 text-4xl text-gold sm:text-5xl">
+          <p className="font-pinyon mt-4 text-3xl text-gold sm:text-4xl">
             We&apos;re all ears.
           </p>
         </Reveal>
