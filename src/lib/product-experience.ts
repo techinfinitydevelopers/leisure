@@ -568,10 +568,9 @@ const legend: ProductExperience = {
     { id: "white", name: "White", hex: "#f3efe6", images: ["/products/legend/white/1.jpg", "/products/legend/white/2.jpg"] },
     { id: "orange", name: "Orange", hex: "#c1502e", images: ["/products/legend/orange/1.jpg", "/products/legend/orange/2.jpg"] },
   ],
-  // No GLB yet — placeholder values, independent per product, ready to use once one is added.
+  model: "/products/legend/legend-model.glb",
   modelBaseRy: -Math.PI / 2 + 0.42,
   modelScale: 1,
-  skipPlaneAnimation: true,
   spinStage: { eyebrow: "Every angle", caption: "See it from all sides." },
   featureFocus: { eyebrow: "Designed around you", caption: "A closer look." },
   overviewModel: { x: 0.32, ry: -0.6, scale: 0.58 },

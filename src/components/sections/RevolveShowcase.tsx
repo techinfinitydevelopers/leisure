@@ -1,9 +1,12 @@
 "use client";
 
-import { useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { Canvas } from "@react-three/fiber";
+import { useGLTF } from "@react-three/drei";
+import * as THREE from "three";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -16,7 +19,7 @@ type Scene = {
   x: number; // xPercent
   y: number; // yPercent
   tilt: number; // rotationZ deg
-  tint: string; // rgba tint (0 alpha = natural)
+  bodyColor: string | null; // null = the model's original GLB colour
   glow: string;
 };
 
@@ -30,7 +33,7 @@ const SCENES: Scene[] = [
     x: 46,
     y: -12,
     tilt: -5,
-    tint: "rgba(255,255,255,0)",
+    bodyColor: null,
     glow: "rgba(251,237,43,0.18)",
   },
   {
@@ -42,7 +45,7 @@ const SCENES: Scene[] = [
     x: -46,
     y: 4,
     tilt: 4,
-    tint: "rgba(255,110,24,0.85)",
+    bodyColor: "#D94112",
     glow: "rgba(255,138,42,0.22)",
   },
   {
@@ -54,81 +57,106 @@ const SCENES: Scene[] = [
     x: 46,
     y: 24,
     tilt: -4,
-    tint: "rgba(40,190,118,0.8)",
+    bodyColor: "#1C1D0F",
     glow: "rgba(74,222,128,0.16)",
   },
 ];
 
-// Pre-extracted 360° frames of the real Legend speaker (scrubbed for rotation).
-const FRAME_COUNT = 121;
-const framePath = (i: number) =>
-  `/products/legend360/frame_${String(i).padStart(4, "0")}.jpg`;
+// Verified via a rotation scan against this exact GLB + camera setup —
+// 0 is dead-front (grille square to the camera, "Leisure" wordmark
+// readable straight-on). The product page's offset didn't carry over
+// correctly here (different camera/scale), so this is independently tuned.
+const BASE_RY = 0;
+// One full turn across the whole scroll range.
+const ROTATION_RANGE = Math.PI * 2;
+const MODEL_SCALE = 1.3;
+// Name of the outer body/shell material in the GLB (verified via material
+// scan — everything else, strap/logo/grille/trim, stays untouched).
+const BODY_MATERIAL_NAME = "leather_red_02.001";
+
+type ReadyPayload = { material: THREE.MeshStandardMaterial; group: THREE.Group };
+
+function LegendModel({ onReady }: { onReady: (payload: ReadyPayload) => void }) {
+  const { scene } = useGLTF("/products/legend/legend-model.glb");
+  const groupRef = useRef<THREE.Group>(null);
+  const readyRef = useRef(false);
+
+  useEffect(() => {
+    if (readyRef.current) return;
+    const root = scene.clone(true);
+    const box = new THREE.Box3().setFromObject(root);
+    const size = new THREE.Vector3();
+    const center = new THREE.Vector3();
+    box.getSize(size);
+    box.getCenter(center);
+    root.position.sub(center);
+
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const holder = new THREE.Group();
+    holder.scale.setScalar(maxDim > 0 ? MODEL_SCALE / maxDim : 1);
+    holder.add(root);
+
+    let bodyMaterial: THREE.MeshStandardMaterial | null = null;
+    root.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+      for (const m of mats) {
+        if (m.name === BODY_MATERIAL_NAME && m instanceof THREE.MeshStandardMaterial) {
+          bodyMaterial = m;
+        }
+      }
+    });
+
+    if (groupRef.current && bodyMaterial) {
+      groupRef.current.add(holder);
+      readyRef.current = true;
+      onReady({ material: bodyMaterial, group: groupRef.current });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scene]);
+
+  return <group ref={groupRef} />;
+}
+
+useGLTF.preload("/products/legend/legend-model.glb");
 
 export default function RevolveShowcase() {
   const root = useRef<HTMLDivElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const spinner = useRef<HTMLDivElement>(null);
-  const canvas = useRef<HTMLCanvasElement>(null);
-  const tint = useRef<HTMLDivElement>(null);
   const texts = useRef<HTMLDivElement[]>([]);
   const glow = useRef<HTMLDivElement>(null);
-  const progressTarget = useRef(0);
+
+  const modelGroupRef = useRef<THREE.Group | null>(null);
+  const bodyMaterialRef = useRef<THREE.MeshStandardMaterial | null>(null);
+  const baseColorRef = useRef<THREE.Color | null>(null);
+  const [ready, setReady] = useState(false);
+
+  const handleModelReady = useCallback(({ material, group }: ReadyPayload) => {
+    bodyMaterialRef.current = material;
+    modelGroupRef.current = group;
+    baseColorRef.current = material.color.clone();
+    setReady(true);
+  }, []);
 
   useGSAP(
     () => {
-      if (!root.current || !stage.current || !canvas.current) return;
-      const cvs = canvas.current;
-      const ctx = cvs.getContext("2d");
-      if (!ctx) return;
+      if (!root.current || !stage.current || !ready) return;
+      const modelGroup = modelGroupRef.current;
+      const bodyMaterial = bodyMaterialRef.current;
+      const baseColor = baseColorRef.current;
+      if (!modelGroup || !bodyMaterial || !baseColor) return;
 
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const images: HTMLImageElement[] = [];
-
-      const setSize = () => {
-        cvs.width = cvs.clientWidth * dpr;
-        cvs.height = cvs.clientHeight * dpr;
-      };
-
-      // object-cover draw of a frame into the square canvas.
-      const draw = (idx: number) => {
-        const img = images[idx];
-        if (!img || !img.complete || !img.naturalWidth) return;
-        const cw = cvs.width;
-        const ch = cvs.height;
-        ctx.clearRect(0, 0, cw, ch);
-        const ir = img.naturalWidth / img.naturalHeight;
-        const cr = cw / ch;
-        let dw: number, dh: number, dx: number, dy: number;
-        if (cr > ir) {
-          dw = cw;
-          dh = cw / ir;
-          dx = 0;
-          dy = (ch - dh) / 2;
-        } else {
-          dh = ch;
-          dw = ch * ir;
-          dy = 0;
-          dx = (cw - dw) / 2;
-        }
-        ctx.drawImage(img, dx, dy, dw, dh);
-      };
-
-      setSize();
-      for (let i = 1; i <= FRAME_COUNT; i++) {
-        const im = new Image();
-        im.src = framePath(i);
-        if (i === 1) im.onload = () => draw(0);
-        images.push(im);
-      }
-
-      // Initial state
+      // Initial state — original GLB colour, front-facing.
       gsap.set(spinner.current, {
         xPercent: SCENES[0].x,
         yPercent: SCENES[0].y,
         rotationZ: SCENES[0].tilt,
       });
-      gsap.set(tint.current, { backgroundColor: SCENES[0].tint });
       gsap.set(glow.current, { backgroundColor: SCENES[0].glow });
+      gsap.set(modelGroup.rotation, { y: BASE_RY });
+      bodyMaterial.color.copy(baseColor);
       texts.current.forEach((el, i) =>
         gsap.set(el, { autoAlpha: i === 0 ? 1 : 0, y: i === 0 ? 0 : 24 })
       );
@@ -140,27 +168,22 @@ export default function RevolveShowcase() {
           end: "bottom bottom",
           scrub: 1,
           invalidateOnRefresh: true,
-          onUpdate: (self) => {
-            progressTarget.current = self.progress;
-          },
         },
       });
 
-      // Smoothly ease the rotation frame toward the scroll target.
-      let shown = 0;
-      let lastIdx = -1;
-      const tick = () => {
-        const target = progressTarget.current * (FRAME_COUNT - 1);
-        shown += (target - shown) * 0.16;
-        const idx = Math.round(shown);
-        if (idx !== lastIdx) {
-          draw(idx);
-          lastIdx = idx;
-        }
-      };
-      gsap.ticker.add(tick);
-
+      // The spin lives INSIDE this same scrubbed timeline (one full turn per
+      // travel, via relative "+=" so it keeps accumulating) — it only
+      // rotates during the travel segments below and holds perfectly still
+      // (landing back at BASE_RY, i.e. front-facing) through every hold,
+      // including the final one at the very end of the section. Linear ease
+      // on purpose — a spin reads as smooth at constant angular speed;
+      // power2.inOut's slow-fast-slow curve made it feel like it was
+      // "catching"/stuttering rather than turning fluidly.
       const travel = (from: number, to: number, at: string) => {
+        const target = SCENES[to].bodyColor
+          ? new THREE.Color(SCENES[to].bodyColor as string)
+          : baseColor;
+
         tl
           .to(
             spinner.current,
@@ -169,16 +192,21 @@ export default function RevolveShowcase() {
               yPercent: SCENES[to].y,
               rotationZ: SCENES[to].tilt,
               ease: "power2.inOut",
-              duration: 2.6,
+              duration: 1.6,
             },
             at
           )
+          .to(glow.current, { backgroundColor: SCENES[to].glow, duration: 1.8 }, at)
           .to(
-            tint.current,
-            { backgroundColor: SCENES[to].tint, ease: "power1.inOut", duration: 2.4 },
-            at + "+=0.2"
+            modelGroup.rotation,
+            { y: `+=${ROTATION_RANGE}`, ease: "none", duration: 1.6 },
+            at
           )
-          .to(glow.current, { backgroundColor: SCENES[to].glow, duration: 2.4 }, at)
+          .to(
+            bodyMaterial.color,
+            { r: target.r, g: target.g, b: target.b, ease: "power1.inOut", duration: 1.6 },
+            at
+          )
           .to(
             texts.current[from],
             { autoAlpha: 0, y: -24, ease: "power1.in", duration: 0.9 },
@@ -188,7 +216,7 @@ export default function RevolveShowcase() {
             texts.current[to],
             { autoAlpha: 0, y: 24 },
             { autoAlpha: 1, y: 0, ease: "power2.out", duration: 1 },
-            at + "+=1.3"
+            at + "+=1.8"
           );
       };
 
@@ -200,20 +228,9 @@ export default function RevolveShowcase() {
       travel(1, 2, "t2");
       tl.to({}, { duration: 3 }, ">");
 
-      const onResize = () => {
-        setSize();
-        lastIdx = -1;
-      };
-      window.addEventListener("resize", onResize);
-
       ScrollTrigger.refresh();
-
-      return () => {
-        gsap.ticker.remove(tick);
-        window.removeEventListener("resize", onResize);
-      };
     },
-    { scope: root }
+    { scope: root, dependencies: [ready] }
   );
 
   return (
@@ -238,7 +255,8 @@ export default function RevolveShowcase() {
           </p>
         </div>
 
-        {/* Real speaker frame-sequence — scrubbed on scroll, recoloured per stop */}
+        {/* Real LEGEND 3D model — live-rotated on scroll, recoloured per stop
+            via a single body material colour tween. */}
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <div
             ref={spinner}
@@ -252,9 +270,19 @@ export default function RevolveShowcase() {
                 "radial-gradient(circle at 50% 50%, #000 50%, transparent 74%)",
             }}
           >
-            <canvas ref={canvas} className="absolute inset-0 h-full w-full" />
-            {/* Colour tint — black frame bg stays black under 'color' blend */}
-            <div ref={tint} className="absolute inset-0 mix-blend-color" />
+            <Canvas
+              className="absolute inset-0 h-full w-full"
+              camera={{ position: [0, 0, 3.4], fov: 35 }}
+              gl={{ antialias: true, alpha: true }}
+              onCreated={({ gl }) => gl.setClearColor(new THREE.Color("#000000"), 0)}
+            >
+              <ambientLight intensity={1.9} />
+              <directionalLight position={[3, 5, 4]} intensity={2.8} />
+              <directionalLight position={[-3, -2, 2]} intensity={1} />
+              <directionalLight position={[0, 1.5, -3]} intensity={1.4} />
+              <pointLight position={[0, 0, 3]} intensity={0.6} />
+              <LegendModel onReady={handleModelReady} />
+            </Canvas>
           </div>
         </div>
 

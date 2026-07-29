@@ -16,7 +16,7 @@ const items: GalleryItem[] = getAllProducts().map((p) => ({
 
 export default function ProductShowcase() {
   return (
-    <section className="relative flex w-full flex-col items-center pt-24 pb-8 sm:pt-32 sm:pb-12">
+    <section className="relative flex w-full flex-col items-center pt-12 pb-8 sm:pt-16 sm:pb-12">
       {/* Subtle velvet lift so it reads as a deliberate section after the
           video's black fade above. */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black via-velvet/80 to-transparent" />
