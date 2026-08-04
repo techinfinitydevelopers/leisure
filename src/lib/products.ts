@@ -94,7 +94,7 @@ export const products: Product[] = [
       "Experience the perfect blend of elegance and acoustic brilliance with the Leisure Edge. Designed to complement modern living spaces, it delivers immersive, room-filling sound with deep bass and crystal-clear detail. Whether you're gaming, watching movies, or streaming music, Edge transforms everyday entertainment into a cinematic experience.",
     specs: [
       { label: "Battery Capacity", value: "10000 mAh" },
-      { label: "Output Power", value: "15W×2 + 10W×2" },
+      { label: "Output Power", value: "2 × 15W + 2 × 20W Drivers" },
       { label: "Connectivity", value: "BT / AUX / USB / TWS / Optical" },
       { label: "Playtime", value: ">16 hours" },
       { label: "Charging Time", value: "3:30 hours" },
@@ -126,7 +126,7 @@ export const products: Product[] = [
       "The Leisure Core is where beautiful home decor and powerful, room-filling acoustics live in perfect harmony. Engineered to deliver a refined balance of strong bass and crystal-clear highs, this elegant centerpiece creates an immersive listening experience. It effortlessly brings premium design and soul-soothing performance together to elevate any space.",
     specs: [
       { label: "Battery Capacity", value: "10000 mAh" },
-      { label: "Output Power", value: "40W + 10W×2" },
+      { label: "Output Power", value: "2 × 15W + 1 × 50W Woofer" },
       { label: "Connectivity", value: "BT / AUX / USB / TWS" },
       { label: "Playtime", value: "10 hours" },
       { label: "Charging Time", value: "3:30 hours" },
@@ -152,7 +152,7 @@ export const products: Product[] = [
       "Discover the LEGEND, our perfectly balanced masterpiece designed for those who love to perform. Featuring a built-in handle for effortless carrying and an included wireless microphone, you can easily take your epic karaoke nights anywhere. Gather your friends, enjoy pristine, room-filling sound on the go, and be the absolute star of your own party.",
     specs: [
       { label: "Battery Capacity", value: "10000 mAh" },
-      { label: "Output Power", value: "30W + 10W×2" },
+      { label: "Output Power", value: "50W + 15W×2" },
       { label: "Connectivity", value: "BT / AUX / USB / MIC / TWS" },
       { label: "Playtime", value: "Up to 9 hours" },
       { label: "Charging Time", value: "2 hours" },
@@ -184,7 +184,7 @@ export const products: Product[] = [
       "Take your entertainment to new heights with the ELEVATE, designed for those who love to host and perform. Delivering powerful, thumping sound with exceptional clarity, it transforms any space into a live concert experience. Equipped with dual wireless microphones, it enables seamless duets and dynamic performances, making every gathering more energetic and unforgettable.",
     specs: [
       { label: "Battery Capacity", value: "10000 mAh" },
-      { label: "Output Power", value: "50W + 10W×2" },
+      { label: "Output Power", value: "2 × 15W + 1 × 70W Woofer" },
       { label: "Connectivity", value: "BT / AUX / USB / MIC / TWS" },
       { label: "Playtime", value: "8 hours" },
       { label: "Charging Time", value: "2:30 hours" },
@@ -217,7 +217,7 @@ export const products: Product[] = [
       "Command the ultimate party with the Leisure Dominator, our flagship powerhouse engineered for massive, bone-shaking sound. Designed to deliver a true club-level audio experience, it features dual wireless microphones to handle the most epic, all-night performances. Unleash pure, raw acoustic energy that dominates every space and demands to be heard.",
     specs: [
       { label: "Battery Capacity", value: "20000 mAh" },
-      { label: "Output Power", value: "100W + 10W×2 + 20W×2" },
+      { label: "Output Power", value: "2 × 10W + 2 × 20W + 1 × 100W Woofer" },
       { label: "Connectivity", value: "BT / AUX / USB / MIC / TWS" },
       { label: "Playtime", value: "9 hours" },
       { label: "Charging Time", value: "3:30 hours" },
