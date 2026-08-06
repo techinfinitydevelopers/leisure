@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import SoundToggle from "@/components/SoundToggle";
+import { useAudio } from "@/context/AudioContext";
 import { useBuyBarVisible } from "@/lib/uiStore";
 
 // Global sticky sound control. Sits in the normal bottom-right corner, and
@@ -11,9 +12,12 @@ import { useBuyBarVisible } from "@/lib/uiStore";
 export default function FloatingSoundToggle() {
   const lifted = useBuyBarVisible();
   const pathname = usePathname();
-  // Permanent nudge toward the toggle on the video hero (home only) — a
-  // gentle pulse/bob keeps it feeling alive without ever fading out.
-  const showHint = pathname === "/";
+  const { muted, playing } = useAudio();
+  // Nudge toward the toggle on the video hero (home only) whenever no sound is
+  // actually reaching the user — whether that's because autoplay-with-sound is
+  // still blocked (the default state: unmuted but silent until a gesture) or
+  // because it's muted. It retires only once sound is genuinely audible.
+  const showHint = pathname === "/" && !(playing && !muted);
 
   return (
     <div
@@ -27,7 +31,7 @@ export default function FloatingSoundToggle() {
           style={{ animation: "hint-pulse 2.6s ease-in-out infinite" }}
         >
           <span className="mb-1 whitespace-nowrap text-[10px] font-light uppercase tracking-[0.18em] text-gold/80">
-            Click to hear the audio
+            Hear it for yourself
           </span>
           {/* Supplied glowing curly-arrow asset (public/icons/hint-arrow.png),
               cropped tight to its own content. Its arrowhead tip sits at

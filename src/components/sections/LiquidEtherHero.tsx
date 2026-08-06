@@ -40,13 +40,16 @@ export default function LiquidEtherHero() {
           Leisure
         </p>
         <h1 className="mt-2 font-globe text-4xl font-bold tracking-tight text-offwhite opacity-0 [animation:fade-up_0.9s_ease-out_0.15s_forwards] sm:text-6xl">
-          Sound Your Wild
+          Don&apos;t Just Hear It. Feel It.
         </h1>
-        <p className="mt-4 max-w-md font-sans text-sm leading-relaxed text-offwhite/60 opacity-0 [animation:fade-up_0.9s_ease-out_0.3s_forwards] sm:text-base">
-          Every particle finds its place. Scroll to see it come alive.
+        <p className="mt-4 max-w-xl font-sans text-sm leading-relaxed text-offwhite/60 opacity-0 [animation:fade-up_0.9s_ease-out_0.3s_forwards] sm:text-base">
+          Wherever your journey takes you, Leisure delivers powerful sound that
+          keeps every moment alive.
         </p>
-        <p className="mt-2 max-w-md font-sans text-sm leading-relaxed text-offwhite/60 opacity-0 [animation:fade-up_0.9s_ease-out_0.45s_forwards] sm:text-base">
-          Every beat finds its rhythm. Stay to hear it roar.
+        {/* Micro-label, not brand copy — deliberately smaller/dimmer than the
+            subline so it reads as a UI cue alongside the chevron below. */}
+        <p className="mt-6 text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-offwhite/40 opacity-0 [animation:fade-up_0.9s_ease-out_0.45s_forwards]">
+          Scroll to begin
         </p>
 
         <div className="absolute bottom-10 opacity-0 [animation:fade-in_1s_ease-out_0.9s_forwards]">
