@@ -250,30 +250,40 @@ export function ImageGallery({ items }: { items: GalleryItem[] }) {
         </button>
       </div>
 
-      {/* Caption — below the image, not overlapping it */}
+      {/* Caption — two columns below the image: name/tagline on the left,
+          price/CTA on the right, split by a vertical divider. Stacks and
+          centers on mobile where there's no room for a row. */}
       {current && (
-        <div className="flex flex-col items-center px-6 pt-10 text-center">
-          {current.subtitle && (
-            <p className="font-pinyon text-xl text-gold sm:text-2xl">{current.subtitle}</p>
-          )}
-          <h3 className="mt-1 font-display text-3xl font-semibold text-offwhite sm:text-4xl">
-            {current.title}
-          </h3>
-          {typeof current.price === "number" && (
-            <p className="mt-2 font-display text-xl text-gold">{formatPrice(current.price)}</p>
-          )}
-          {current.href && (
-            <Link
-              href={current.href}
-              className="mt-6 inline-flex items-center gap-2 rounded-full px-7 py-3 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-[#000000] transition-all duration-300 hover:shadow-[0_0_30px_rgba(237,196,132,0.4)]"
-              style={{ background: "linear-gradient(135deg,#fbed2b,#e8d800)" }}
-            >
-              View Speaker
-              <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
-                <path d="M2.5 9.5L9.5 2.5M9.5 2.5H4M9.5 2.5V8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </Link>
-          )}
+        <div className="mx-auto mt-6 flex w-full max-w-[1200px] flex-col items-center gap-5 px-6 text-center sm:mt-8 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:px-10 sm:text-left lg:mt-6">
+          <div>
+            {current.subtitle && (
+              <p className="font-pinyon text-xl text-gold sm:text-2xl">{current.subtitle}</p>
+            )}
+            <h3 className="mt-1 font-display text-3xl font-semibold text-offwhite sm:text-4xl">
+              {current.title}
+            </h3>
+          </div>
+
+          {/* Divider — only reads as a column split once the row layout kicks in */}
+          <div className="hidden h-16 w-px shrink-0 bg-offwhite/15 sm:block" />
+
+          <div className="flex flex-col items-center gap-4 sm:items-end">
+            {typeof current.price === "number" && (
+              <p className="font-display text-xl text-gold sm:text-2xl">{formatPrice(current.price)}</p>
+            )}
+            {current.href && (
+              <Link
+                href={current.href}
+                className="inline-flex items-center gap-2 rounded-full px-7 py-3 text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-[#000000] transition-all duration-300 hover:shadow-[0_0_30px_rgba(237,196,132,0.4)]"
+                style={{ background: "linear-gradient(135deg,#fbed2b,#e8d800)" }}
+              >
+                View Speaker
+                <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                  <path d="M2.5 9.5L9.5 2.5M9.5 2.5H4M9.5 2.5V8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </Link>
+            )}
+          </div>
         </div>
       )}
     </div>

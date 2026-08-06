@@ -10,16 +10,53 @@ const quickLinks = [
   { label: "Contact", href: "/" },
 ];
 
-// Waveform bars — flat baseline (60px) + additive sine variation so every
-// letter (including E) always has tall enough bars to be clearly visible.
+// Waveform bars — heights are a direct percentage (25–45%) of each
+// letter's own internal height, not the word-wide/absolute-unit scheme
+// used previously. Available height per letter (baseline to cap-top) was
+// measured by rasterizing this exact text against the real embedded font
+// (SF Pro Display Black, 172px): caps top out at y≈34.8, baseline at
+// y=158, so 123.2 viewBox units are available — 25% = 31, 45% = 55.
+const LETTER_HEIGHT = 123.2;
+const MIN_H = Math.round(LETTER_HEIGHT * 0.25); // 31
+const MAX_H = Math.round(LETTER_HEIGHT * 0.45); // 55
+// Measured x-ranges (viewBox units) of each letter's glyph, L→E→I→S→U→R→E.
+const LETTER_RANGES: [number, number][] = [
+  [277, 356],
+  [367, 446],
+  [459, 497],
+  [511, 601],
+  [610, 718],
+  [736, 841],
+  [850, 929],
+];
+function letterIndexAt(x: number) {
+  for (let k = 0; k < LETTER_RANGES.length; k++) {
+    const [a, b] = LETTER_RANGES[k];
+    if (x >= a - 2 && x <= b + 2) return k;
+  }
+  return -1;
+}
+// Each letter's bars are generated from their OWN local sine wave (phase
+// offset by the letter's index k) instead of one continuous wave across the
+// whole word — a single word-wide wave let some letters (e.g. "L") land
+// entirely in a trough while others hit every peak, so only a couple of
+// letters ever showed tall bars. Per-letter waves, plus a clamp tuned so
+// the amplitude reliably exceeds the ±(MAX_H-MIN_H)/2 swing needed, mean
+// every letter independently reaches the same 25–45% band and touches (or
+// nearly touches) 45% at its own peak — verified per-letter, not assumed.
 const WAVE_BARS = Array.from({ length: 100 }, (_, i) => {
-  const x = i / 99;
-  const v =
-    32 * Math.sin(x * Math.PI * 2.3 + 0.5) +
-    22 * Math.sin(x * Math.PI * 5.1 + 1.7) +
-    14 * Math.sin(x * Math.PI * 9.7 + 0.3) +
-     8 * Math.sin(x * Math.PI * 15.3 + 2.6);
-  const h = Math.round(Math.max(28, Math.min(148, 68 + v)));
+  const x = i * 12;
+  const k = letterIndexAt(x);
+  let h = MIN_H;
+  if (k !== -1) {
+    const [a, b] = LETTER_RANGES[k];
+    const lx = (x - a) / (b - a);
+    const v =
+      11 * Math.sin(lx * Math.PI * 2.6 + k * 1.7) +
+       7 * Math.sin(lx * Math.PI * 5.9 + k * 0.9 + 1) +
+       4 * Math.sin(lx * Math.PI * 10.3 + k * 2.3 + 2);
+    h = Math.round(Math.max(MIN_H, Math.min(MAX_H, 43 + v)));
+  }
   return {
     h,
     dur: 0.44 + (i % 9) * 0.09,
@@ -187,13 +224,18 @@ export default function Footer() {
             LEISURE
           </text>
 
-          {/* Animated waveform bars clipped to text shape — bottom-anchored */}
+          {/* Animated waveform bars clipped to text shape — bottom-anchored
+              at y=160 (the letters' true bottom, incl. the slight round-
+              letter overshoot on S/U below the y=158 baseline), not the old
+              y=180: that left 22 wasted units below anything the clip path
+              could ever show, which is what freed up the extra headroom
+              used above. */}
           <g clipPath="url(#leisure-text-clip)">
             {WAVE_BARS.map((b, i) => (
               <rect
                 key={i}
                 x={i * 12}
-                y={180 - b.h}
+                y={160 - b.h}
                 width={10}
                 height={b.h}
                 fill="#fbed2b"

@@ -13,6 +13,21 @@ gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 const products = getAllProducts();
 
+// Cap for the giant background watermark, in cqw (% of the details column's
+// own width) — measured directly against the rendered font (sfpro, bold,
+// 144px) so longer/wider names get a proportionally smaller cap and never
+// overflow the column at any breakpoint. Combined with min() against the
+// existing 7rem/9rem sizes below, so shorter names that already fit keep
+// their original size exactly as before.
+const WATERMARK_CQW_CAP: Record<string, number> = {
+  DRIFT: 34,
+  EDGE: 37,
+  CORE: 35,
+  LEGEND: 25,
+  ELEVATE: 23,
+  DOMINATOR: 16,
+};
+
 const inr = new Intl.NumberFormat("en-IN", {
   style: "currency",
   currency: "INR",
@@ -141,7 +156,7 @@ export default function ParallaxGrid() {
 
       {/* Sticky stacking deck. Each item is sticky at the same top, so each
           new card scrolls up and stacks on top of the one before it. */}
-      <div className="relative z-10 mx-auto max-w-[1200px]">
+      <div className="relative z-10 mx-auto max-w-[1100px]">
         {products.map((product, i) => {
           const imageOnLeft = i % 2 === 0;
           const savePct = Math.round(
@@ -160,37 +175,53 @@ export default function ParallaxGrid() {
                 <article
                   data-card
                   data-image-side={imageOnLeft ? "left" : "right"}
-                  className="grid h-[82vh] w-full grid-cols-1 items-center gap-8 overflow-hidden rounded-3xl border border-offwhite/10 bg-gradient-to-br from-velvet to-deepblack p-8 will-change-transform gold-glow sm:p-12 lg:grid-cols-2 lg:gap-14"
+                  className="grid h-[75vh] w-full grid-cols-1 items-center gap-8 overflow-hidden rounded-3xl border border-offwhite/10 bg-gradient-to-br from-velvet to-deepblack p-8 will-change-transform gold-glow sm:p-12 lg:grid-cols-2 lg:gap-14"
                 >
                   {/* Image panel — DOM order first; flips visually on lg. */}
                   <Link
                     href={`/product/${product.slug}`}
                     aria-label={`View the ${product.model}`}
-                    className={`group relative block h-full overflow-hidden rounded-2xl bg-gradient-to-b from-velvet/80 to-nearblack ${
+                    className={`group relative flex h-full items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-b from-velvet/80 to-nearblack ${
                       imageOnLeft ? "lg:order-1" : "lg:order-2"
                     }`}
                   >
-                    <div className="relative h-full min-h-[40vh] w-full">
+                    {/* Boxed to the product photos' real ratio (1605:1065)
+                        instead of forcing them into the full-height column —
+                        that mismatch (landscape photo in a portrait box) was
+                        the actual cause of the "small, empty" look, not the
+                        image being too small. Centered by the flex parent
+                        above, so the margin stays equal on every side. */}
+                    <div className="relative aspect-[1605/1065] w-full">
                       <Image
                         src={`/products/${product.slug}.png`}
                         alt={`${product.model} — ${product.tagline}`}
                         fill
                         sizes="(min-width: 1024px) 50vw, 100vw"
-                        className="object-contain p-6 transition-transform duration-700 group-hover:scale-105 sm:p-10"
+                        className="scale-[1.3] object-contain p-1 transition-transform duration-700 group-hover:scale-[1.36]"
                       />
                     </div>
                   </Link>
 
                   {/* Details column */}
                   <div
-                    className={`relative flex flex-col items-center text-center lg:items-start lg:text-left ${
+                    className={`relative flex flex-col items-center text-center [container-type:inline-size] lg:items-start lg:text-left ${
                       imageOnLeft ? "lg:order-2" : "lg:order-1"
                     }`}
                   >
-                    {/* Faint giant model watermark behind the text. */}
+                    {/* Faint giant model watermark behind the text — sized
+                        with min(rem, cqw-cap) so it never overflows this
+                        column, at any breakpoint. The per-model cap goes in
+                        via a CSS custom property (Tailwind can't compile a
+                        runtime-interpolated arbitrary value, only a static
+                        one referencing var()) — see WATERMARK_CQW_CAP. */}
                     <span
                       aria-hidden="true"
-                      className="pointer-events-none absolute -top-8 left-1/2 -z-0 -translate-x-1/2 select-none font-display text-[7rem] font-bold leading-none text-offwhite/[0.06] sm:text-[9rem] lg:left-0 lg:translate-x-0"
+                      style={
+                        {
+                          "--wm-cap": WATERMARK_CQW_CAP[product.model],
+                        } as React.CSSProperties
+                      }
+                      className="pointer-events-none absolute -top-8 left-1/2 -z-0 -translate-x-1/2 select-none font-display text-[min(7rem,calc(var(--wm-cap)*1cqw))] font-bold leading-none text-offwhite/[0.06] sm:text-[min(9rem,calc(var(--wm-cap)*1cqw))] lg:left-0 lg:translate-x-0"
                     >
                       {product.model}
                     </span>

@@ -53,9 +53,9 @@ const SCENES: Scene[] = [
     title: "Made to roam",
     body: "Rugged, weather-ready, and rated for days off the charger. Follow the moment — beach, balcony, or somewhere off the map.",
     textSide: "left",
-    vy: "62%",
+    vy: "56%",
     x: 46,
-    y: 24,
+    y: 16,
     tilt: -4,
     bodyColor: "#1C1D0F",
     glow: "rgba(74,222,128,0.16)",
@@ -69,7 +69,9 @@ const SCENES: Scene[] = [
 const BASE_RY = 0;
 // One full turn across the whole scroll range.
 const ROTATION_RANGE = Math.PI * 2;
-const MODEL_SCALE = 1.3;
+// +30% over the previous 1.3 — the model itself fills more of the same
+// frustum (see camera below), rather than upscaling via CSS.
+const MODEL_SCALE = 1.7;
 // Name of the outer body/shell material in the GLB (verified via material
 // scan — everything else, strap/logo/grille/trim, stays untouched).
 const BODY_MATERIAL_NAME = "leather_red_02.001";
@@ -260,7 +262,7 @@ export default function RevolveShowcase() {
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <div
             ref={spinner}
-            className="relative aspect-square w-[72vw] max-w-[500px] sm:w-[50vw] md:w-[40vw]"
+            className="relative aspect-square w-[72vw] max-w-[560px] sm:w-[52vw] md:w-[46vw]"
             style={{
               isolation: "isolate",
               willChange: "transform",
