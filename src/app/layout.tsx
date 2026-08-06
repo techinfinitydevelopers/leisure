@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Pinyon_Script } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
@@ -54,6 +55,16 @@ const pinyon = localFont({
   ],
 });
 
+// Pinyon Script — calligraphic accent, used for the "Leisure" wordmark in the
+// LiquidEther hero. NOTE: deliberately NOT on `--font-pinyon` — that variable
+// name was repurposed for Albra Trial Grotesk and 21 files depend on it.
+const pinyonScript = Pinyon_Script({
+  variable: "--font-pinyon-script",
+  display: "swap",
+  subsets: ["latin"],
+  weight: "400",
+});
+
 // THE GLOBE — distressed/stencil display accent (personal-use license; check
 // before using in shipped commercial marketing assets)
 const globe = localFont({
@@ -77,7 +88,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${roboto.variable} ${sfpro.variable} ${pinyon.variable} ${globe.variable} h-full antialiased`}
+      className={`${roboto.variable} ${sfpro.variable} ${pinyon.variable} ${globe.variable} ${pinyonScript.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <CartProvider>

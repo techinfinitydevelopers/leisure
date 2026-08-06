@@ -10,6 +10,7 @@ import ParallaxGrid from "@/components/sections/ParallaxGrid";
 import TestimonialSection from "@/components/sections/TestimonialSection";
 import MarqueeBand from "@/components/sections/MarqueeBand";
 import RevolveShowcase from "@/components/sections/RevolveShowcase";
+import LiquidEtherHero from "@/components/sections/LiquidEtherHero";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -30,13 +31,15 @@ export default function LandingExperience() {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fadeRef = useRef<HTMLDivElement>(null);
+  const heroRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
       const canvas = canvasRef.current;
       const container = containerRef.current;
       const fade = fadeRef.current;
-      if (!canvas || !container || !fade) return;
+      const hero = heroRef.current;
+      if (!canvas || !container || !fade || !hero) return;
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
@@ -139,6 +142,32 @@ export default function LandingExperience() {
         }
       );
 
+      // First ~8% of the track: the liquid-ether hero fades off, revealing the
+      // video behind it. autoAlpha (not plain opacity) so the faded-out
+      // overlay stops swallowing the cursor once it's invisible.
+      const heroTween = gsap.to(hero, {
+        autoAlpha: 0,
+        ease: "power1.inOut",
+        scrollTrigger: {
+          trigger: container,
+          start: "top top",
+          end: "8% top",
+          scrub: 1,
+        },
+      });
+
+      // Once it's fully gone, drop it out of layout entirely. LiquidEther only
+      // pauses its WebGL loop when its container has no box — visibility:hidden
+      // still reads as "intersecting", and this sticky stage stays on screen
+      // for the full 800vh, so without this the sim would run the whole way.
+      // onEnter/onLeaveBack are symmetric, so scrolling back up restores it.
+      const heroToggle = ScrollTrigger.create({
+        trigger: container,
+        start: "9% top",
+        onEnter: () => gsap.set(hero, { display: "none" }),
+        onLeaveBack: () => gsap.set(hero, { display: "" }),
+      });
+
       const onResize = () => {
         setCanvasSize();
         render();
@@ -150,6 +179,9 @@ export default function LandingExperience() {
         tween.kill();
         fadeTween.scrollTrigger?.kill();
         fadeTween.kill();
+        heroTween.scrollTrigger?.kill();
+        heroTween.kill();
+        heroToggle.kill();
         window.removeEventListener("resize", onResize);
         gsap.ticker.remove(tickerFn);
         lenis.destroy();
@@ -172,6 +204,11 @@ export default function LandingExperience() {
             ref={fadeRef}
             className="pointer-events-none absolute inset-0 bg-black opacity-0"
           />
+          {/* Liquid-ether hero, laid OVER the video's first frames. Fades out
+              on scroll (see heroTween) to reveal the video underneath. */}
+          <div ref={heroRef} className="absolute inset-0">
+            <LiquidEtherHero />
+          </div>
         </div>
       </div>
 
