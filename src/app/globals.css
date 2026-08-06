@@ -158,6 +158,17 @@ body {
   100% { transform: scaleY(1); }
 }
 
+/* Sound-toggle hint: stays on screen permanently, just breathes gently so
+   it reads as a live nudge rather than static UI chrome. */
+@keyframes hint-pulse {
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 1; }
+}
+@keyframes hint-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(3px); }
+}
+
 /* Rich-text blog body (editor + rendered post) — restore list/link/emphasis
    styling that Tailwind's preflight strips. */
 .blog-content ul,

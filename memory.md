@@ -93,6 +93,11 @@ Declared in `src/app/layout.tsx`, tokens in `src/app/globals.css` `@theme inline
 
 ## Build log
 
+### 2026-08-06
+- Cloned `techinfinitydevelopers/leisure` (GitHub) fresh to `C:\Users\Lenovo\OneDrive\Desktop\leisure` (Windows machine). Prior memory entries below reference Mac paths (`/Users/apple/Downloads/leisure-web`) from earlier sessions — same repo, different local checkout. `main` branch checked out, tracking `origin/main`, working tree clean at commit `cf59343`.
+- `npm install` had never been run on this checkout (`node_modules` missing — that's why `next dev` failed with "'next' is not recognized"). Installed deps; `@prisma/client` also needed a manual `npx prisma generate` since npm's allow-scripts policy blocked its postinstall.
+- Added a permanent "Click to hear the audio" hint (`src/components/FloatingSoundToggle.tsx`) next to the global sound-toggle button on the homepage hero — text stays right-aligned (avoids clipping off the viewport edge) while the arrow icon gets its own computed `margin-right` so its tip still lands exactly on the button's center. Iterated through several hand-coded SVG curly-arrow designs (verified by rasterizing each candidate to PNG with `sharp` + `Read`, since the Browser pane's screenshot tool was unreliable this session) before the user supplied their own arrow image via a Google Drive link; that PNG (cropped tight to content, saved as `public/icons/hint-arrow.png`) is what's live now, rendered via `next/image`. Alignment math (tip-to-button-center offset, text-clipping check) was verified against the live DOM (`getBoundingClientRect`), not guessed.
+
 ### 2026-07-24 (cont'd 14)
 - `/shop` header (`shop/page.tsx`): added `mt-5`.
 - Committed all of today's session work as `1413786` ("Add per-product 3D model tuning, Shopify image fixes, and UI polish") — **not pushed**, user explicitly said hold off. Excluded from the commit: GLB backups (now gitignored by user), `frames_old_backup/`, and the untracked `Core.glb`/`Elevate.glb` (not wired into code yet — see 3D models section).
