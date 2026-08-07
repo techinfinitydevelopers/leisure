@@ -137,7 +137,7 @@ export default function ParallaxGrid() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full px-6 py-28 sm:py-36"
+      className="relative w-full px-6 pt-28 pb-12 sm:pt-36 sm:pb-16"
     >
       {/* Subtle velvet gradient lift so the section reads as its own band. */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-velvet/40 to-transparent" />
