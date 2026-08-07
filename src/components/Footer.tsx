@@ -78,8 +78,7 @@ export default function Footer() {
           {/* Col 1 — Brand */}
           <div className="flex flex-col gap-5">
 
-            <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-gold" />
+            <div className="flex items-center">
               <Image
                 src="/brand/leisure-logo.png"
                 alt="Leisure"

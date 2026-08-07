@@ -41,8 +41,7 @@ export default function Nav() {
             }`}
           >
             {/* Logo */}
-            <Link href="/" className="flex shrink-0 items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-gold" />
+            <Link href="/" className="flex shrink-0 items-center">
               <Image
                 src="/brand/leisure-logo.png"
                 alt="Leisure"
@@ -150,8 +149,7 @@ export default function Nav() {
       >
         <div className="flex h-16 items-center justify-between px-5">
           {/* Logo */}
-          <Link href="/" className="relative z-50 flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-gold" />
+          <Link href="/" className="relative z-50 flex items-center">
             <Image
               src="/brand/leisure-logo.png"
               alt="Leisure"
