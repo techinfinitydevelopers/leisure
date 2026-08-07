@@ -70,7 +70,11 @@ export default function Preloader() {
       ))}
 
       {/* Logo */}
-      <div className="relative z-10 mb-10">
+      {/* The logo asset is a 1024x1024 square with the wordmark banded in the
+          middle — ~40% of its height is transparent padding below the ink,
+          which lands as ~81px of dead space in this 200px box. The negative
+          margin pulls the EQ bars back up under it so the gap reads tight. */}
+      <div className="relative z-10 -mb-16">
         <Image
           src="/brand/leisure-logo.png"
           alt="Leisure"
