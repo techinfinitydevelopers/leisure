@@ -69,14 +69,19 @@ const SCENES: Scene[] = [
 const BASE_RY = 0;
 // One full turn across the whole scroll range.
 const ROTATION_RANGE = Math.PI * 2;
-// +30% over the previous 1.3 — the model itself fills more of the same
-// frustum (see camera below), rather than upscaling via CSS.
-const MODEL_SCALE = 1.7;
-// Name of the outer body/shell material in the GLB (verified via material
-// scan — everything else, strap/logo/grille/trim, stays untouched).
-const BODY_MATERIAL_NAME = "leather_red_02.001";
+// The model fills the frustum (see camera below) rather than being upscaled
+// via CSS, which keeps it sharp. Eased back slightly from 1.7 — that read a
+// touch large against the scene copy.
+const MODEL_SCALE = 1.55;
+// Materials recoloured per scene (verified against a scan of this GLB):
+// `...001` is the outer body/shell, `...002` is the carry strap. Everything
+// else — logo, grille, hardware, feet — keeps its original finish.
+const TINTED_MATERIAL_NAMES = ["leather_red_02.001", "leather_red_02.002"];
 
-type ReadyPayload = { material: THREE.MeshStandardMaterial; group: THREE.Group };
+type ReadyPayload = {
+  materials: THREE.MeshStandardMaterial[];
+  group: THREE.Group;
+};
 
 function LegendModel({ onReady }: { onReady: (payload: ReadyPayload) => void }) {
   const { scene } = useGLTF("/products/legend/legend-model.glb");
@@ -98,22 +103,27 @@ function LegendModel({ onReady }: { onReady: (payload: ReadyPayload) => void }) 
     holder.scale.setScalar(maxDim > 0 ? MODEL_SCALE / maxDim : 1);
     holder.add(root);
 
-    let bodyMaterial: THREE.MeshStandardMaterial | null = null;
+    // Collect every tinted material. A material can be shared by several
+    // meshes, so de-dupe — otherwise one gets tweened multiple times.
+    const tinted = new Set<THREE.MeshStandardMaterial>();
     root.traverse((o) => {
       const mesh = o as THREE.Mesh;
       if (!mesh.isMesh) return;
       const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
       for (const m of mats) {
-        if (m.name === BODY_MATERIAL_NAME && m instanceof THREE.MeshStandardMaterial) {
-          bodyMaterial = m;
+        if (
+          TINTED_MATERIAL_NAMES.includes(m.name) &&
+          m instanceof THREE.MeshStandardMaterial
+        ) {
+          tinted.add(m);
         }
       }
     });
 
-    if (groupRef.current && bodyMaterial) {
+    if (groupRef.current && tinted.size > 0) {
       groupRef.current.add(holder);
       readyRef.current = true;
-      onReady({ material: bodyMaterial, group: groupRef.current });
+      onReady({ materials: [...tinted], group: groupRef.current });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scene]);
@@ -131,14 +141,16 @@ export default function RevolveShowcase() {
   const glow = useRef<HTMLDivElement>(null);
 
   const modelGroupRef = useRef<THREE.Group | null>(null);
-  const bodyMaterialRef = useRef<THREE.MeshStandardMaterial | null>(null);
-  const baseColorRef = useRef<THREE.Color | null>(null);
+  const tintedMaterialsRef = useRef<THREE.MeshStandardMaterial[]>([]);
+  // Each tinted material keeps its OWN original colour, so "no tint" restores
+  // the real GLB look (body and strap don't start from the same black).
+  const baseColorsRef = useRef<THREE.Color[]>([]);
   const [ready, setReady] = useState(false);
 
-  const handleModelReady = useCallback(({ material, group }: ReadyPayload) => {
-    bodyMaterialRef.current = material;
+  const handleModelReady = useCallback(({ materials, group }: ReadyPayload) => {
+    tintedMaterialsRef.current = materials;
     modelGroupRef.current = group;
-    baseColorRef.current = material.color.clone();
+    baseColorsRef.current = materials.map((m) => m.color.clone());
     setReady(true);
   }, []);
 
@@ -146,9 +158,9 @@ export default function RevolveShowcase() {
     () => {
       if (!root.current || !stage.current || !ready) return;
       const modelGroup = modelGroupRef.current;
-      const bodyMaterial = bodyMaterialRef.current;
-      const baseColor = baseColorRef.current;
-      if (!modelGroup || !bodyMaterial || !baseColor) return;
+      const tintedMaterials = tintedMaterialsRef.current;
+      const baseColors = baseColorsRef.current;
+      if (!modelGroup || tintedMaterials.length === 0) return;
 
       // Initial state — original GLB colour, front-facing.
       gsap.set(spinner.current, {
@@ -158,7 +170,7 @@ export default function RevolveShowcase() {
       });
       gsap.set(glow.current, { backgroundColor: SCENES[0].glow });
       gsap.set(modelGroup.rotation, { y: BASE_RY });
-      bodyMaterial.color.copy(baseColor);
+      tintedMaterials.forEach((m, i) => m.color.copy(baseColors[i]));
       texts.current.forEach((el, i) =>
         gsap.set(el, { autoAlpha: i === 0 ? 1 : 0, y: i === 0 ? 0 : 24 })
       );
@@ -182,9 +194,20 @@ export default function RevolveShowcase() {
       // power2.inOut's slow-fast-slow curve made it feel like it was
       // "catching"/stuttering rather than turning fluidly.
       const travel = (from: number, to: number, at: string) => {
-        const target = SCENES[to].bodyColor
+        const tint = SCENES[to].bodyColor
           ? new THREE.Color(SCENES[to].bodyColor as string)
-          : baseColor;
+          : null;
+
+        // Body and strap share the scene tint; with no tint each returns to
+        // its own original colour rather than a single shared one.
+        tintedMaterials.forEach((m, i) => {
+          const target = tint ?? baseColors[i];
+          tl.to(
+            m.color,
+            { r: target.r, g: target.g, b: target.b, ease: "power1.inOut", duration: 1.6 },
+            at
+          );
+        });
 
         tl
           .to(
@@ -202,11 +225,6 @@ export default function RevolveShowcase() {
           .to(
             modelGroup.rotation,
             { y: `+=${ROTATION_RANGE}`, ease: "none", duration: 1.6 },
-            at
-          )
-          .to(
-            bodyMaterial.color,
-            { r: target.r, g: target.g, b: target.b, ease: "power1.inOut", duration: 1.6 },
             at
           )
           .to(
