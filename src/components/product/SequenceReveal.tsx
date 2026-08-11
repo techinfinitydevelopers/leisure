@@ -17,6 +17,13 @@ const SCROLL_VH = 3.5;
 // Fraction of the scroll spent on the card -> full-bleed expansion. The frame
 // sequence plays across the remaining (1 - EXPAND_END).
 const EXPAND_END = 0.28;
+// The stage fades out over the tail end of the pin. The section carries a
+// -100vh bottom margin (see the CSS) so the next section starts exactly as the
+// pin releases, but this 100vh stage still physically slides its own height out
+// afterwards — opaque, on z-index 40, straight over the next section while that
+// section is already running its own pinned scrub underneath. Fading the stage
+// first means it slides away invisibly and the next section is never covered.
+const FADE_START = 0.94;
 // Below this viewport width we load the lighter mobile frame set.
 const MOBILE_MAX_W = 768;
 
@@ -166,6 +173,10 @@ export default function SequenceReveal() {
       stageEl.style.setProperty("--seq-inset", `${(1 - expand) * 6}%`);
       stageEl.style.setProperty("--seq-radius", `${(1 - expand) * 28}px`);
       if (overlay.current) overlay.current.style.opacity = String(expand);
+
+      // hand off to the next section: fade the stage out before it starts
+      // sliding over it (see FADE_START)
+      stageEl.style.opacity = String(1 - clamp01((p - FADE_START) / (1 - FADE_START)));
 
       // phase 2 — linear scroll-to-frame lookup, no easing
       const play = clamp01((p - EXPAND_END) / (1 - EXPAND_END));

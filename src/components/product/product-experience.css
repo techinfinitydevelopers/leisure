@@ -357,9 +357,25 @@ html.lenis, html.lenis body { height: auto; }
    GSAP also copies the computed padding inline onto the pinned element, so it
    has to be zero BEFORE the pin is created. */
 .leisure-xp .seqreveal { position: relative; height: 100vh; padding: 0; }
+/* margin-bottom: -100vh pulls whatever follows up by one viewport. Once the pin
+   releases, this 100vh frame still has to scroll its own height out before the
+   next section's top could reach the viewport top — that tail is unavoidable
+   for a full-viewport pin, and it read as a big empty black band (the last
+   frame is dark at the bottom, and the next section leads with its own top
+   padding). GSAP copies the margin onto the pin spacer, so the next section
+   now starts as the pin ends, and the stage fades out (see FADE_START in the
+   component) before it slides over it — no dead scroll, nothing covered.
+   Gated on motion being allowed: with reduced motion there is no pin at all,
+   so an unconditional negative margin would park this opaque stage on top of
+   the next section permanently. */
+@media (prefers-reduced-motion: no-preference) {
+  .leisure-xp .seqreveal { margin-bottom: -100vh; }
+}
 /* z-index above the WebGL layer (30) so the full-bleed frame owns the screen,
    below the nav/buybar — same convention as .features--bg / .specx. */
-.seqreveal__stage { position: relative; z-index: 40; height: 100vh; width: 100%; display: flex; align-items: center; justify-content: center; background: var(--bg, #000); }
+/* pointer-events:none — nothing in here is interactive, and once it has faded
+   out it still overlaps the next section for a viewport's worth of scroll. */
+.seqreveal__stage { position: relative; z-index: 40; height: 100vh; width: 100%; display: flex; align-items: center; justify-content: center; background: var(--bg, #000); pointer-events: none; }
 /* --seq-inset / --seq-radius are driven from the scroll progress in JS: the
    frame starts as an inset rounded card and expands to full bleed. */
 .seqreveal__frame {
