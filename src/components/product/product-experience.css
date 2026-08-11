@@ -348,6 +348,44 @@ html.lenis, html.lenis body { height: auto; }
 .deepdive-row--flip .deepdive-row__copy { margin-left: auto; }
 @media (max-width: 640px) { .deepdive-row, .deepdive-row--flip { grid-template-columns: 1fr; } .deepdive-row--flip .deepdive-row__body { text-align: left; } .deepdive-row--flip .deepdive-row__n { grid-column: 1; } .deepdive-row--flip .deepdive-row__copy { margin-left: 0; } }
 
+/* ---------- Scroll-scrubbed frame sequence (before Specifications) ---------- */
+/* The section itself is one viewport tall; GSAP pins .seqreveal__stage and adds
+   the scroll distance as pin spacing, so no extra height is declared here. */
+/* `.leisure-xp .seqreveal` (not just `.seqreveal`) so it outranks the global
+   `.leisure-xp section` padding — that inset would otherwise keep the frame
+   ~173px narrower than the viewport and it could never reach true full bleed.
+   GSAP also copies the computed padding inline onto the pinned element, so it
+   has to be zero BEFORE the pin is created. */
+.leisure-xp .seqreveal { position: relative; height: 100vh; padding: 0; }
+/* z-index above the WebGL layer (30) so the full-bleed frame owns the screen,
+   below the nav/buybar — same convention as .features--bg / .specx. */
+.seqreveal__stage { position: relative; z-index: 40; height: 100vh; width: 100%; display: flex; align-items: center; justify-content: center; background: var(--bg, #000); }
+/* --seq-inset / --seq-radius are driven from the scroll progress in JS: the
+   frame starts as an inset rounded card and expands to full bleed. */
+.seqreveal__frame {
+  position: absolute;
+  inset: var(--seq-inset, 6%);
+  border-radius: var(--seq-radius, 28px);
+  overflow: hidden;
+  background: #000;
+  will-change: inset, border-radius;
+}
+.seqreveal__canvas { display: block; width: 100%; height: 100%; }
+.seqreveal__overlay { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 38%, rgba(0,0,0,0.65) 100%); }
+/* Centred with left/right + flex rather than a translate, because the JS writes
+   the inline `transform` every frame for the upward drift — mixing that with a
+   `translate: -50%` for centring made the two fight and pushed the copy off to
+   the right. */
+.seqreveal__caption { position: absolute; left: 0; right: 0; bottom: clamp(5rem, 16vh, 10rem); display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 clamp(1.2rem, 5vw, 3rem); transform: translate3d(0, 18px, 0); opacity: 0; pointer-events: none; }
+.seqreveal__caption-text { margin: 0.5rem 0 0; max-width: 620px; font-family: var(--display); font-weight: 700; letter-spacing: -0.01em; text-transform: uppercase; line-height: 1.05; font-size: clamp(1.4rem, 3.4vw, 2.6rem); color: var(--ink); text-shadow: 0 2px 24px rgba(0,0,0,0.55); }
+.seqreveal__loader { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+.seqreveal__loader-bar { width: min(38%, 260px); height: 2px; background: rgba(255,255,255,0.16); overflow: hidden; }
+.seqreveal__loader-fill { display: block; height: 100%; background: var(--accent); transition: width 0.2s linear; }
+@media (prefers-reduced-motion: reduce) {
+  .seqreveal__frame { will-change: auto; }
+  .seqreveal__loader-fill { transition: none; }
+}
+
 .specs--tech { min-height: auto; display: block; }
 
 /* ---------- Technical Details: split-scroll (sticky list + model right) ---------- */

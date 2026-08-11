@@ -95,6 +95,13 @@ export type ProductExperience = {
    *  "Why {name}" / "Made for the move" if not set — override per product
    *  when that default doesn't fit (e.g. a non-portable flagship speaker). */
   deepDiveHeading?: { eyebrow: string; title: string };
+  /** Pinned scroll-scrubbed frame sequence (rendered to a canvas) placed just
+   *  before the Specifications section. Frames live at
+   *  /products/{slug}/legend-seq/{desktop,mobile}/frame_001.webp … */
+  sequenceReveal?: {
+    frameCount: number;
+    captions: { eyebrow?: string; text: string }[];
+  };
   /** Render Technical Details as an Apple-style split-scroll: sticky spec list
    *  on the left, the model showing a different angle per spec on the right. */
   technicalSplit?: boolean;
@@ -411,6 +418,15 @@ const dominator: ProductExperience = {
   // flagship, so it was showing DRIFT's own hardcoded copy verbatim before
   // this field existed at all.
   deepDiveHeading: { eyebrow: "Why DOMINATOR", title: "Built to dominate." },
+  sequenceReveal: {
+    frameCount: 120,
+    captions: [
+      { eyebrow: "Presence", text: "Fills the room before it makes a sound." },
+      { eyebrow: "Power", text: "140W of clean, room-shaking output." },
+      { eyebrow: "Control", text: "Hand-tuned dials, right where you reach." },
+      { eyebrow: "Built for it", text: "Rugged enough to travel. Loud enough to host." },
+    ],
+  },
   technicalSplit: true, // sticky spec list left, model angles per spec on the right
   landingStage: { eyebrow: "Turn it up", caption: "That's DOMINATOR." },
   featureStops: [

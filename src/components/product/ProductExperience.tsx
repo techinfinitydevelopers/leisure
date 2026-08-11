@@ -17,6 +17,7 @@ import LandingStage from "./LandingStage";
 import Overview from "./Overview";
 import ParallaxBreak from "./ParallaxBreak";
 import FeatureGrid from "./FeatureGrid";
+import SequenceReveal from "./SequenceReveal";
 import SpecsSection from "./SpecsSection";
 import SpecRail from "./SpecRail";
 import SpecExplorer from "./SpecExplorer";
@@ -109,6 +110,8 @@ export default function ProductExperience({
           <Overview />
           <ParallaxBreak />
           <FeatureGrid />
+          {/* Scroll-scrubbed frame sequence, immediately before the specs */}
+          <SequenceReveal />
           {specLayout === "explorer" ? (
             <SpecExplorer />
           ) : specLayout === "rail" ? (
