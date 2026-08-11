@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useProductExperience } from "@/lib/product-experience-context";
-import { scroll } from "@/lib/scrollStore";
+import { pushHide, popHide } from "@/lib/scrollStore";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -17,6 +17,17 @@ export default function SpecRail() {
     const wrap = wrapRef.current;
     const track = trackRef.current;
     if (!wrap || !track) return;
+    let hidden = false;
+    const armHide = () => {
+      if (hidden) return;
+      hidden = true;
+      pushHide();
+    };
+    const disarmHide = () => {
+      if (!hidden) return;
+      hidden = false;
+      popHide();
+    };
     const ctx = gsap.context(() => {
       gsap.to(track, {
         x: () => -(track.scrollWidth - window.innerWidth),
@@ -35,13 +46,14 @@ export default function SpecRail() {
         trigger: wrap,
         start: "top 80%",
         end: "bottom 20%",
-        onToggle: (self) => {
-          scroll.productHide = self.isActive ? 1 : 0;
-        },
+        onEnter: armHide,
+        onEnterBack: armHide,
+        onLeave: disarmHide,
+        onLeaveBack: disarmHide,
       });
     }, wrap);
     return () => {
-      scroll.productHide = 0;
+      disarmHide();
       ctx.revert();
     };
   }, []);

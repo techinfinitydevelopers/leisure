@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useProductExperience } from "@/lib/product-experience-context";
-import { scroll } from "@/lib/scrollStore";
+import { pushHide, popHide } from "@/lib/scrollStore";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -24,16 +24,28 @@ export default function Highlights() {
       scrollTrigger: { trigger: el, start: "top 80%" },
     });
     // hide the roaming product while this centered numbers band is on screen
+    let armed = false;
+    const arm = () => {
+      if (armed) return;
+      armed = true;
+      pushHide();
+    };
+    const disarm = () => {
+      if (!armed) return;
+      armed = false;
+      popHide();
+    };
     const hide = ScrollTrigger.create({
       trigger: el,
       start: "top 80%",
       end: "bottom 20%",
-      onToggle: (self) => {
-        scroll.productHide = self.isActive ? 1 : 0;
-      },
+      onEnter: arm,
+      onEnterBack: arm,
+      onLeave: disarm,
+      onLeaveBack: disarm,
     });
     return () => {
-      scroll.productHide = 0;
+      disarm();
       hide.kill();
       tween.scrollTrigger?.kill();
       tween.kill();

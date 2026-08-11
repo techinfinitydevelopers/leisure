@@ -91,6 +91,10 @@ export type ProductExperience = {
   /** Deep-dive roam: model sits on the empty side of each alternating row
    *  (x = offset magnitude, applied left/right per row). */
   deepDiveModel?: { x?: number; ry?: number; scale?: number };
+  /** Eyebrow/title for the deep-dive section. Defaults to a generic
+   *  "Why {name}" / "Made for the move" if not set — override per product
+   *  when that default doesn't fit (e.g. a non-portable flagship speaker). */
+  deepDiveHeading?: { eyebrow: string; title: string };
   /** Render Technical Details as an Apple-style split-scroll: sticky spec list
    *  on the left, the model showing a different angle per spec on the right. */
   technicalSplit?: boolean;
@@ -395,8 +399,18 @@ const dominator: ProductExperience = {
   overviewModel: { x: 0.32, ry: -0.6, scale: 0.5 }, // right, closer to the copy, turned right, smaller
   featuresBackground: true, // model sits behind the feature grid (frosted backdrop)
   featuresModel: { x: -0.32, ry: 0, scale: 0.4 }, // left, front, smaller (background) — sized down for the deeper box
-  specsModel: { x: 0.0, ry: 0, scale: 0.32 }, // parked in the empty gap between the spec labels and values (list scrolls past underneath, so it must clear BOTH columns, not just the right one)
-  deepDiveModel: { x: 0.34, ry: 1.45, scale: 0.4 }, // roams to the empty side; ~90° so it shows its side profile
+  // No specsModel — client asked to drop the speaker from Specifications
+  // entirely; it didn't fit the section's design language and repeated
+  // movement already used everywhere else. Leaving it unset keeps the model
+  // hidden (SpecsSection.tsx's hold/reveal trigger is skipped when absent).
+  // No deepDiveModel — client asked to drop the speaker from "Why DOMINATOR"
+  // too; leaving it unset keeps the model hidden for this section
+  // (FeatureDeepDive.tsx hides it when absent, same convention as Specs).
+  // Override the section's default "Why {name} / Made for the move" — that
+  // line was written for a portable speaker; DOMINATOR is a stay-put party
+  // flagship, so it was showing DRIFT's own hardcoded copy verbatim before
+  // this field existed at all.
+  deepDiveHeading: { eyebrow: "Why DOMINATOR", title: "Built to dominate." },
   technicalSplit: true, // sticky spec list left, model angles per spec on the right
   landingStage: { eyebrow: "Turn it up", caption: "That's DOMINATOR." },
   featureStops: [

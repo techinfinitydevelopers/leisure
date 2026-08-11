@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useProductExperience } from "@/lib/product-experience-context";
-import { scroll } from "@/lib/scrollStore";
+import { scroll, pushHide, popHide, requestVisible } from "@/lib/scrollStore";
 import SpecRow from "./SpecRow";
 
 export default function SpecsSection() {
@@ -34,6 +34,17 @@ export default function SpecsSection() {
       held = false;
       scroll.holdCount -= 1;
     };
+    let hidden = false;
+    const armHide = () => {
+      if (hidden) return;
+      hidden = true;
+      pushHide();
+    };
+    const disarmHide = () => {
+      if (!hidden) return;
+      hidden = false;
+      popHide();
+    };
     const ctx = gsap.context(() => {
       if (sm) {
         // hold + reveal the model for the whole time Specs is in view
@@ -42,12 +53,12 @@ export default function SpecsSection() {
           start: "top bottom",
           end: "bottom top",
           onEnter: () => {
-            scroll.productHide = 0;
+            requestVisible();
             scroll.holdX = FROM_X;
             hold();
           },
           onEnterBack: () => {
-            scroll.productHide = 0;
+            requestVisible();
             hold();
           },
           onLeave: () => release(),
@@ -63,6 +74,34 @@ export default function SpecsSection() {
           onUpdate: (self) => {
             scroll.holdX = FROM_X + (restX - FROM_X) * self.progress;
           },
+        });
+      } else {
+        // No specsModel configured for this product — the speaker doesn't
+        // fit the design language of this section, so keep it fully hidden
+        // for as long as Specifications is in view (mirrors FeatureGrid's
+        // own hide-while-in-view pattern).
+        // The window is measured in PIXELS, because none of ScrollTrigger's
+        // keyword ranges describe how long this section is actually on
+        // screen. The pin below runs "top top" -> "+=110%" with
+        // pinSpacing:true, so the section's life on screen is three parts:
+        //   1. scrolling in   — viewportHeight     (top hits bottom -> top top)
+        //   2. pinned         — 110% viewportHeight (the pin's own distance)
+        //   3. scrolling out  — its own height      (unpins at the spacer's
+        //      bottom minus its height, then scrolls off the top normally)
+        // Ranges tried before that all FAILED, for the record: "top 80%"/
+        // "bottom 20%" and "top bottom"/"bottom top" resolve against the
+        // element's natural (pre-pin) box and so miss part 2, while copying
+        // the pin's own "top top"/"+=110%" covers part 2 but misses part 3 —
+        // and part 3 is exactly where the speaker was reappearing over the
+        // still-visible spec rows (row 01 already scrolled past the top).
+        ScrollTrigger.create({
+          trigger: el,
+          start: "top bottom",
+          end: () => `+=${window.innerHeight * 2.1 + el.offsetHeight}`,
+          onEnter: armHide,
+          onEnterBack: armHide,
+          onLeave: disarmHide,
+          onLeaveBack: disarmHide,
         });
       }
 
@@ -88,6 +127,7 @@ export default function SpecsSection() {
     }, pinRef);
     return () => {
       release();
+      disarmHide();
       ctx.revert();
     };
   }, [sm]);

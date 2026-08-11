@@ -4,7 +4,7 @@ import { useEffect, useRef, type ReactNode } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useProductExperience } from "@/lib/product-experience-context";
-import { scroll } from "@/lib/scrollStore";
+import { scroll, pushHide, popHide } from "@/lib/scrollStore";
 
 const ICONS: Record<string, ReactNode> = {
   drop: <path d="M12 3c4 5 6 8 6 11a6 6 0 1 1-12 0c0-3 2-6 6-11Z" />,
@@ -151,18 +151,30 @@ export default function FeatureGrid() {
   // Hide the roaming model entirely while the feature grid is in view.
   useEffect(() => {
     if (!product.featuresBackground) return;
+    let armed = false;
+    const arm = () => {
+      if (armed) return;
+      armed = true;
+      pushHide();
+    };
+    const disarm = () => {
+      if (!armed) return;
+      armed = false;
+      popHide();
+    };
     const ctx = gsap.context(() => {
       ScrollTrigger.create({
         trigger: root.current,
         start: "top 80%",
         end: "bottom 20%",
-        onToggle: (self) => {
-          scroll.productHide = self.isActive ? 1 : 0;
-        },
+        onEnter: arm,
+        onEnterBack: arm,
+        onLeave: disarm,
+        onLeaveBack: disarm,
       });
     }, root);
     return () => {
-      scroll.productHide = 0;
+      disarm();
       ctx.revert();
     };
   }, [product]);

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useProductExperience } from "@/lib/product-experience-context";
-import { scroll } from "@/lib/scrollStore";
+import { scroll, pushHide, popHide, requestVisible } from "@/lib/scrollStore";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -477,17 +477,23 @@ export function EdgeFAQGrid() {
     const el = rootRef.current;
     if (!el || items.length === 0) return;
     // Hide model while FAQ is centre-stage — copy reads clean.
+    let hidden = false;
+    const armHide = () => { if (hidden) return; hidden = true; pushHide(); };
+    const disarmHide = () => { if (!hidden) return; hidden = false; popHide(); };
     const st = ScrollTrigger.create({
       trigger: el,
       start: "top 80%",
       end: "bottom 20%",
-      onToggle: (self) => { scroll.productHide = self.isActive ? 1 : 0; },
+      onEnter: armHide,
+      onEnterBack: armHide,
+      onLeave: disarmHide,
+      onLeaveBack: disarmHide,
     });
     const tween = gsap.from(el.querySelectorAll(".edge-faqg__cell"), {
       opacity: 0, y: 24, duration: 0.6, stagger: 0.06,
       scrollTrigger: { trigger: el, start: "top 75%" },
     });
-    return () => { st.kill(); tween.scrollTrigger?.kill(); tween.kill(); scroll.productHide = 0; };
+    return () => { st.kill(); tween.scrollTrigger?.kill(); tween.kill(); disarmHide(); };
   }, [items.length]);
 
   if (items.length === 0) return null;
@@ -524,7 +530,7 @@ export function EdgeCtaBand({ onBuy }: { onBuy: () => void }) {
     const hold = () => {
       if (held) return;
       held = true;
-      scroll.productHide = 0;
+      requestVisible();
       scroll.holdX = 0;
       scroll.holdY = 0.2;
       scroll.holdRX = 0.35;

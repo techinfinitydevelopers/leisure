@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useProductExperience } from "@/lib/product-experience-context";
-import { scroll } from "@/lib/scrollStore";
+import { scroll, requestVisible } from "@/lib/scrollStore";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -21,7 +21,7 @@ export default function LandingStage() {
     // caption for the whole finale — it does not scroll up and does not fade.
     let held = false;
     const hold = () => {
-      scroll.productHide = 0; // ensure visible here (FAQ hides it just before)
+      requestVisible(); // ensure visible here (FAQ hides it just before)
       if (held) return;
       held = true;
       scroll.holdX = 0;

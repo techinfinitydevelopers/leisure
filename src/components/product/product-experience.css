@@ -318,7 +318,14 @@ html.lenis, html.lenis body { height: auto; }
 .parallax-break__title { font-family: var(--display); font-weight: 800; letter-spacing: -0.01em; font-size: clamp(2rem, 6vw, 4.5rem); line-height: 1; text-transform: uppercase; color: var(--ink); }
 
 /* ---------- Feature deep dive ---------- */
-.deepdive__head { max-width: 1100px; margin: 0 auto clamp(2rem, 6vh, 4rem); }
+/* Lifted above the WebGL layer (z-index: 30, see .webgl-wrap) — the roaming
+   model swaps sides per row and briefly crosses centre while transitioning,
+   which otherwise paints over the copy. z-index: 40 matches the convention
+   already used by .features--bg / .specx for the same problem. The soft
+   radial scrim behind each row's text (not a full-bleed backdrop, so the
+   model still reads as a companion visual beside the copy, not hidden)
+   guards contrast if the model settles directly behind it. */
+.deepdive__head { max-width: 1100px; margin: 0 auto clamp(2rem, 6vh, 4rem); position: relative; z-index: 40; }
 .deepdive__title { font-family: var(--display); font-size: clamp(2.5rem, 8vw, 6rem); text-transform: uppercase; line-height: 1; }
 .deepdive__list { max-width: 1100px; margin: 0 auto; display: grid; gap: clamp(2rem, 6vh, 4.5rem); }
 .deepdive-row { display: grid; grid-template-columns: 5rem 1fr; gap: clamp(1.2rem, 4vw, 3rem); align-items: start; border-top: 1px solid var(--line); padding-top: clamp(1.5rem, 4vh, 2.5rem); }
@@ -326,7 +333,16 @@ html.lenis, html.lenis body { height: auto; }
 .deepdive-row--flip { grid-template-columns: 1fr 5rem; }
 .deepdive-row--flip .deepdive-row__n { grid-column: 2; grid-row: 1; }
 .deepdive-row--flip .deepdive-row__body { grid-column: 1; grid-row: 1; }
-.deepdive-row__n { font-family: var(--display); color: var(--accent); font-size: 1.4rem; }
+.deepdive-row__n { font-family: var(--display); color: var(--accent); font-size: 1.4rem; position: relative; z-index: 40; }
+.deepdive-row__body { position: relative; z-index: 40; }
+.deepdive-row__body::before {
+  content: '';
+  position: absolute;
+  inset: -1rem -1.5rem;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 70%);
+  z-index: -1;
+  pointer-events: none;
+}
 .deepdive-row__title { font-family: var(--display); font-size: clamp(1.8rem, 5vw, 3.4rem); text-transform: uppercase; line-height: 1; }
 .deepdive-row__copy { margin-top: 1rem; max-width: 52ch; color: var(--muted); line-height: 1.7; font-size: 1.05rem; }
 .deepdive-row--flip .deepdive-row__copy { margin-left: auto; }

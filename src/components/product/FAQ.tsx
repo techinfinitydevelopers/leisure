@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useProductExperience } from "@/lib/product-experience-context";
-import { scroll } from "@/lib/scrollStore";
+import { pushHide, popHide } from "@/lib/scrollStore";
 
 type FaqItemProps = {
   q: string;
@@ -59,18 +59,30 @@ export default function FAQ() {
   useEffect(() => {
     const el = root.current;
     if (!el) return;
+    let armed = false;
+    const arm = () => {
+      if (armed) return;
+      armed = true;
+      pushHide();
+    };
+    const disarm = () => {
+      if (!armed) return;
+      armed = false;
+      popHide();
+    };
     const ctx = gsap.context(() => {
       ScrollTrigger.create({
         trigger: el,
         start: "top 80%",
         end: "bottom 20%",
-        onToggle: (self) => {
-          scroll.productHide = self.isActive ? 1 : 0;
-        },
+        onEnter: arm,
+        onEnterBack: arm,
+        onLeave: disarm,
+        onLeaveBack: disarm,
       });
     }, root);
     return () => {
-      scroll.productHide = 0;
+      disarm();
       ctx.revert();
     };
   }, []);

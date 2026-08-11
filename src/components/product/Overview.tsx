@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useProductExperience } from "@/lib/product-experience-context";
-import { scroll } from "@/lib/scrollStore";
+import { scroll, requestVisible } from "@/lib/scrollStore";
 
 export default function Overview() {
   const product = useProductExperience();
@@ -51,16 +51,20 @@ export default function Overview() {
         end: "bottom top",
         scrub: true,
         onEnter: () => {
-          scroll.productHide = 0;
+          requestVisible();
           hold();
         },
         onEnterBack: () => {
-          scroll.productHide = 0;
+          requestVisible();
           hold();
         },
         onLeave: () => {
-          // slid off the right and now into the Feature Grid — keep it gone
-          scroll.productHide = 1;
+          // Slid off the right and now into the Feature Grid. This used to
+          // also force productHide = 1 to keep the model gone from here on,
+          // but that's the Feature Grid's job (its own hide window already
+          // opens before this one ends) — and as a refcounted push it would
+          // never have been released, hiding the model for the whole rest of
+          // the page including the finale.
           release();
         },
         onLeaveBack: () => release(),

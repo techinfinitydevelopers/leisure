@@ -14,13 +14,29 @@ import LiquidEtherHero from "@/components/sections/LiquidEtherHero";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
-// End the scrub on the branded hero (~180); a separate overlay handles a
-// slow, smooth fade to black (frames 181-193 fade too fast on their own).
-const FRAME_COUNT = 180;
+// End the scrub on the branded hero (~179); a separate overlay handles a
+// slow, smooth fade to black (later frames fade too fast on their own).
+const FRAME_COUNT = 179;
 // Bump when the frames are re-exported, to bust the browser cache.
-const FRAME_VERSION = 3;
+const FRAME_VERSION = 4;
 const framePath = (i: number) =>
   `/frames/frame_${String(i).padStart(4, "0")}.jpg?v=${FRAME_VERSION}`;
+
+// Scroll distance (in viewport-heights) for each phase of the pinned stage,
+// measured from the container's top. SCRUB_VH: video plays. FADE_VH: fades
+// to black after that. HOLD_VH: the stage stays genuinely pinned (truly
+// motionless, full-screen black — not just faded) for this much extra
+// scroll past FADE_VH, before the next section is allowed to appear.
+// TRANSITION_VH is NOT extra pause time — it's the one-viewport-height of
+// scroll GSAP's own unpin mechanics need to hand off to normal document
+// flow (see pinTrigger below). It must stay exactly 100; shrinking it just
+// makes MarqueeBand/RevolveShowcase peek in from the bottom edge before the
+// screen has finished being solid black.
+const SCRUB_VH = 644; // 92% of the original 700vh track
+const FADE_VH = 700;
+const HOLD_VH = 50;
+const TRANSITION_VH = 100;
+const TOTAL_VH = FADE_VH + HOLD_VH + TRANSITION_VH;
 
 /**
  * Full-screen scroll-scrubbed video, rendered as a preloaded image sequence
@@ -29,6 +45,7 @@ const framePath = (i: number) =>
  */
 export default function LandingExperience() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fadeRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
@@ -37,9 +54,10 @@ export default function LandingExperience() {
     () => {
       const canvas = canvasRef.current;
       const container = containerRef.current;
+      const stage = stageRef.current;
       const fade = fadeRef.current;
       const hero = heroRef.current;
-      if (!canvas || !container || !fade || !hero) return;
+      if (!canvas || !container || !stage || !fade || !hero) return;
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
@@ -111,7 +129,30 @@ export default function LandingExperience() {
         images.push(img);
       }
 
-      // Video plays across the first ~80% of the scroll, settling on the hero.
+      // Pin the video's visual stage for the container's full height, then
+      // release with ZERO extra scroll. Plain CSS `position: sticky` (the
+      // previous approach) can't do this: unsticking always costs an extra
+      // viewportHeight of scroll for the child to physically scroll past —
+      // the same as any real block element.
+      // GSAP's own unpin also has a version of this cost: when it releases,
+      // it freezes the stage in place with a landing transform for one more
+      // viewportHeight of scroll before the page's normal flow fully carries
+      // it away — otherwise that frozen, still-opaque stage sits on top of
+      // MarqueeBand/RevolveShowcase, hiding them. Ending the pin one
+      // viewportHeight before the container's true bottom makes that frozen
+      // tail play out INSIDE the container's own remaining height instead of
+      // bleeding into the next section.
+      const pinTrigger = ScrollTrigger.create({
+        trigger: container,
+        start: "top top",
+        end: () => `+=${container.offsetHeight - window.innerHeight}`,
+        pin: stage,
+        pinSpacing: false,
+      });
+
+      // Video plays across the first SCRUB_VH of the pin, settling on the
+      // hero. Pixel offsets (not "X% top") so growing the container for the
+      // HOLD_VH pause below doesn't also stretch out the video/fade timing.
       const tween = gsap.to(state, {
         frame: FRAME_COUNT - 1,
         ease: "none",
@@ -120,13 +161,16 @@ export default function LandingExperience() {
         scrollTrigger: {
           trigger: container,
           start: "top top",
-          end: "92% bottom",
+          end: () => `+=${(SCRUB_VH / 100) * window.innerHeight}`,
           scrub: 1,
         },
       });
 
-      // Last ~8%: a quick fade to black over the held hero shot (was 20% —
-      // that left a long dead black-screen scroll before the next section).
+      // Fades to black over the held hero shot, completing at FADE_VH. The
+      // remaining HOLD_VH of scroll (up to the container's true end) then
+      // just holds on that solid black before the next section appears —
+      // the pin's landing transform (see pinTrigger below) keeps the stage
+      // visually frozen in place through that whole stretch.
       const fadeTween = gsap.fromTo(
         fade,
         { opacity: 0 },
@@ -135,8 +179,8 @@ export default function LandingExperience() {
           ease: "power1.inOut",
           scrollTrigger: {
             trigger: container,
-            start: "92% bottom",
-            end: "bottom bottom",
+            start: () => `top+=${(SCRUB_VH / 100) * window.innerHeight}px top`,
+            end: () => `top+=${(FADE_VH / 100) * window.innerHeight}px top`,
             scrub: 1,
           },
         }
@@ -171,10 +215,12 @@ export default function LandingExperience() {
       const onResize = () => {
         setCanvasSize();
         render();
+        ScrollTrigger.refresh();
       };
       window.addEventListener("resize", onResize);
 
       return () => {
+        pinTrigger.kill();
         tween.scrollTrigger?.kill();
         tween.kill();
         fadeTween.scrollTrigger?.kill();
@@ -192,12 +238,25 @@ export default function LandingExperience() {
 
   return (
     <>
-      {/* Tall scroll track: more height = slower, smoother per-scroll scrub.
-          The video scrubs to its end (fully black) right as this ends.
-          Reduced from 1000vh — the tail fade-to-black was taking too long
-          to scroll through before the next section appeared. */}
-      <div ref={containerRef} className="relative h-[800vh] w-full bg-black">
-        <div className="sticky top-0 h-screen w-full overflow-hidden">
+      {/* Scroll track: its height IS the pin's scroll distance (see the
+          pinTrigger's pinSpacing:false above) — no extra height needed for
+          an "unstick" tail the way CSS position:sticky would require. The
+          video scrubs and fades to black within the first FADE_VH of this;
+          the remaining HOLD_VH is a deliberate pause on solid black before
+          the next section appears. */}
+      <div
+        ref={containerRef}
+        className="relative w-full bg-black"
+        style={{ height: `${TOTAL_VH}vh` }}
+      >
+        {/* z-10: GSAP's pin sets this to position:fixed, which drops it out
+            of normal document flow — unlike the old sticky approach, it's no
+            longer constrained to its own document position, so once later
+            sections (MarqueeBand, RevolveShowcase — both position:relative)
+            scroll into view, they'd otherwise paint OVER this on z-index:auto
+            DOM order alone, showing through the still-pinned video. Kept
+            below Nav's z-50 so nav stays clickable throughout. */}
+        <div ref={stageRef} className="relative z-10 h-screen w-full overflow-hidden">
           <canvas ref={canvasRef} className="block h-full w-full" />
           {/* Smooth fade-to-black overlay (driven by scroll, last ~20%). */}
           <div

@@ -29,26 +29,39 @@ export default function LifestyleLoop() {
   // While the marquee is in view, hold the model to the left in a steady
   // top-front view (tilted forward so the top + grille read at once).
   useEffect(() => {
+    // Guarded (armed/disarm), not a bare +=1/-=1 on every onToggle call —
+    // onToggle can re-fire for the SAME state (e.g. around a
+    // ScrollTrigger.refresh() elsewhere on the page), and an unguarded
+    // increment would leak a permanent +1 that never gets released, leaving
+    // this section's hold bleeding into every later section on the page.
+    let armed = false;
+    const arm = () => {
+      if (armed) return;
+      armed = true;
+      scroll.holdX = -0.28;
+      scroll.holdY = 0;
+      scroll.holdRX = 0.6; // tilt toward top-front
+      scroll.holdRY = 0; // front-on
+      scroll.holdS = 0.55;
+      scroll.holdCount += 1;
+    };
+    const disarm = () => {
+      if (!armed) return;
+      armed = false;
+      scroll.holdCount -= 1;
+    };
     const st = ScrollTrigger.create({
       trigger: rootRef.current!,
       start: "top 75%",
       end: "bottom 25%",
-      onToggle: (self) => {
-        if (self.isActive) {
-          scroll.holdX = -0.28;
-          scroll.holdY = 0;
-          scroll.holdRX = 0.6; // tilt toward top-front
-          scroll.holdRY = 0; // front-on
-          scroll.holdS = 0.55;
-          scroll.holdCount += 1;
-        } else {
-          scroll.holdCount -= 1;
-        }
-      },
+      onEnter: () => arm(),
+      onEnterBack: () => arm(),
+      onLeave: () => disarm(),
+      onLeaveBack: () => disarm(),
     });
     return () => {
       st.kill();
-      scroll.holdCount = 0;
+      disarm();
     };
   }, []);
 

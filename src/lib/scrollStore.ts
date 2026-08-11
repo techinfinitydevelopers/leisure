@@ -24,6 +24,7 @@ export type ScrollStore = {
   holdRX: number; // target X-tilt (rad) while held
   holdS: number; // scale multiplier while held (1 = unchanged, <1 = smaller)
   sideCount: number; // >0 when sections want the plane to SLIDE aside (stays visible)
+  hideCount: number; // >0 when ANY section wants the model gone — drives productHide
 };
 
 export const scroll: ScrollStore = {
@@ -49,4 +50,35 @@ export const scroll: ScrollStore = {
   holdRX: 0,
   holdS: 1,
   sideCount: 0,
+  hideCount: 0,
 };
+
+// `productHide` is read as a 0..1 number by the WebGL layer, but SEVEN
+// sections want a say in it (Overview + Specs want the model shown, while
+// FeatureGrid / Specs-without-a-model / Why-{name} / Highlights / FAQ /
+// ParallaxBreak want it gone) and their scroll windows OVERLAP. Writing the
+// flag directly made it last-writer-wins, and which section wrote last
+// depended on scroll DIRECTION — so the model would stay hidden going down
+// but pop back in over the text going up (and vice versa).
+//
+// Refcount instead, exactly like holdCount/sideCount above: each hider
+// pushes on enter and pops on leave, and the model is hidden while any
+// pusher is still active. Direction stops mattering. Always pair a push
+// with a pop, and guard both with a local `armed` boolean so a
+// re-fired ScrollTrigger callback can't leak a count that never releases.
+export function pushHide() {
+  scroll.hideCount += 1;
+  scroll.productHide = 1;
+}
+
+export function popHide() {
+  scroll.hideCount = Math.max(0, scroll.hideCount - 1);
+  scroll.productHide = scroll.hideCount > 0 ? 1 : 0;
+}
+
+/** For sections that want the model VISIBLE (Overview, Specs-with-a-model,
+ *  LandingStage). Yields to any section that is actively hiding it, instead
+ *  of forcing the flag to 0 and fighting them. */
+export function requestVisible() {
+  if (scroll.hideCount === 0) scroll.productHide = 0;
+}

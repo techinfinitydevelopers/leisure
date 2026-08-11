@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useProductExperience } from "@/lib/product-experience-context";
-import { scroll } from "@/lib/scrollStore";
+import { scroll, pushHide, popHide } from "@/lib/scrollStore";
 
 type DeepDiveRowProps = {
   title: string;
@@ -79,34 +79,81 @@ export default function FeatureDeepDive() {
   // Hold the model (steady scale/heading) for as long as the deep-dive section
   // is in view; the per-row triggers above swap which side it sits on.
   useEffect(() => {
-    if (!dm) return;
     const el = root.current!;
+    if (!dm) {
+      // No deepDiveModel configured for this product — keep the speaker
+      // fully hidden for as long as this section is in view (mirrors
+      // SpecsSection's own hide-while-in-view pattern).
+      let hidden = false;
+      const armHide = () => {
+        if (hidden) return;
+        hidden = true;
+        pushHide();
+      };
+      const disarmHide = () => {
+        if (!hidden) return;
+        hidden = false;
+        popHide();
+      };
+      const st = ScrollTrigger.create({
+        trigger: el,
+        start: "top 80%",
+        end: "bottom 20%",
+        onEnter: armHide,
+        onEnterBack: armHide,
+        onLeave: disarmHide,
+        onLeaveBack: disarmHide,
+      });
+      return () => {
+        st.kill();
+        disarmHide();
+      };
+    }
+    // Guarded like a refcount (armed/disarm), not a bare +=1/-=1 on every
+    // onToggle call — onToggle can re-fire for the SAME state (e.g. around a
+    // ScrollTrigger.refresh() elsewhere on the page), and an unguarded
+    // increment would leak a permanent +1 that's never released, leaving
+    // this section's default holdX bleeding into every later section for
+    // the rest of the page (confirmed: it was still showing up in Technical
+    // Details' model position).
+    let armed = false;
+    const arm = () => {
+      if (armed) return;
+      armed = true;
+      scroll.holdS = dm.scale ?? 1;
+      scroll.holdX = dm.x ?? 0.34; // default side until a row sets it
+      scroll.holdCount += 1;
+    };
+    const disarm = () => {
+      if (!armed) return;
+      armed = false;
+      scroll.holdCount -= 1;
+    };
     const st = ScrollTrigger.create({
       trigger: el,
       start: "top 70%",
       end: "bottom 30%",
-      onToggle: (self) => {
-        if (self.isActive) {
-          scroll.holdS = dm.scale ?? 1;
-          scroll.holdX = dm.x ?? 0.34; // default side until a row sets it
-          scroll.holdCount += 1;
-        } else {
-          scroll.holdCount -= 1;
-        }
-      },
+      onEnter: () => arm(),
+      onEnterBack: () => arm(),
+      onLeave: () => disarm(),
+      onLeaveBack: () => disarm(),
     });
     return () => {
       st.kill();
-      scroll.holdCount = 0;
+      disarm();
     };
   }, [dm]);
 
   if (!product.deepDives?.length) return null;
+  const heading = product.deepDiveHeading ?? {
+    eyebrow: `Why ${product.name}`,
+    title: "Made for the move",
+  };
   return (
     <section className="deepdive" id="deepdive" ref={root}>
       <header className="deepdive__head">
-        <span className="eyebrow">Why DRIFT</span>
-        <h2 className="deepdive__title">Made for the move</h2>
+        <span className="eyebrow">{heading.eyebrow}</span>
+        <h2 className="deepdive__title">{heading.title}</h2>
       </header>
       <div className="deepdive__list">
         {product.deepDives.map((d, i) => (

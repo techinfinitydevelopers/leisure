@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useProductExperience } from "@/lib/product-experience-context";
-import { scroll } from "@/lib/scrollStore";
+import { scroll, pushHide, popHide } from "@/lib/scrollStore";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -16,6 +16,10 @@ export default function ParallaxBreak() {
   const root = useRef<HTMLElement>(null);
   const img = useRef<HTMLImageElement>(null);
   const parallax = product.parallax;
+
+  // Holds the current trigger's release fn so unmount can settle whichever
+  // counter (hide or slide-aside) this break happens to have pushed.
+  const disarmRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     if (!parallax) return;
@@ -38,19 +42,32 @@ export default function ParallaxBreak() {
       // While this break owns the screen, either FADE the roaming product out
       // (default) or — if the product opts in via `parallax.slideAside` — keep
       // it visible and slide it to the side (scroll.sideCount).
+      let armed = false;
+      const arm = () => {
+        if (armed) return;
+        armed = true;
+        if (parallax.slideAside) scroll.sideCount += 1;
+        else pushHide();
+      };
+      const disarm = () => {
+        if (!armed) return;
+        armed = false;
+        if (parallax.slideAside) scroll.sideCount = Math.max(0, scroll.sideCount - 1);
+        else popHide();
+      };
+      disarmRef.current = disarm;
       ScrollTrigger.create({
         trigger: root.current,
         start: "top 70%",
         end: "bottom 30%",
-        onToggle: (self) => {
-          if (parallax.slideAside) scroll.sideCount += self.isActive ? 1 : -1;
-          else scroll.productHide = self.isActive ? 1 : 0;
-        },
+        onEnter: arm,
+        onEnterBack: arm,
+        onLeave: disarm,
+        onLeaveBack: disarm,
       });
     }, root);
     return () => {
-      scroll.productHide = 0;
-      scroll.sideCount = 0;
+      disarmRef.current?.();
       ctx.revert();
     };
   }, [parallax]);
