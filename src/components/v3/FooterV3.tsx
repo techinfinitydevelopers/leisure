@@ -70,7 +70,7 @@ export default function FooterV3() {
 
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-[#e8d800]" />
-              <Image src="/brand/leisure-logo.png" alt="Leisure" width={130} height={40} className="h-7 w-auto brightness-0 invert" />
+              <Image src="/brand/leisure-mark.png" alt="Leisure" width={130} height={40} className="h-7 w-auto brightness-0 invert" />
             </div>
 
             <p className="text-sm leading-relaxed text-white/50">

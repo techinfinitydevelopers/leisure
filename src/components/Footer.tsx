@@ -80,7 +80,7 @@ export default function Footer() {
 
             <div className="flex items-center">
               <Image
-                src="/brand/leisure-logo.png"
+                src="/brand/leisure-mark.png"
                 alt="Leisure"
                 width={90}
                 height={90}

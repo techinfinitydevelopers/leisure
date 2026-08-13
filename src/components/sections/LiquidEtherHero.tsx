@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { ChevronDown } from "lucide-react";
 // Plain-JS component from the React Bits registry (JS-CSS variant).
 import LiquidEther from "@/components/ui/LiquidEther/LiquidEther";
@@ -36,9 +37,14 @@ export default function LiquidEtherHero() {
 
       {/* Brand overlay — pointer-events-none so the fluid stays cursor-reactive. */}
       <div className="pointer-events-none relative z-10 flex h-full w-full flex-col items-center justify-center px-6 text-center">
-        <p className="font-pinyon-script text-3xl font-bold text-gold opacity-0 [animation:fade-up_0.9s_ease-out_forwards] sm:text-5xl">
-          Leisure
-        </p>
+        <Image
+          src="/brand/leisure-wordmark.png"
+          alt="Leisure"
+          width={1024}
+          height={377}
+          priority
+          className="h-10 w-auto opacity-0 [animation:fade-up_0.9s_ease-out_forwards] sm:h-16"
+        />
         <h1 className="mt-2 font-globe text-4xl font-bold tracking-tight text-offwhite opacity-0 [animation:fade-up_0.9s_ease-out_0.15s_forwards] sm:text-6xl">
           Elegance You Can Hear
         </h1>

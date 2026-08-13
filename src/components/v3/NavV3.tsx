@@ -38,7 +38,7 @@ export default function NavV3() {
           >
             <Link href="/v3" className="flex shrink-0 items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-[#e8d800]" />
-              <Image src="/brand/leisure-logo.png" alt="Leisure" width={140} height={42} priority className="h-9 w-auto" />
+              <Image src="/brand/leisure-mark.png" alt="Leisure" width={140} height={42} priority className="h-9 w-auto" />
             </Link>
 
             <ul className="flex items-center gap-7 text-[0.78rem] font-medium uppercase tracking-[0.16em] text-[#000000]/70">
@@ -82,7 +82,7 @@ export default function NavV3() {
         <div className="flex h-16 items-center justify-between px-5">
           <Link href="/v3" className="relative z-50 flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-[#e8d800]" />
-            <Image src="/brand/leisure-logo.png" alt="Leisure" width={140} height={42} priority className="h-9 w-auto" />
+            <Image src="/brand/leisure-mark.png" alt="Leisure" width={140} height={42} priority className="h-9 w-auto" />
           </Link>
           <button type="button" aria-label="Toggle menu" onClick={() => setMenuOpen((v) => !v)} className="relative z-50 flex h-10 w-10 flex-col items-center justify-center gap-[5px]">
             <span className={`block h-px w-6 bg-[#000000] transition-all duration-300 ${menuOpen ? "translate-y-[6px] rotate-45" : ""}`} />

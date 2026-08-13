@@ -129,7 +129,7 @@ export default function DashboardShell({
     <div className="flex h-full flex-col">
       <div className="flex items-center px-6 py-6">
         <Image
-          src="/brand/leisure-logo.png"
+          src="/brand/leisure-mark.png"
           alt="Leisure"
           width={132}
           height={36}

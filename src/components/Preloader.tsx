@@ -76,7 +76,7 @@ export default function Preloader() {
           margin pulls the EQ bars back up under it so the gap reads tight. */}
       <div className="relative z-10 -mb-16">
         <Image
-          src="/brand/leisure-logo.png"
+          src="/brand/leisure-mark.png"
           alt="Leisure"
           width={200}
           height={60}

@@ -38,7 +38,7 @@ export default function NavV2() {
           >
             <Link href="/v2" className="flex shrink-0 items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-gold" />
-              <Image src="/brand/leisure-logo.png" alt="Leisure" width={140} height={42} priority className="h-9 w-auto brightness-0 invert" />
+              <Image src="/brand/leisure-mark.png" alt="Leisure" width={140} height={42} priority className="h-9 w-auto brightness-0 invert" />
             </Link>
 
             <ul className="flex items-center gap-7 text-[0.78rem] font-medium uppercase tracking-[0.16em] text-white/75">
@@ -80,7 +80,7 @@ export default function NavV2() {
         <div className="flex h-16 items-center justify-between px-5">
           <Link href="/v2" className="relative z-50 flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-gold" />
-            <Image src="/brand/leisure-logo.png" alt="Leisure" width={140} height={42} priority className="h-9 w-auto brightness-0 invert" />
+            <Image src="/brand/leisure-mark.png" alt="Leisure" width={140} height={42} priority className="h-9 w-auto brightness-0 invert" />
           </Link>
           <button type="button" aria-label="Toggle menu" onClick={() => setMenuOpen((v) => !v)} className="relative z-50 flex h-10 w-10 flex-col items-center justify-center gap-[5px]">
             <span className={`block h-px w-6 bg-white transition-all duration-300 ${menuOpen ? "translate-y-[6px] rotate-45" : ""}`} />

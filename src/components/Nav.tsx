@@ -43,7 +43,7 @@ export default function Nav() {
             {/* Logo */}
             <Link href="/" className="flex shrink-0 items-center">
               <Image
-                src="/brand/leisure-logo.png"
+                src="/brand/leisure-mark.png"
                 alt="Leisure"
                 width={90}
                 height={90}
@@ -151,7 +151,7 @@ export default function Nav() {
           {/* Logo */}
           <Link href="/" className="relative z-50 flex items-center">
             <Image
-              src="/brand/leisure-logo.png"
+              src="/brand/leisure-mark.png"
               alt="Leisure"
               width={120}
               height={120}

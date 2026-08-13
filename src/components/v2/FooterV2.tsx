@@ -75,7 +75,7 @@ export default function FooterV2() {
             </div>
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-gold" />
-              <Image src="/brand/leisure-logo.png" alt="Leisure" width={130} height={40} className="h-7 w-auto brightness-0 invert" />
+              <Image src="/brand/leisure-mark.png" alt="Leisure" width={130} height={40} className="h-7 w-auto brightness-0 invert" />
             </div>
             <p className="text-sm leading-relaxed" style={{ color: "rgba(250,248,251,0.5)" }}>
               Premium retro Bluetooth speakers — crafted for powerful sound, built to turn heads.

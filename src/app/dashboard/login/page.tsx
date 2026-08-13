@@ -42,7 +42,7 @@ export default function LoginPage() {
       <div className="glass gold-glow w-full max-w-sm rounded-3xl p-8">
         <div className="mb-8 flex flex-col items-center text-center">
           <Image
-            src="/brand/leisure-logo.png"
+            src="/brand/leisure-mark.png"
             alt="Leisure"
             width={148}
             height={44}
