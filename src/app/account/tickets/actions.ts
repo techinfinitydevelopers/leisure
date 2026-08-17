@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { getCustomerSession } from "@/lib/customer-session";
-import { getCurrentCustomer } from "@/lib/customer-account";
+import { getCurrentCustomer, deriveDisplayName } from "@/lib/customer-account";
 import { listMyTickets, replyToTicket } from "@/lib/support-app";
 
 export async function submitTicketReply(ticketId: string, formData: FormData) {
@@ -24,7 +24,7 @@ export async function submitTicketReply(ticketId: string, formData: FormData) {
   const message = String(formData.get("message") ?? "").trim();
   if (!message) return;
 
-  const authorName = [customer.firstName, customer.lastName].filter(Boolean).join(" ") || "Customer";
+  const authorName = deriveDisplayName(customer.firstName, customer.lastName, customer.email);
   await replyToTicket(ticketId, authorName, message);
   revalidatePath(`/account/tickets/${ticketId}`);
 }
