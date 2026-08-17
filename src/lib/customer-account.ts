@@ -145,6 +145,31 @@ export async function getCurrentCustomer(accessToken: string): Promise<CustomerI
   };
 }
 
+/** Best-effort greeting name. Shopify accounts created via a passwordless
+ *  email/OTP flow (no separate "name" step) often have null first/last
+ *  name — falling back to a bare "Welcome back" there reads as broken next
+ *  to a customer who DOES have a name, so derive something from the email's
+ *  local part instead (e.g. "developers@x.com" -> "Developers") for a
+ *  consistently personal greeting either way. */
+export function deriveDisplayName(
+  firstName: string | null | undefined,
+  lastName: string | null | undefined,
+  email: string | null | undefined
+): string {
+  const fromName = [firstName, lastName].filter(Boolean).join(" ").trim();
+  if (fromName) return fromName;
+  const local = email?.split("@")[0];
+  if (local) {
+    return local
+      .replace(/[._-]+/g, " ")
+      .split(" ")
+      .filter(Boolean)
+      .map((w) => w[0].toUpperCase() + w.slice(1))
+      .join(" ");
+  }
+  return "there";
+}
+
 export async function customerAccountQuery<T>(
   accessToken: string,
   query: string,
