@@ -6,7 +6,7 @@ import WarrantyClaimForm, {
 } from "@/components/WarrantyClaimForm";
 import { getAllProducts } from "@/lib/products";
 import { getCustomerSession } from "@/lib/customer-session";
-import { getCurrentCustomer } from "@/lib/customer-account";
+import { getCurrentCustomer, type CustomerIdentity } from "@/lib/customer-account";
 
 export const metadata: Metadata = {
   title: "Support — Leisure",
@@ -85,7 +85,20 @@ export default async function Support() {
   // finds "yours" later), so the form itself is gated behind login rather
   // than collecting contact details from an anonymous visitor.
   const session = await getCustomerSession();
-  const customer = session ? await getCurrentCustomer(session.access_token) : null;
+  console.log(
+    "[debug/support] session=",
+    session
+      ? { hasAccessToken: !!session.access_token, expiresAt: session.obtainedAt + session.expires_in * 1000, now: Date.now() }
+      : null
+  );
+  let customer: CustomerIdentity | null = null;
+  if (session) {
+    try {
+      customer = await getCurrentCustomer(session.access_token);
+    } catch (err) {
+      console.log("[debug/support] getCurrentCustomer threw:", err);
+    }
+  }
 
   return (
     <main className="overflow-hidden">
