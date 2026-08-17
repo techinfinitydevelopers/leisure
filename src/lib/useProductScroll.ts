@@ -5,6 +5,7 @@ import Lenis from "lenis";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { scroll } from "./scrollStore";
+import { LENIS_OPTIONS } from "./lenis-options";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -14,11 +15,7 @@ gsap.registerPlugin(ScrollTrigger);
 // prototype's useSmoothScroll.
 export function useProductScroll() {
   useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.15,
-      smoothWheel: true,
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-    });
+    const lenis = new Lenis(LENIS_OPTIONS);
 
     lenis.on("scroll", (e: { scroll: number; limit: number; velocity: number }) => {
       scroll.progress = e.limit > 0 ? e.scroll / e.limit : 0;

@@ -120,9 +120,27 @@ export default function Nav() {
                   Contact
                 </Link>
               </li>
+
+              <li>
+                <Link href="/support" className="transition-colors hover:text-gold">
+                  Support
+                </Link>
+              </li>
             </ul>
 
             <div className="flex items-center gap-3">
+              <Link
+                href="/account"
+                aria-label="My Account"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-offwhite transition-colors hover:border-gold/60 hover:text-gold"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0 2c-4.4 0-8 2.2-8 5v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1c0-2.8-3.6-5-8-5Z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </Link>
               <CartIcon />
               {/* CTA pill button */}
               <Link
@@ -185,6 +203,8 @@ export default function Nav() {
           <Link href="/blog" className="font-display text-4xl text-offwhite transition-colors hover:text-gold">Blog</Link>
           <Link href="/about" className="font-display text-4xl text-offwhite transition-colors hover:text-gold">About</Link>
           <Link href="/contact" className="font-display text-4xl text-offwhite transition-colors hover:text-gold">Contact</Link>
+          <Link href="/support" className="font-display text-4xl text-offwhite transition-colors hover:text-gold">Support</Link>
+          <Link href="/account" className="font-display text-4xl text-offwhite transition-colors hover:text-gold">My Account</Link>
           <div className="border-t border-white/10 pt-6">
             <p className="mb-4 font-pinyon text-xl text-gold">Products</p>
             <div className="flex flex-col gap-3">

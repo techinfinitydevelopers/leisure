@@ -5,9 +5,10 @@ import { getAllProducts } from "@/lib/products";
 const products = getAllProducts();
 
 const quickLinks = [
-  { label: "About Us", href: "/" },
+  { label: "About Us", href: "/about" },
   { label: "Products", href: "/shop" },
-  { label: "Contact", href: "/" },
+  { label: "Contact", href: "/contact" },
+  { label: "Support", href: "/support" },
 ];
 
 // Waveform bars — heights are a direct percentage (25–45%) of each

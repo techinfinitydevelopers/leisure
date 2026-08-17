@@ -5,6 +5,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import Lenis from "lenis";
+import { LENIS_OPTIONS } from "@/lib/lenis-options";
 import ProductShowcase from "@/components/sections/ProductShowcase";
 import ParallaxGrid from "@/components/sections/ParallaxGrid";
 import TestimonialSection from "@/components/sections/TestimonialSection";
@@ -72,9 +73,20 @@ export default function LandingExperience() {
         canvas.height = canvas.clientHeight * dpr;
       };
 
-      const render = () => {
-        const img = images[Math.round(state.frame)];
+      // Redraw only when the snapped frame actually changes. `snap: "frame"`
+      // holds state.frame on integers, but onUpdate still fires every tick —
+      // and with 179 frames spread over SCRUB_VH most ticks land on the frame
+      // already on screen. Those repeats each cost a full-canvas fillRect plus
+      // an upscaled drawImage (a 2880x1800 backing store at DPR 2) for no
+      // visual change, which is where the scroll was losing its frame budget.
+      // `force` is for resize, where the box changed but the frame did not.
+      let drawnFrame = -1;
+      const render = (force = false) => {
+        const idx = Math.round(state.frame);
+        if (!force && idx === drawnFrame) return;
+        const img = images[idx];
         if (!img || !img.complete || !img.naturalWidth) return;
+        drawnFrame = idx;
         const cw = canvas.width;
         const ch = canvas.height;
         ctx.fillStyle = "#000";
@@ -102,12 +114,9 @@ export default function LandingExperience() {
       setCanvasSize();
 
       // Smooth (inertia) scrolling, synced to GSAP's ticker + ScrollTrigger.
-      const lenis = new Lenis({
-        duration: 1.4,
-        easing: (t: number) => 1 - Math.pow(1 - t, 3),
-        wheelMultiplier: 0.85,
-        touchMultiplier: 1.1,
-      });
+      // Feel lives in one shared place so this page and the product pages
+      // can't drift apart again — see lenis-options.ts.
+      const lenis = new Lenis(LENIS_OPTIONS);
       lenis.on("scroll", ScrollTrigger.update);
       const tickerFn = (time: number) => lenis.raf(time * 1000);
       gsap.ticker.add(tickerFn);
@@ -157,12 +166,18 @@ export default function LandingExperience() {
         frame: FRAME_COUNT - 1,
         ease: "none",
         snap: "frame",
-        onUpdate: render,
+        onUpdate: () => render(),
         scrollTrigger: {
           trigger: container,
           start: "top top",
           end: () => `+=${(SCRUB_VH / 100) * window.innerHeight}`,
-          scrub: 1,
+          // `true`, not a number: Lenis is already smoothing the scroll
+          // position, so a numeric scrub stacked a second ~1s catch-up on top
+          // of it and the frames visibly trailed the wheel by both lags
+          // combined. Tracking Lenis directly keeps one smoothing layer.
+          // (Frame granularity is set by frames-per-scroll-distance, which
+          // this does not change — only the lag.)
+          scrub: true,
         },
       });
 
@@ -214,7 +229,7 @@ export default function LandingExperience() {
 
       const onResize = () => {
         setCanvasSize();
-        render();
+        render(true);
         ScrollTrigger.refresh();
       };
       window.addEventListener("resize", onResize);
