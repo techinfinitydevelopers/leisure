@@ -13,12 +13,31 @@ export const metadata: Metadata = {
   title: "My Warranty Tickets — Leisure",
 };
 
-export default async function MyTicketsPage() {
-  const session = await getCustomerSession();
-  if (!session) redirect("/account/login");
+let debugCounter = 0;
 
-  const customer = await getCurrentCustomer(session.access_token);
-  const tickets = await listMyTickets(customer.id);
+export default async function MyTicketsPage() {
+  const hit = ++debugCounter;
+  const session = await getCustomerSession();
+  console.log(`[debug/tickets #${hit}] session=`, session ? { expiresAt: session.obtainedAt + session.expires_in * 1000, now: Date.now() } : null);
+  if (!session) {
+    console.log(`[debug/tickets #${hit}] redirecting to login, no session`);
+    redirect("/account/login");
+  }
+
+  let customer;
+  try {
+    customer = await getCurrentCustomer(session.access_token);
+  } catch (err) {
+    console.log(`[debug/tickets #${hit}] getCurrentCustomer threw:`, err);
+    throw err;
+  }
+  let tickets;
+  try {
+    tickets = await listMyTickets(customer.id);
+  } catch (err) {
+    console.log(`[debug/tickets #${hit}] listMyTickets threw:`, err);
+    throw err;
+  }
   const name = deriveDisplayName(customer.firstName, customer.lastName, customer.email);
 
   return (
