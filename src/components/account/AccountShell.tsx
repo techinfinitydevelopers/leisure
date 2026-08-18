@@ -33,13 +33,13 @@ export default function AccountShell({ name, email, active, children }: AccountS
               <p className="truncate font-display text-lg font-bold text-offwhite">{name}</p>
               {email && <p className="truncate text-sm text-offwhite/50">{email}</p>}
             </div>
-            <Link
+            <a
               href="/account/logout"
               aria-label="Log out"
               className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/15 text-offwhite/60 transition-colors hover:border-red-400/40 hover:text-red-300 lg:hidden"
             >
               <LogOut size={16} />
-            </Link>
+            </a>
           </div>
 
           <nav className="mt-6 flex gap-2 overflow-x-auto pb-1 lg:mt-8 lg:flex-col lg:gap-1 lg:overflow-visible lg:pb-0">
@@ -63,13 +63,13 @@ export default function AccountShell({ name, email, active, children }: AccountS
             })}
           </nav>
 
-          <Link
+          <a
             href="/account/logout"
             className="btn-outline mt-8 hidden w-full items-center justify-center gap-2 lg:flex"
           >
             <LogOut size={15} />
             Log out
-          </Link>
+          </a>
         </aside>
 
         <div className="min-w-0">{children}</div>

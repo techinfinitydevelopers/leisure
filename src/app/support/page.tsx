@@ -72,8 +72,6 @@ const channels = [
   },
 ];
 
-let debugCounter = 0;
-
 export default async function Support() {
   // The claim form only needs identity + colour names, so narrow the catalog
   // down before it crosses into the client bundle.
@@ -86,22 +84,10 @@ export default async function Support() {
   // A ticket must be tied to a real customerId (that's how /account/tickets
   // finds "yours" later), so the form itself is gated behind login rather
   // than collecting contact details from an anonymous visitor.
-  const hit = ++debugCounter;
   const session = await getCustomerSession();
-  console.log(
-    `[debug/support #${hit}] session=`,
-    session
-      ? { hasAccessToken: !!session.access_token, expiresAt: session.obtainedAt + session.expires_in * 1000, now: Date.now() }
-      : null
-  );
-  let customer: CustomerIdentity | null = null;
-  if (session) {
-    try {
-      customer = await getCurrentCustomer(session.access_token);
-    } catch (err) {
-      console.log("[debug/support] getCurrentCustomer threw:", err);
-    }
-  }
+  const customer: CustomerIdentity | null = session
+    ? await getCurrentCustomer(session.access_token)
+    : null;
 
   return (
     <main className="overflow-hidden">

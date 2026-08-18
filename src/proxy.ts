@@ -47,28 +47,20 @@ export async function proxy(request: NextRequest) {
     try {
       const session = JSON.parse(raw);
       const expiresAt = session.obtainedAt + session.expires_in * 1000;
-      const needsRefresh = Date.now() >= expiresAt - 60_000;
-      console.log(
-        `[debug/proxy] ${pathname} expiresAt=${expiresAt} now=${Date.now()} needsRefresh=${needsRefresh}`
-      );
-      if (needsRefresh) {
+      if (Date.now() >= expiresAt - 60_000) {
         const refreshed = await refreshTokens(session.refresh_token);
-        console.log(`[debug/proxy] ${pathname} refreshed ok, new expiresAt=${refreshed.obtainedAt + refreshed.expires_in * 1000}`);
         response.cookies.set(
           CUSTOMER_SESSION_COOKIE,
           JSON.stringify(refreshed),
           CUSTOMER_SESSION_COOKIE_OPTIONS
         );
       }
-    } catch (err) {
+    } catch {
       // Refresh token is dead too — clear it so the page renders its
       // logged-out state instead of retrying with a cookie that will never
       // work again.
-      console.log(`[debug/proxy] ${pathname} refresh failed, clearing cookie:`, err);
       response.cookies.delete(CUSTOMER_SESSION_COOKIE);
     }
-  } else {
-    console.log(`[debug/proxy] ${pathname} no customer_session cookie in request`);
   }
   return response;
 }
