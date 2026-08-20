@@ -29,8 +29,8 @@ const MOBILE_MAX_W = 768;
 
 const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
 
-const framePath = (set: "desktop" | "mobile", i: number) =>
-  `/products/dominator/legend-seq/${set}/frame_${String(i).padStart(3, "0")}.webp`;
+const framePath = (slug: string, set: "desktop" | "mobile", i: number) =>
+  `/products/${slug}/legend-seq/${set}/frame_${String(i).padStart(3, "0")}.webp`;
 
 export default function SequenceReveal() {
   const product = useProductExperience();
@@ -112,7 +112,7 @@ export default function SequenceReveal() {
     for (let i = 1; i <= frameCount; i++) {
       const img = new Image();
       img.decoding = "async";
-      img.src = framePath(set, i);
+      img.src = framePath(product.slug, set, i);
       img.onload = () => {
         loaded += 1;
         if (disposed) return;
@@ -242,7 +242,7 @@ export default function SequenceReveal() {
       disarmHide();
       st.kill();
     };
-  }, [cfg, frameCount, captions.length]);
+  }, [cfg, frameCount, captions.length, product.slug]);
 
   if (!cfg) return null;
 

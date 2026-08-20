@@ -6,7 +6,7 @@ import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { scroll } from "@/lib/scrollStore";
 import { sampleTrack } from "@/lib/keyframes";
-import type { ProductExperience } from "@/lib/product-experience";
+import { PRODUCT_EXPERIENCES, type ProductExperience } from "@/lib/product-experience";
 
 type Props = {
   product: ProductExperience;
@@ -278,7 +278,16 @@ export default function ProductModel({ product, onReady }: Props) {
   );
 }
 
-// Preload so the model starts fetching as soon as the module is imported.
+// Preload every product's model as soon as this shared module is imported
+// (rather than just DRIFT's) — this module is imported on every product
+// page, but which product is being viewed isn't known at module-load time,
+// so all of them start fetching in parallel instead of only the current
+// page's model waiting for <ProductModel> itself to mount inside Suspense.
 if (typeof window !== "undefined") {
-  useGLTF.preload("/products/drift/drift-model.glb");
+  const seen = new Set<string>();
+  for (const p of Object.values(PRODUCT_EXPERIENCES)) {
+    if (!p.model || seen.has(p.model)) continue;
+    seen.add(p.model);
+    useGLTF.preload(p.model);
+  }
 }

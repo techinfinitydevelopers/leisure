@@ -4,7 +4,7 @@ import { useEffect, useRef, type ReactNode } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useProductExperience } from "@/lib/product-experience-context";
-import { scroll, pushHide, popHide } from "@/lib/scrollStore";
+import { scroll, pushHide, popHide, requestVisible } from "@/lib/scrollStore";
 
 const ICONS: Record<string, ReactNode> = {
   drop: <path d="M12 3c4 5 6 8 6 11a6 6 0 1 1-12 0c0-3 2-6 6-11Z" />,
@@ -148,19 +148,33 @@ export default function FeatureGrid() {
     };
   }, [product]);
 
-  // Hide the roaming model entirely while the feature grid is in view.
+  // While the feature grid is in view: if `featuresModel` is configured,
+  // park the model visibly at that position (the "frosted backdrop" look —
+  // .features--bg's translucent panels are designed to show it dimly
+  // through); otherwise hide it entirely, same convention as
+  // SpecsSection.tsx's specsModel-present/absent branch.
+  const fm = product.featuresModel;
   useEffect(() => {
-    if (!product.featuresBackground) return;
     let armed = false;
     const arm = () => {
       if (armed) return;
       armed = true;
-      pushHide();
+      if (fm) {
+        requestVisible();
+        scroll.holdX = fm.x ?? 0;
+        scroll.holdRY = fm.ry ?? 0;
+        scroll.holdRX = 0;
+        scroll.holdS = fm.scale ?? 1;
+        scroll.holdCount += 1;
+      } else {
+        pushHide();
+      }
     };
     const disarm = () => {
       if (!armed) return;
       armed = false;
-      popHide();
+      if (fm) scroll.holdCount -= 1;
+      else popHide();
     };
     const ctx = gsap.context(() => {
       ScrollTrigger.create({
@@ -177,7 +191,7 @@ export default function FeatureGrid() {
       disarm();
       ctx.revert();
     };
-  }, [product]);
+  }, [product, fm]);
 
   if (!product.features?.length) return null;
   const cls = product.featuresBackground ? "features features--bg" : "features";

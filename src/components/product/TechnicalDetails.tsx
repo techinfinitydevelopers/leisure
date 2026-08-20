@@ -37,6 +37,23 @@ function TechnicalSplit() {
       scroll.holdS = p.s;
       setActive(i);
     };
+    // Guarded like a refcount (armed/disarm), not a bare +=1/-=1 on every
+    // onToggle call — see FeatureDeepDive.tsx's arm/disarm for why an
+    // unguarded increment/decrement (or a hard reset to 0) can leave
+    // `scroll.holdCount` desynced if another pinned section's hold overlaps
+    // this one's mount/unmount.
+    let armed = false;
+    const arm = () => {
+      if (armed) return;
+      armed = true;
+      applyPose(idx < 0 ? 0 : idx);
+      scroll.holdCount += 1;
+    };
+    const disarm = () => {
+      if (!armed) return;
+      armed = false;
+      scroll.holdCount -= 1;
+    };
     const ctx = gsap.context(() => {
       // Pin the whole section so the spec list stays on the left for the entire
       // beat; the model (right) changes pose per spec as you scroll through.
@@ -49,12 +66,8 @@ function TechnicalSplit() {
         scrub: true,
         anticipatePin: 1,
         onToggle: (self) => {
-          if (self.isActive) {
-            applyPose(idx < 0 ? 0 : idx);
-            scroll.holdCount += 1;
-          } else {
-            scroll.holdCount -= 1;
-          }
+          if (self.isActive) arm();
+          else disarm();
         },
         onUpdate: (self) => {
           const i = Math.min(n - 1, Math.max(0, Math.floor(self.progress * n)));
@@ -66,7 +79,7 @@ function TechnicalSplit() {
       });
     }, root);
     return () => {
-      scroll.holdCount = 0;
+      disarm();
       scroll.holdRX = 0;
       ctx.revert();
     };

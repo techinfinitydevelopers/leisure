@@ -427,7 +427,7 @@ const dominator: ProductExperience = {
   featureStops: [
     { title: "Signature Sound", copy: "Analog-tuned drivers fill the room — clean highs, warm lows.", rx: 0, ry: 0, x: -0.3 },
     { title: "DOMINATOR Controls", copy: "Bass, mid, treble and volume — hand-tuned dials, right on top where you reach.", rx: 1.1, ry: 0, x: 0 },
-    { title: "Grab & Go", copy: "A leather carry strap and a rugged build made to travel with you.", rx: -0.3, ry: -0.7, x: 0.15 },
+    { title: "Own the Mic", copy: "Two wireless microphones, ready out of the box — plug into the MIC input and turn any room into a stage.", rx: -0.3, ry: -0.7, x: 0.15 },
   ],
   perspective: { heroVariant: "split" },
   track: [
