@@ -18,12 +18,12 @@ export default function AccountShell({ name, email, active, children }: AccountS
   const initial = name.trim().charAt(0).toUpperCase() || "?";
 
   return (
-    <main className="mx-auto max-w-5xl px-4 pb-24 pt-32 sm:px-6 sm:pt-40">
+    <main className="mx-auto max-w-7xl px-4 pb-24 pt-32 sm:px-6 sm:pt-40">
       <p className="mb-6 text-[0.7rem] font-semibold uppercase tracking-[0.32em] text-gold/80">
         My Account
       </p>
 
-      <div className="grid gap-6 lg:grid-cols-[272px_1fr] lg:items-start lg:gap-10">
+      <div className="grid gap-6 lg:grid-cols-[320px_1fr] lg:items-start lg:gap-10">
         <aside className="glass rounded-3xl p-6 lg:sticky lg:top-28">
           <div className="flex items-center gap-4">
             <div className="gold-glow flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gold font-display text-xl font-bold text-black">
