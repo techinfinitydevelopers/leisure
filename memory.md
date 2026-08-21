@@ -208,3 +208,27 @@ Declared in `src/app/layout.tsx`, tokens in `src/app/globals.css` `@theme inline
 - Compressed Dominator GLB 924MB → 20.6MB (Draco) to clear GitHub's 100MB push limit.
 - Committed and pushed 240 files to `main` (`b8c1918`) — triggers Railway auto-deploy. Excluded scratch backup files (`frames_old_backup/`, `dominator-model-old.glb`) from the commit.
 - Gave user the 4 Shopify env var values to add to Railway's dashboard manually.
+
+### 2026-08-21 — Architecture Q&A: Railway ⟷ Shopify ⟷ Hostinger domain
+**Question asked (recurring):** how does the Railway ↔ Shopify headless connection work, and can the same domain live on both?
+
+**Answer / knowledge base:**
+- **Railway ⟷ Shopify is API-only, no DNS coupling.** Railway runs the Next.js app (GitHub push → build → deploy, `railway.json`). `src/lib/shopify.ts` hits `https://<store>.myshopify.com/api/${SHOPIFY_API_VERSION}/graphql.json` with `NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN` + `NEXT_PUBLIC_SHOPIFY_STOREFRONT_TOKEN` (30s `next.revalidate`). `src/lib/shopify-checkout.ts` does `cartCreate` → redirects browser to Shopify's `checkoutUrl`. Payments/orders never touch Railway.
+- Env vars live in local `.env` — must be mirrored into Railway → Service → Variables or prod reads nothing. (Values were handed over 2026-07-22.)
+- **One hostname cannot serve both.** Split by host:
+  - `www.yourdomain.com` → Railway (CNAME + TXT; **both** required, missing TXT = 404 even after CNAME resolves)
+  - `yourdomain.com` → redirect to www
+  - `shop.yourdomain.com` → Shopify (CNAME `shops.myshopify.com`), set as **primary domain in Shopify Admin → Domains** so checkout renders on it instead of `.myshopify.com`. Single-domain checkout (`checkout.yourdomain.com`) is Shopify Plus only.
+- **Hostinger blocker:** Railway apex domains need CNAME flattening or dynamic ALIAS (per Railway docs `networking/domains/working-with-domains`); Hostinger DNS supports neither. Options: (a) www on Railway + Hostinger apex→www redirect, or (b) move nameservers to Cloudflare (free CNAME flattening) — Cloudflare is the recommended path.
+- Railway custom-domain plan limits: Trial 1/service, Hobby 2/service, Pro 20/service — apex + www count as two.
+- **SEO:** metadata/sitemap/robots all come from Next.js on Railway; Shopify product SEO fields are pulled via Storefront API into Next metadata. Password-protect the Shopify online store (Preferences → password page) so `shop.` / `.myshopify.com` aren't indexed as duplicate content.
+
+**Build log:** No code changes. Read-only inspection of `src/lib/shopify.ts`, `src/lib/shopify-checkout.ts`, `.env` (keys only), `railway.json`; verified apex-domain constraint against live Railway docs.
+
+### 2026-08-21 — Cursor size + DOMINATOR ghost-model bugs (user-confirmed fixed)
+- **Cursor**: `public/cursor-mic.png` resized 64×64 → 32×32 (`sips`); hotspot in `src/app/globals.css` updated `4 4` → `2 2` (both the `html` and `*,*::before,*::after` rules). Original 64×64 backed up in scratchpad only (not in repo).
+- **DOMINATOR "exploded video frames" (SequenceReveal) section was showing a second/ghost speaker behind the frame sequence.** Two separate root causes, both fixed:
+  1. `ProductModel.tsx` (~line 266): the model's hide-fade (`hideRef`) eased toward `scroll.productHide` at a flat `0.1` lerp regardless of direction — on a fast scroll into a section that pins abruptly (SequenceReveal), the fade lagged ~0.3–0.4s behind the pin engaging, so the model was briefly still visible. Fixed: asymmetric lerp alpha — `0.6` when hiding (target > current), `0.1` when revealing (keeps the existing gentle reveal fade).
+  2. `FeatureGrid.tsx`'s own hide-window (`ScrollTrigger` for the no-`featuresModel` case) ended at `end: "bottom 20%"`, but `SequenceReveal`'s hide-window only arms at `top top` — leaving a real ~20vh scroll gap between the two sections where `scroll.hideCount` could hit 0 and the roaming model reappeared. This was the persistent one, visible in *both* scroll directions (user caught it scrolling bottom-to-top). Fixed: `end: "bottom top"` so the two sections' hide windows hand off at the same scroll boundary with no gap.
+- **General pattern worth remembering for this codebase**: model visibility across sections is a refcounted `hideCount`/`holdCount` system (`src/lib/scrollStore.ts`, `pushHide`/`popHide`/`requestVisible`) — each section arms/disarms on `onEnter`/`onEnterBack`/`onLeave`/`onLeaveBack`. The refcounting itself tolerates overlap fine; the actual bug class here is **boundary mismatches between adjacent sections' trigger windows** (one using a percentage-of-viewport boundary, the next using a pin-relative one) leaving a gap. If a "ghost model" bug shows up again in a different product/section pair, check for this same kind of boundary gap first before assuming it's an opacity/timing issue.
+- Verified: `tsc --noEmit` clean after each change; user manually re-tested on localhost and confirmed fixed.

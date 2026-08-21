@@ -199,8 +199,8 @@ body {
 
 /* ── Site-wide custom cursor (Rose Gold mic) ── */
 html {
-  cursor: url("/cursor-mic.png") 4 4, auto;
+  cursor: url("/cursor-mic.png") 2 2, auto;
 }
 *, *::before, *::after {
-  cursor: url("/cursor-mic.png") 4 4, auto !important;
+  cursor: url("/cursor-mic.png") 2 2, auto !important;
 }

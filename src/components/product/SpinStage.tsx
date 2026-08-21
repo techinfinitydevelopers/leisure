@@ -63,6 +63,7 @@ export default function SpinStage() {
         // release the spin once the section is gone so roam resumes
         onLeave: () => {
           scroll.spin = 0;
+          disarm();
         },
         onLeaveBack: () => {
           scroll.spin = 0;

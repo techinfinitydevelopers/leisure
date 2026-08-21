@@ -10,6 +10,7 @@ import { PRODUCT_EXPERIENCES, type ProductExperience } from "@/lib/product-exper
 
 type Props = {
   product: ProductExperience;
+  colorIndex?: number;
   onReady?: () => void;
 };
 
@@ -45,10 +46,13 @@ type Part = {
   baseRot: THREE.Euler; // rest rotation to add tumble onto
 };
 
-export default function ProductModel({ product, onReady }: Props) {
+export default function ProductModel({ product, colorIndex = 0, onReady }: Props) {
   const group = useRef<THREE.Group>(null);
   const { viewport } = useThree();
-  const { scene } = useGLTF(product.model!);
+  const colorId = product.colors[colorIndex]?.id;
+  const modelPath = (colorId && product.colorModels?.[colorId]) || product.model!;
+  const baseRy = (colorId ? product.colorModelBaseRy?.[colorId] : undefined) ?? product.modelBaseRy ?? BASE_RY;
+  const { scene } = useGLTF(modelPath);
 
   // Clone, center at origin, scale to a consistent height, and precompute each
   // part's outward explode direction (in its parent's local space).
@@ -68,7 +72,7 @@ export default function ProductModel({ product, onReady }: Props) {
     const holder = new THREE.Group();
     root.position.sub(center); // center the model on the origin
     holder.scale.setScalar(scale);
-    holder.rotation.y = product.modelBaseRy ?? BASE_RY;
+    holder.rotation.y = baseRy;
     holder.add(root);
     holder.updateWorldMatrix(true, true);
 
@@ -109,7 +113,7 @@ export default function ProductModel({ product, onReady }: Props) {
     });
 
     return { holder, parts };
-  }, [scene, product.modelScale, product.modelBaseRy]);
+  }, [scene, product.modelScale, baseRy]);
 
   // Collect materials once so we can drive opacity (reveal + parallax hide).
   // Keep the authored transparency (only 3 blend mats) so the model renders
@@ -126,6 +130,16 @@ export default function ProductModel({ product, onReady }: Props) {
     return [...set];
   }, [holder]);
   const fadingRef = useRef<boolean | null>(null);
+  // `materials` is a fresh array every time the color switch loads a new GLB
+  // (new THREE.Material instances, all defaulting to transparent=false). The
+  // useFrame loop below only applies transparent=true on a CHANGE from the
+  // previous fadingRef value — without this reset it sees "no change" (the
+  // fading state itself didn't flip) and skips setting it on the new
+  // materials, leaving the just-switched color fully opaque/visible even
+  // when scroll position says it should still be hidden pre-reveal.
+  useEffect(() => {
+    fadingRef.current = null;
+  }, [materials]);
 
   useEffect(() => {
     onReady?.();
@@ -249,7 +263,10 @@ export default function ProductModel({ product, onReady }: Props) {
     // opacity: reveal in once, fade out during parallax breaks
     scroll.planeReveal = THREE.MathUtils.lerp(scroll.planeReveal, 1, 0.06);
     fadeRef.current = THREE.MathUtils.lerp(fadeRef.current, 1, 0.14);
-    hideRef.current = THREE.MathUtils.lerp(hideRef.current, scroll.productHide, 0.1);
+    // Hide fast (don't let a just-hidden section's pin catch the model mid-fade),
+    // reveal slow (keep the existing gentle cross-fade back in).
+    const hideAlpha = scroll.productHide > hideRef.current ? 0.6 : 0.1;
+    hideRef.current = THREE.MathUtils.lerp(hideRef.current, scroll.productHide, hideAlpha);
     const opacity =
       k.o * scroll.planeReveal * fadeRef.current * (1 - hideRef.current) * revealGate;
     // Only go transparent while actually fading; otherwise render opaque/solid
@@ -286,8 +303,11 @@ export default function ProductModel({ product, onReady }: Props) {
 if (typeof window !== "undefined") {
   const seen = new Set<string>();
   for (const p of Object.values(PRODUCT_EXPERIENCES)) {
-    if (!p.model || seen.has(p.model)) continue;
-    seen.add(p.model);
-    useGLTF.preload(p.model);
+    const paths = [p.model, ...Object.values(p.colorModels ?? {})];
+    for (const path of paths) {
+      if (!path || seen.has(path)) continue;
+      seen.add(path);
+      useGLTF.preload(path);
+    }
   }
 }

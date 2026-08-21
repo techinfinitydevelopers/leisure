@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -51,6 +51,16 @@ export default function ProductExperience({
   // that have deep-dive content so leaner pages skip it.
   const hasDeepDives = !!product.deepDives?.length;
 
+  // Stable identity (not a fresh closure every render) — ProductModel/
+  // ProductPlane re-fire their "ready" effect whenever this prop reference
+  // changes, so an inline arrow here would re-trigger ScrollTrigger.refresh()
+  // on every colorIndex/viewIndex change, not just on first mount. A refresh
+  // mid-transition can perturb the model's rotation lerp for a moment,
+  // reading as a wrong-facing flash right after switching color.
+  const handleModelReady = useCallback(() => {
+    setTimeout(() => ScrollTrigger.refresh(), 300);
+  }, []);
+
   // color change resets the angle back to front
   const handleColor = (i: number) => {
     setColorIndex(i);
@@ -81,12 +91,13 @@ export default function ProductExperience({
               {product.model ? (
                 <ProductModel
                   product={product}
-                  onReady={() => setTimeout(() => ScrollTrigger.refresh(), 300)}
+                  colorIndex={colorIndex}
+                  onReady={handleModelReady}
                 />
               ) : product.skipPlaneAnimation ? null : (
                 <ProductPlane
                   product={product}
-                  onReady={() => setTimeout(() => ScrollTrigger.refresh(), 300)}
+                  onReady={handleModelReady}
                   colorIndex={colorIndex}
                   viewIndex={viewIndex}
                 />

@@ -179,8 +179,19 @@ export default function FeatureGrid() {
     const ctx = gsap.context(() => {
       ScrollTrigger.create({
         trigger: root.current,
-        start: "top 80%",
-        end: "bottom 20%",
+        // No-model case only: Overview's own exit choreography slides the
+        // model off the right edge across its OWN trigger's progress, ending
+        // exactly at Overview's "bottom top" (= this section's top, since
+        // they're adjacent). Arming hide any earlier ("top 80%", still used
+        // when `fm` is set so that case's dock-in keeps its head start) faded
+        // the model out mid-slide, before it had visually cleared the frame.
+        start: fm ? "top 80%" : "top top",
+        // "bottom top" (not "bottom 20%") — must hand off to SequenceReveal's
+        // own hide window at the exact same boundary (its arm fires at
+        // "top top", which is this section's bottom hitting the viewport
+        // top too, since they're adjacent). A gap here left ~20vh of scroll
+        // where nothing held hideCount, so the roaming model popped back in.
+        end: "bottom top",
         onEnter: arm,
         onEnterBack: arm,
         onLeave: disarm,

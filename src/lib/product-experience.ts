@@ -37,8 +37,14 @@ export type ProductExperience = {
   colors: ExpColor[];
   texture?: string;
   /** Optional 3D model (glTF/GLB). When set, the roaming 3D model replaces the
-   *  2D image plane and is driven by the same scroll track. */
+   *  2D image plane and is driven by the same scroll track. Acts as the
+   *  fallback model for any color not listed in `colorModels` below. */
   model?: string;
+  /** Optional per-color GLB override, keyed by the color's `id` (see
+   *  `colors` below). Only needed when different colorways actually have
+   *  separate model files — most products reuse one `model` for every
+   *  color (a re-tinted material, not a re-exported mesh). */
+  colorModels?: Record<string, string>;
   /** No GLB yet for this product — skip the roaming/explode 2D-plane
    *  animation entirely (still shows the static hero image + swatches).
    *  Remove this flag once `model` is set. */
@@ -50,6 +56,11 @@ export type ProductExperience = {
    *  front faces the camera at rest. Only needed when a GLB's authored
    *  front axis differs from the rest (e.g. a re-exported/replacement model). */
   modelBaseRy?: number;
+  /** Per-color override of `modelBaseRy`, keyed by color `id` — needed when
+   *  `colorModels` swaps in a GLB whose authored front axis differs from the
+   *  others (e.g. exported from a different source file). Falls back to
+   *  `modelBaseRy` for any color not listed here. */
+  colorModelBaseRy?: Record<string, number>;
   perspective?: {
     heroVariant?: "split";
     specLayout?: "explorer" | "rail" | "default";
@@ -391,7 +402,11 @@ const dominator: ProductExperience = {
     { id: "black", name: "Black", hex: "#000000", images: ["/products/dominator/black/1.jpg", "/products/dominator/black/2.jpg", "/products/dominator/black/3.jpg"] },
     { id: "grey", name: "Grey", hex: "#b8b8b8", images: ["/products/dominator/light-grey/1.jpg", "/products/dominator/light-grey/2.jpg", "/products/dominator/light-grey/3.jpg"] },
   ],
-  model: "/products/dominator/dominator-model.glb",
+  model: "/products/dominator/dominator-model.glb", // grey — fallback
+  colorModels: {
+    grey: "/products/dominator/dominator-model.glb",
+    black: "/products/dominator/dominator-model-black.glb",
+  },
   // DOMINATOR is a big, deep box (338x180x240mm — much deeper front-to-back
   // than DRIFT's 128x49x93mm), so it needs its own facing + scale-fit tuning
   // rather than reusing DRIFT's. Independent literal values below (not
@@ -404,8 +419,10 @@ const dominator: ProductExperience = {
   spinStage: { eyebrow: "Every angle", caption: "See it from all sides." },
   featureFocus: { eyebrow: "Designed around you", caption: "A closer look." },
   overviewModel: { x: 0.32, ry: -0.6, scale: 0.5 }, // right, closer to the copy, turned right, smaller
-  featuresBackground: true, // model sits behind the feature grid (frosted backdrop)
-  featuresModel: { x: -0.32, ry: 0, scale: 0.4 }, // left, front, smaller (background) — sized down for the deeper box
+  featuresBackground: true, // just the frosted-glass card styling, no model behind it
+  // Client asked to drop the speaker from Feature Grid entirely — no
+  // featuresModel means FeatureGrid.tsx keeps it fully hidden through this
+  // section (same convention as specsModel/deepDiveModel below).
   // No specsModel — client asked to drop the speaker from Specifications
   // entirely; it didn't fit the section's design language and repeated
   // movement already used everywhere else. Leaving it unset keeps the model
