@@ -10,6 +10,7 @@ const items: GalleryItem[] = getAllProducts().map((p) => ({
   title: p.model,
   subtitle: p.tagline,
   url: `/gallery/${p.slug}.png`,
+  mobileUrl: `/gallery/${p.slug}-mobile.png`,
   href: `/product/${p.slug}`,
   price: p.price,
 }));

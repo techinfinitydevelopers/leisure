@@ -11,6 +11,8 @@ export type GalleryItem = {
   title: string;
   subtitle?: string;
   url: string;
+  /** Optional mobile-only override image (shown below the `sm` breakpoint). */
+  mobileUrl?: string;
   href?: string;
   price?: number;
 };
@@ -91,14 +93,28 @@ function GalleryImage({ item, id, total, open, dir, onInPlace }: GalleryImagePro
     <div
       ref={elRef}
       className="absolute inset-0"
-      style={{
-        zIndex: open ? total + 1 : id,
-        backgroundImage: `url(${item.url})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        transformOrigin: "center center",
-      }}
-    />
+      style={{ zIndex: open ? total + 1 : id, transformOrigin: "center center" }}
+    >
+      {/* Mobile-only override image (falls back to the desktop image when a
+          product has no dedicated mobile shot) — split into two layers so
+          the breakpoint swap doesn't fight the GSAP transform above. */}
+      <div
+        className="absolute inset-0 sm:hidden"
+        style={{
+          backgroundImage: `url(${item.mobileUrl ?? item.url})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      />
+      <div
+        className="absolute inset-0 hidden sm:block"
+        style={{
+          backgroundImage: `url(${item.url})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      />
+    </div>
   );
 }
 
@@ -209,7 +225,7 @@ export function ImageGallery({ items }: { items: GalleryItem[] }) {
   return (
     <div className="flex w-full flex-col items-center">
       {/* Stage row */}
-      <div className="relative flex w-full items-center justify-center" style={{ aspectRatio: "1200 / 320" }}>
+      <div className="relative flex w-full items-center justify-center aspect-[1000/1000] sm:aspect-[1200/320]">
 
         {/* Prev */}
         <button
