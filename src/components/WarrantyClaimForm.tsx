@@ -162,15 +162,44 @@ export default function WarrantyClaimForm({
           </div>
         </div>
 
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label htmlFor="claim-invoice" className={labelClass}>
+              Order / Invoice Number
+            </label>
+            <input
+              id="claim-invoice"
+              name="invoice"
+              required
+              placeholder="From your purchase confirmation"
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label htmlFor="claim-purchase-date" className={labelClass}>
+              Date of Purchase
+            </label>
+            <input
+              id="claim-purchase-date"
+              name="purchaseDate"
+              type="date"
+              required
+              max={new Date().toISOString().split("T")[0]}
+              className={inputClass}
+            />
+          </div>
+        </div>
+
         <div>
-          <label htmlFor="claim-invoice" className={labelClass}>
-            Order / Invoice Number
+          <label htmlFor="claim-description" className={labelClass}>
+            Description
           </label>
-          <input
-            id="claim-invoice"
-            name="invoice"
+          <textarea
+            id="claim-description"
+            name="description"
             required
-            placeholder="From your purchase confirmation"
+            rows={4}
+            placeholder="What's wrong with your speaker?"
             className={inputClass}
           />
         </div>

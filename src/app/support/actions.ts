@@ -42,7 +42,9 @@ export async function submitClaim(
       productModel,
       colour: String(formData.get("color") ?? ""),
       invoiceNumber: String(formData.get("invoice") ?? ""),
+      purchaseDate: String(formData.get("purchaseDate") ?? ""),
       pincode: String(formData.get("pincode") ?? ""),
+      message: String(formData.get("description") ?? "") || undefined,
     });
   } catch (err) {
     console.error("createTicket failed:", err);

@@ -23,6 +23,7 @@ export type Ticket = {
   productModel: string;
   colour: string;
   invoiceNumber: string;
+  purchaseDate: string | null;
   pincode: string;
   createdAt: string;
   updatedAt: string;
@@ -62,6 +63,7 @@ export async function createTicket(input: {
   productModel: string;
   colour: string;
   invoiceNumber: string;
+  purchaseDate: string;
   pincode: string;
   message?: string;
 }): Promise<Ticket> {
