@@ -18,7 +18,7 @@ export default function AccountShell({ name, email, active, children }: AccountS
   const initial = name.trim().charAt(0).toUpperCase() || "?";
 
   return (
-    <main className="mx-auto max-w-[900px] px-4 pb-24 pt-32 sm:px-6 sm:pt-40">
+    <main className="mx-auto max-w-[900px] px-4 pb-24 pt-32 sm:px-6 sm:pt-40 lg:mx-[190px]">
       <p className="mb-6 text-[0.7rem] font-semibold uppercase tracking-[0.32em] text-gold/80">
         My Account
       </p>
