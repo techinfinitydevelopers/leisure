@@ -31,6 +31,21 @@ export async function submitClaim(
     return { error: "Select a product." };
   }
 
+  const invoiceFile = formData.get("invoiceFile");
+  let invoiceFileBase64: string | undefined;
+  let invoiceFileName: string | undefined;
+  let invoiceFileType: string | undefined;
+  if (invoiceFile instanceof File && invoiceFile.size > 0) {
+    const MAX_SIZE = 6 * 1024 * 1024;
+    if (invoiceFile.size > MAX_SIZE) {
+      return { error: "Invoice file is too large. Please keep it under 6MB." };
+    }
+    const buffer = Buffer.from(await invoiceFile.arrayBuffer());
+    invoiceFileBase64 = buffer.toString("base64");
+    invoiceFileName = invoiceFile.name;
+    invoiceFileType = invoiceFile.type || "application/octet-stream";
+  }
+
   let ticket;
   try {
     ticket = await createTicket({
@@ -45,6 +60,9 @@ export async function submitClaim(
       purchaseDate: String(formData.get("purchaseDate") ?? ""),
       pincode: String(formData.get("pincode") ?? ""),
       message: String(formData.get("description") ?? "") || undefined,
+      invoiceFileBase64,
+      invoiceFileName,
+      invoiceFileType,
     });
   } catch (err) {
     console.error("createTicket failed:", err);

@@ -203,6 +203,22 @@ export default function WarrantyClaimForm({
             className={inputClass}
           />
         </div>
+
+        <div>
+          <label htmlFor="claim-invoice-file" className={labelClass}>
+            Invoice Photo / PDF{" "}
+            <span className="normal-case tracking-normal text-offwhite/40">
+              (optional, speeds up verification)
+            </span>
+          </label>
+          <input
+            id="claim-invoice-file"
+            name="invoiceFile"
+            type="file"
+            accept="image/*,.pdf"
+            className={`${inputClass} file:mr-4 file:rounded-full file:border-0 file:bg-gold file:px-4 file:py-2 file:text-xs file:font-bold file:uppercase file:tracking-wide file:text-black`}
+          />
+        </div>
       </div>
 
       <label className="mt-6 flex cursor-pointer items-start gap-3">

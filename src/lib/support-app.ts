@@ -25,6 +25,8 @@ export type Ticket = {
   invoiceNumber: string;
   purchaseDate: string | null;
   pincode: string;
+  invoiceFileName: string | null;
+  invoiceFileDataUrl: string | null;
   createdAt: string;
   updatedAt: string;
   messages: TicketMessage[];
@@ -66,6 +68,9 @@ export async function createTicket(input: {
   purchaseDate: string;
   pincode: string;
   message?: string;
+  invoiceFileBase64?: string;
+  invoiceFileName?: string;
+  invoiceFileType?: string;
 }): Promise<Ticket> {
   assertConfigured();
   const res = await fetch(`${BASE_URL}/api/tickets`, {

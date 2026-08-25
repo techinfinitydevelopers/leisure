@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ArrowLeft, CheckCircle2, Send } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Send, Paperclip } from "lucide-react";
 import { getCustomerSession } from "@/lib/customer-session";
 import { getCurrentCustomer, deriveDisplayName } from "@/lib/customer-account";
 import { listMyTickets } from "@/lib/support-app";
@@ -54,6 +54,16 @@ export default async function TicketDetailPage({
             year: "numeric",
           })}
         </p>
+        {ticket.invoiceFileDataUrl && (
+          <a
+            href={ticket.invoiceFileDataUrl}
+            download={ticket.invoiceFileName ?? "invoice"}
+            className="mt-3 inline-flex items-center gap-1.5 text-sm text-gold hover:underline"
+          >
+            <Paperclip size={14} />
+            {ticket.invoiceFileName ?? "Invoice file"}
+          </a>
+        )}
       </Reveal>
 
       <Reveal delay={0.05}>
