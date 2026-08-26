@@ -19,9 +19,21 @@ gsap.registerPlugin(useGSAP, ScrollTrigger);
 // slow, smooth fade to black (later frames fade too fast on their own).
 const FRAME_COUNT = 179;
 // Bump when the frames are re-exported, to bust the browser cache.
-const FRAME_VERSION = 5;
-const framePath = (i: number) =>
-  `/frames/frame_${String(i).padStart(4, "0")}.jpg?v=${FRAME_VERSION}`;
+const FRAME_VERSION = 6;
+// Below this viewport width we load the portrait mobile set — same breakpoint
+// SequenceReveal uses for the product-page sequences.
+const MOBILE_MAX_W = 768;
+// Two separate shoots, not one video at two sizes: desktop is a 1600x900
+// landscape JPG set, mobile is a 720x1280 portrait WebP set (the canvas
+// cover-fits, so a landscape frame on a portrait screen would crop its sides
+// away). Both are sampled to FRAME_COUNT so the scrub feels identical and one
+// constant still drives the whole timeline.
+const framePath = (i: number, set: "desktop" | "mobile") => {
+  const n = String(i).padStart(4, "0");
+  return set === "mobile"
+    ? `/frames/mobile/frame_${n}.webp?v=${FRAME_VERSION}`
+    : `/frames/desktop/frame_${n}.jpg?v=${FRAME_VERSION}`;
+};
 
 // Scroll distance (in viewport-heights) for each phase of the pinned stage,
 // measured from the container's top. SCRUB_VH: video plays. FADE_VH: fades
@@ -122,10 +134,16 @@ export default function LandingExperience() {
       gsap.ticker.add(tickerFn);
       gsap.ticker.lagSmoothing(0);
 
+      // Chosen once, on mount. A phone that rotates keeps the set it loaded —
+      // re-picking mid-scroll would throw away the whole warm cache and
+      // re-download 179 frames, which is far worse than a slightly-off crop.
+      const frameSet: "desktop" | "mobile" =
+        window.innerWidth <= MOBILE_MAX_W ? "mobile" : "desktop";
+
       let firstLoaded = false;
       for (let i = 1; i <= FRAME_COUNT; i++) {
         const img = new Image();
-        img.src = framePath(i);
+        img.src = framePath(i, frameSet);
         if (i === 1) {
           img.onload = () => {
             if (!firstLoaded) {
@@ -260,6 +278,7 @@ export default function LandingExperience() {
           the remaining HOLD_VH is a deliberate pause on solid black before
           the next section appears. */}
       <div
+        id="landing-experience"
         ref={containerRef}
         className="relative w-full bg-black"
         style={{ height: `${TOTAL_VH}vh` }}

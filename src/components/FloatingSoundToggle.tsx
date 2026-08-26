@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import SoundToggle from "@/components/SoundToggle";
@@ -13,11 +14,37 @@ export default function FloatingSoundToggle() {
   const lifted = useBuyBarVisible();
   const pathname = usePathname();
   const { muted, playing } = useAudio();
+  const [pastHero, setPastHero] = useState(false);
+
+  // The hint is meant to nudge users during the video hero specifically —
+  // without this, it stays pinned bottom-right for the rest of the scroll
+  // (as long as sound hasn't been unmuted) and ends up overlapping later
+  // sections' own buttons/CTAs. #landing-experience is the hero's full
+  // scroll-scrubbed track, so "past it" means the hero is done. Re-queries
+  // the element on every scroll (rather than IntersectionObserver on mount)
+  // since LandingExperience can mount after this component, and a one-shot
+  // lookup at effect-time would miss it and never recover.
+  useEffect(() => {
+    if (pathname !== "/") {
+      setPastHero(false);
+      return;
+    }
+    function checkScroll() {
+      const el = document.getElementById("landing-experience");
+      if (!el) return;
+      setPastHero(el.getBoundingClientRect().bottom <= 0);
+    }
+    checkScroll();
+    window.addEventListener("scroll", checkScroll, { passive: true });
+    return () => window.removeEventListener("scroll", checkScroll);
+  }, [pathname]);
+
   // Nudge toward the toggle on the video hero (home only) whenever no sound is
   // actually reaching the user — whether that's because autoplay-with-sound is
   // still blocked (the default state: unmuted but silent until a gesture) or
-  // because it's muted. It retires only once sound is genuinely audible.
-  const showHint = pathname === "/" && !(playing && !muted);
+  // because it's muted. It retires once sound is genuinely audible, or once
+  // the hero has scrolled past.
+  const showHint = pathname === "/" && !pastHero && !(playing && !muted);
 
   return (
     <div

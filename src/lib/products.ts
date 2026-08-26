@@ -41,20 +41,13 @@ function colors(...names: string[]): ProductColor[] {
   }));
 }
 
-/** Returns all image paths for a given product+color (up to `limit`). */
+/** Returns all image paths for a given product+color (up to `limit`).
+ *  Only the FIRST image per colour still exists on disk for most products —
+ *  product pages take their gallery from Shopify now, so the higher-numbered
+ *  local shots were removed. Callers here only ever ask for index 1. */
 export function getProductImages(slug: string, colorFolderSlug: string, count: number): string[] {
   return Array.from({ length: count }, (_, i) => `/products/${slug}/${colorFolderSlug}/${i + 1}.jpg`);
 }
-
-/** Image counts per product/color — derived from the copied files. */
-export const PRODUCT_IMAGE_COUNTS: Record<string, Record<string, number>> = {
-  core:      { black: 5, brown: 7, green: 6, white: 4 },
-  dominator: { "light-grey": 4, black: 5 },
-  drift:     { black: 4, white: 6 },
-  edge:      { black: 6, brown: 7, orange: 6, white: 6 },
-  elevate:   { black: 7, brown: 6, orange: 5 },
-  legend:    { black: 5, brown: 5, green: 5, orange: 6, white: 6 },
-};
 
 export const products: Product[] = [
   {

@@ -78,13 +78,20 @@ const MODEL_SCALE = 1.55;
 // else — logo, grille, hardware, feet — keeps its original finish.
 const TINTED_MATERIAL_NAMES = ["leather_red_02.001", "leather_red_02.002"];
 
+// Scene 01 renders this GLB's own untinted colour, so the black export is the
+// base. Was `legend-model.glb`, which was replaced by the per-colour Legend
+// exports — that old file no longer exists, so this pointed at a 404 and the
+// showcase never got past useGLTF's suspense. Verified the two tinted
+// material names above still exist in this export.
+const LEGEND_MODEL = "/products/legend/Legend-Black.glb";
+
 type ReadyPayload = {
   materials: THREE.MeshStandardMaterial[];
   group: THREE.Group;
 };
 
 function LegendModel({ onReady }: { onReady: (payload: ReadyPayload) => void }) {
-  const { scene } = useGLTF("/products/legend/legend-model.glb");
+  const { scene } = useGLTF(LEGEND_MODEL);
   const groupRef = useRef<THREE.Group>(null);
   const readyRef = useRef(false);
 
@@ -131,7 +138,7 @@ function LegendModel({ onReady }: { onReady: (payload: ReadyPayload) => void }) 
   return <group ref={groupRef} />;
 }
 
-useGLTF.preload("/products/legend/legend-model.glb");
+useGLTF.preload(LEGEND_MODEL);
 
 export default function RevolveShowcase() {
   const root = useRef<HTMLDivElement>(null);
@@ -162,10 +169,16 @@ export default function RevolveShowcase() {
       const baseColors = baseColorsRef.current;
       if (!modelGroup || tintedMaterials.length === 0) return;
 
+      // Below sm, text moves to a fixed strip under the model instead of
+      // sitting beside it (see the text blocks' className) — so the model
+      // itself should stay centered rather than sliding left/right per
+      // scene, which was purely to make room for that side-by-side text.
+      const isDesktop = window.matchMedia("(min-width: 640px)").matches;
+
       // Initial state — original GLB colour, front-facing.
       gsap.set(spinner.current, {
-        xPercent: SCENES[0].x,
-        yPercent: SCENES[0].y,
+        xPercent: isDesktop ? SCENES[0].x : 0,
+        yPercent: isDesktop ? SCENES[0].y : 0,
         rotationZ: SCENES[0].tilt,
       });
       gsap.set(glow.current, { backgroundColor: SCENES[0].glow });
@@ -213,8 +226,8 @@ export default function RevolveShowcase() {
           .to(
             spinner.current,
             {
-              xPercent: SCENES[to].x,
-              yPercent: SCENES[to].y,
+              xPercent: isDesktop ? SCENES[to].x : 0,
+              yPercent: isDesktop ? SCENES[to].y : 0,
               rotationZ: SCENES[to].tilt,
               ease: "power2.inOut",
               duration: 1.6,
@@ -276,11 +289,13 @@ export default function RevolveShowcase() {
         </div>
 
         {/* Real LEGEND 3D model — live-rotated on scroll, recoloured per stop
-            via a single body material colour tween. */}
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+            via a single body material colour tween. Sits in the upper
+            portion below sm so the text strip has room underneath it,
+            instead of both competing for the same centered space. */}
+        <div className="pointer-events-none absolute inset-0 flex items-start justify-center pt-24 sm:items-center sm:pt-0">
           <div
             ref={spinner}
-            className="relative aspect-square w-[72vw] max-w-[560px] sm:w-[52vw] md:w-[46vw]"
+            className="relative aspect-square w-[58vw] max-w-[380px] sm:w-[52vw] sm:max-w-[560px] md:w-[46vw]"
             style={{
               isolation: "isolate",
               willChange: "transform",
@@ -306,18 +321,27 @@ export default function RevolveShowcase() {
           </div>
         </div>
 
-        {/* Write-ups (one visible per stop) */}
+        {/* Write-ups (one visible per stop). Below sm they all sit centered
+            in a fixed strip under the model — the per-scene left/right
+            split (and per-scene vy) is a sm+ thing, since on a narrow
+            screen there's no room beside the model for it without
+            overlapping. */}
         {SCENES.map((s, i) => (
           <div
             key={s.tag}
             ref={(el) => {
               if (el) texts.current[i] = el;
             }}
-            style={{ top: s.vy }}
-            className={`pointer-events-none absolute z-10 w-[80%] max-w-sm -translate-y-1/2 ${
+            style={{ "--vy": s.vy } as React.CSSProperties}
+            // Horizontal centering below sm uses inset-x-0 + mx-auto (not a
+            // -translate-x transform) — GSAP drives this element's `y` via
+            // a direct inline `transform` for the slide in/out, which
+            // replaces rather than merges with a Tailwind translateX class,
+            // so a transform-based centering trick gets silently wiped.
+            className={`pointer-events-none absolute z-10 inset-x-0 top-[68%] mx-auto w-[88%] max-w-sm -translate-y-1/2 text-center sm:inset-x-auto sm:top-[var(--vy)] sm:mx-0 sm:w-[80%] ${
               s.textSide === "left"
-                ? "left-[6%] text-left md:left-[8%]"
-                : "right-[6%] text-right md:right-[8%]"
+                ? "sm:left-[6%] sm:text-left md:left-[8%]"
+                : "sm:right-[6%] sm:text-right md:right-[8%]"
             }`}
           >
             <p className="mb-3 text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-gold">
@@ -328,7 +352,7 @@ export default function RevolveShowcase() {
             </h2>
             <p
               className={`mt-5 text-base leading-relaxed text-offwhite/65 ${
-                s.textSide === "right" ? "ml-auto" : ""
+                s.textSide === "right" ? "sm:ml-auto" : ""
               }`}
             >
               {s.body}

@@ -177,11 +177,18 @@ export default function ParallaxGrid() {
                   data-image-side={imageOnLeft ? "left" : "right"}
                   className="grid h-[75vh] w-full grid-cols-1 items-center gap-8 overflow-hidden rounded-3xl border border-offwhite/10 bg-gradient-to-br from-velvet to-deepblack p-8 will-change-transform gold-glow sm:p-12 lg:grid-cols-2 lg:gap-14"
                 >
-                  {/* Image panel — DOM order first; flips visually on lg. */}
+                  {/* Image panel — DOM order first; flips visually on lg.
+                      `h-full` is lg-only: on the mobile grid-cols-1 layout,
+                      image panel and details column are separate auto-sized
+                      grid rows, so a percentage height here has nothing to
+                      resolve against and collapses to 0 (clipping the image
+                      entirely via overflow-hidden). At lg, both sit in the
+                      same row next to the (taller) details column, so
+                      h-full correctly matches its height there. */}
                   <Link
                     href={`/product/${product.slug}`}
                     aria-label={`View the ${product.model}`}
-                    className={`group relative flex h-full items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-b from-velvet/80 to-nearblack ${
+                    className={`group relative flex items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-b from-velvet/80 to-nearblack lg:h-full ${
                       imageOnLeft ? "lg:order-1" : "lg:order-2"
                     }`}
                   >
@@ -197,7 +204,13 @@ export default function ParallaxGrid() {
                         alt={`${product.model} — ${product.tagline}`}
                         fill
                         sizes="(min-width: 1024px) 50vw, 100vw"
-                        className="scale-[1.3] object-contain p-1 transition-transform duration-700 group-hover:scale-[1.36]"
+                        // Base scale used to be 1.3 (always on) — inside this
+                        // overflow-hidden, aspect-locked box that zoomed past
+                        // the image's own edges and cropped the actual
+                        // speaker (its rounded top/bottom), worst on mobile
+                        // where the box is shortest. Now only the hover state
+                        // zooms in, which touch devices never trigger anyway.
+                        className="object-contain p-1 transition-transform duration-700 group-hover:scale-[1.06]"
                       />
                     </div>
                   </Link>
@@ -252,14 +265,24 @@ export default function ParallaxGrid() {
                       )}
                     </div>
 
-                    {/* Key spec highlights */}
-                    <dl className="relative mt-8 grid w-full max-w-md grid-cols-1 gap-x-8 gap-y-3 sm:grid-cols-3">
+                    {/* Key spec highlights — a compact label/value row per
+                        spec on mobile (long values like "2 × 15W + 1 × 50W
+                        Woofer" only cost one line instead of stacking label
+                        above value) so this block doesn't grow tall enough
+                        to push the fixed-height card's content, and with it
+                        the image, past the overflow-hidden edge. Reverts to
+                        the original stacked 3-column layout from sm up,
+                        where there's room to spare. */}
+                    <dl className="relative mt-6 flex w-full max-w-md flex-col gap-y-2 sm:mt-8 sm:grid sm:grid-cols-3 sm:gap-x-8 sm:gap-y-3">
                       {product.specs.slice(0, 3).map((spec) => (
-                        <div key={spec.label} className="flex flex-col">
-                          <dt className="font-sans text-xs uppercase tracking-wide text-offwhite/50">
+                        <div
+                          key={spec.label}
+                          className="flex items-baseline justify-between gap-4 border-b border-offwhite/8 pb-2 sm:flex-col sm:justify-normal sm:gap-0 sm:border-0 sm:pb-0"
+                        >
+                          <dt className="shrink-0 font-sans text-xs uppercase tracking-wide text-offwhite/50">
                             {spec.label}
                           </dt>
-                          <dd className="mt-1 font-display text-base font-semibold text-offwhite">
+                          <dd className="text-right font-display text-sm font-semibold text-offwhite sm:mt-1 sm:text-left sm:text-base">
                             {spec.value}
                           </dd>
                         </div>

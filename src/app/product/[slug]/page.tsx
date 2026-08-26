@@ -2,20 +2,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getProductBySlugDB } from "@/lib/db-products";
-import { getProduct } from "@/lib/products";
 import { getMergedExperience } from "@/lib/merge-experience";
 import { getStorefrontProductBySlug } from "@/lib/products-source";
-import ProductHero from "@/components/ProductHero";
 import ProductExperience from "@/components/product/ProductExperience";
-import EdgeExperience from "@/components/product/edge/EdgeExperience";
 
 export const dynamic = "force-dynamic";
-
-// Classic (pre-R3F) static pages, kept accessible under an alias slug even though
-// the default slug now renders the rich experience. Maps alias -> real product slug.
-const CLASSIC_ALIASES: Record<string, string> = {
-  "drift-classic": "drift",
-};
 
 export async function generateMetadata({
   params,
@@ -23,11 +14,9 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const aliasBase = CLASSIC_ALIASES[slug];
 
-  // Rich R3F experience carries its own marketing copy — prefer it for metadata
-  // (skipped for classic-alias slugs, which intentionally render the static page).
-  const experience = aliasBase ? null : await getMergedExperience(slug);
+  // Rich R3F experience carries its own marketing copy — prefer it for metadata.
+  const experience = await getMergedExperience(slug);
   if (experience) {
     return {
       title: `Leisure ${experience.name} — ${experience.tagline}`,
@@ -35,7 +24,7 @@ export async function generateMetadata({
     };
   }
 
-  const product = await getStorefrontProductBySlug(aliasBase ?? slug);
+  const product = await getStorefrontProductBySlug(slug);
   if (!product) {
     return { title: "Leisure — Speaker not found" };
   }
@@ -53,38 +42,30 @@ export default async function ProductPage({
 }) {
   const { slug } = await params;
 
-  // Classic-alias slugs (e.g. drift-classic) intentionally bypass the experience
-  // and render the original static page using the real product's data.
-  const aliasBase = CLASSIC_ALIASES[slug];
-  const dataSlug = aliasBase ?? slug;
-
   // If a rich scroll-animated experience exists for this slug, render it. It is
   // self-contained (own hero, pricing, specs, 3D roaming plane) and works even
   // for showcase-only slugs (e.g. drift2) that aren't in the commerce DB.
-  const experience = aliasBase ? null : await getMergedExperience(slug);
+  //
+  // The classic (pre-R3F) static page below is now only a safety net for a
+  // storefront product with no experience entry — e.g. a Shopify handle that
+  // isn't in PRODUCT_EXPERIENCES. The `drift-classic` alias that used to force
+  // this path for DRIFT has been removed.
+  const experience = await getMergedExperience(slug);
   if (experience) {
     // resolve the commerce product id (Shopify first, then DB) so cart works
     const db = await getStorefrontProductBySlug(slug);
-    // EDGE has its own bespoke cinema-mode layout; other rich slugs use the
-    // shared ProductExperience component.
-    if (slug === "edge") {
-      return <EdgeExperience product={experience} productId={db?.id ?? 0} />;
-    }
+    // Every rich slug — EDGE included — renders through the one shared
+    // component, so section placement is identical across product pages.
+    // EDGE used to branch off to a bespoke cinema-mode layout
+    // (components/product/edge/) which is now unreferenced.
     return <ProductExperience product={experience} productId={db?.id ?? 0} />;
   }
 
-  const product = await getStorefrontProductBySlug(dataSlug);
+  const product = await getStorefrontProductBySlug(slug);
 
   if (!product) {
     notFound();
   }
-
-  // Static product data has color+image metadata; DB product has pricing/specs
-  const staticProduct = getProduct(dataSlug);
-
-  const savePercent = Math.round(
-    ((product.mrp - product.price) / product.mrp) * 100,
-  );
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
@@ -95,25 +76,17 @@ export default async function ProductPage({
         ← All Speakers
       </Link>
 
-      {staticProduct ? (
-        <ProductHero
-          productId={product.id}
-          slug={dataSlug}
-          model={product.model}
-          tagline={product.tagline}
-          price={product.price}
-          mrp={product.mrp}
-          savePercent={savePercent}
-          colors={staticProduct.colors}
-        />
-      ) : (
-        <section className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-2">
-          <div className="min-h-[420px] rounded-3xl border border-white/10 bg-[#0d0d0d]" />
-          <div>
-            <h1 className="font-display text-5xl font-bold text-offwhite">{product.model}</h1>
-          </div>
-        </section>
-      )}
+      {/* Minimal header. The old rich <ProductHero> branch was unreachable —
+          it only rendered when getProduct(slug) matched, and every slug in
+          products.ts also has a PRODUCT_EXPERIENCES entry, so those all
+          returned above. A slug that lands here is by definition one we have
+          no static data for (e.g. a Shopify handle with no experience). */}
+      <section className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-2">
+        <div className="min-h-[420px] rounded-3xl border border-white/10 bg-[#0d0d0d]" />
+        <div>
+          <h1 className="font-display text-5xl font-bold text-offwhite">{product.model}</h1>
+        </div>
+      </section>
 
       {/* Overview */}
       <section className="mt-24">

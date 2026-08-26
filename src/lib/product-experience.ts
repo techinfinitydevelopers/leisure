@@ -144,23 +144,43 @@ const drift: ProductExperience = {
     { id: "grey", name: "Grey", hex: "#b8b8b8", images: ["/products/drift/grey-drift-front.png", "/products/drift/tiltedgrey-drift-front.png"] },
   ],
   texture: "/products/drift/front.png",
-  model: "/products/drift/drift-model.glb",
+  model: "/products/drift/Drift-grey.glb", // grey — fallback
+  // Keyed by the color's runtime `id`, which is slugify(color.name). The live
+  // product's second colourway comes back from the DB as "White" -> "white",
+  // while this file's static fallback list calls it "Grey" -> "grey", so BOTH
+  // keys map to the same non-black GLB. Without the "white" key the DB-driven
+  // page silently fell through to `model` above.
+  colorModels: {
+    grey: "/products/drift/Drift-grey.glb",
+    white: "/products/drift/Drift-grey.glb",
+    black: "/products/drift/Drift-Black.glb",
+  },
   modelBaseRy: 0,
   spinStage: { eyebrow: "Every angle", caption: "See it from all sides." },
   featureFocus: { eyebrow: "Designed around you", caption: "A closer look." },
   overviewModel: { x: 0.32, ry: -0.6, scale: 0.62 }, // right, closer to the copy, turned right, smaller
   featuresBackground: true, // model sits behind the feature grid (frosted backdrop)
-  featuresModel: { x: -0.32, ry: 0, scale: 0.5 }, // left, front, smaller (background)
-  specsModel: { x: 0.04, ry: 0, scale: 0.4 }, // parked in the empty gap between the spec labels and values (list scrolls past underneath, so it must clear BOTH columns, not just the right one)
-  deepDiveModel: { x: 0.34, ry: 1.45, scale: 0.5 }, // roams to the empty side; ~90° so it shows its side profile
+  // No featuresModel / specsModel / deepDiveModel — see DOMINATOR. Leaving all
+  // three unset is what hides the speaker through Feature Grid, Specifications
+  // and the deep-dive section (each takes an explicit pushHide() branch when
+  // its field is missing).
+  // Scroll-scrubbed exploded-view sequence, same treatment as DOMINATOR.
+  // 121 frames extracted from the supplied Drift_Exploded.mp4 (24fps, 5.04s)
+  // into public/products/drift/legend-seq/{desktop,mobile}/. Captions left
+  // empty on purpose — the sequence plays with no copy over it until
+  // client-approved lines exist; adding entries slices them evenly.
+  sequenceReveal: { frameCount: 121, captions: [] },
   technicalSplit: true, // sticky spec list left, model angles per spec on the right
   landingStage: { eyebrow: "Made for the move", caption: "That's DRIFT." },
   // Guided tour — model rotates to each angle as its text fades in.
-  // rx/ry in radians; tune against a screenshot.
+  // rx/ry in radians; tune against a screenshot. x stays 0 on every stop —
+  // this section's copy is hard-centred by CSS (.featureseq__stop is
+  // left:50% + text-align:center), so the model belongs on the same axis;
+  // the tour reads through ROTATION, not by sliding side to side.
   featureStops: [
-    { title: "Signature Sound", copy: "Analog-tuned drivers fill the room — clean highs, warm lows.", rx: 0, ry: 0, x: -0.3 }, // front grille, left
+    { title: "Signature Sound", copy: "Analog-tuned drivers fill the room — clean highs, warm lows.", rx: 0, ry: 0, x: 0 }, // front grille
     { title: "DOMINATOR Controls", copy: "Bass, mid, treble and volume — hand-tuned dials, right on top where you reach.", rx: 1.1, ry: 0, x: 0 }, // top view
-    { title: "Grab & Go", copy: "A leather carry strap and a rugged build made to travel with you.", rx: -0.3, ry: -0.7, x: 0.15 }, // 3/4 angle
+    { title: "Grab & Go", copy: "A leather carry strap and a rugged build made to travel with you.", rx: -0.3, ry: -0.7, x: 0 }, // 3/4 angle
   ],
   perspective: { heroVariant: "split" },
   // Horizontal roam — clean left <-> right sweeps, minimal vertical drift.
@@ -232,46 +252,99 @@ const edge: ProductExperience = {
     { id: "black", name: "Black", hex: "#000000", images: ["/products/edge/black/edge-black-front.png", "/products/edge/black/edge-black-back.png"] },
     { id: "white", name: "White", hex: "#e9e6df", images: ["/products/edge/white/white-edge-front.png", "/products/edge/white/white-edge-back.png"] },
     { id: "orange", name: "Orange", hex: "#e8631a", images: ["/products/edge/orange/edge-orange-front.png", "/products/edge/orange/edge-orange-back.png"] },
+    // NOTE: brown/1.jpg-2.jpg are plain studio photos (cream background),
+    // not the transparent PNG cutouts the other colors use for the roaming
+    // plane — swap these for a proper cutout when one's available, this is
+    // a placeholder so the color isn't missing entirely.
+    { id: "brown", name: "Brown", hex: "#6b4a34", images: ["/products/edge/brown/1.jpg", "/products/edge/brown/2.jpg"] },
   ],
-  perspective: { heroVariant: "split", specLayout: "explorer" },
-  // Bespoke cinema-mode experience. Uses the shared GLB roam infrastructure
-  // but drives it through EDGE-specific choreography (see /edge/EdgeExperience).
-  model: "/products/edge/edge-model.glb",
-  modelScale: 1.35,
+  // No specLayout: the "explorer" layout deliberately never hides the roaming
+  // model (SpecExplorer sits at z-index 40 over the canvas's 30 and lets it
+  // pass behind), so Specifications has to use the default SpecsSection to get
+  // the same model-hidden treatment DOMINATOR has.
+  perspective: { heroVariant: "split" },
+  model: "/products/edge/Edge-Black.glb", // black — fallback
+  colorModels: {
+    black: "/products/edge/Edge-Black.glb",
+    white: "/products/edge/Edge-White.glb",
+    orange: "/products/edge/Edge-Orange.glb",
+    brown: "/products/edge/Edge-Brown.glb",
+  },
+  // EDGE is a 500×94×93 mm bar, so ProductModel's normalise-by-largest-dimension
+  // fit keys off its WIDTH. At the old 1.35 (tuned for the retired bespoke
+  // layout) that made it ~35% wider on screen than every other product, which
+  // is what pushed it off-frame in the pinned finale. 1.0 lands its width
+  // exactly on DOMINATOR's in every section — verified by projecting the GLB
+  // bbox through this page's camera (fov 40 @ z=6).
+  modelScale: 1.0,
   // Explicit, independent value (was silently falling back to the shared
   // BASE_RY default before) — verified this facing is correct for EDGE's
   // GLB via screenshots, now locked in so it can't drift if the shared
   // default is ever retuned for another product.
   modelBaseRy: -Math.PI / 2 + 0.42,
+  // Stage placement copied from DOMINATOR so both pages choreograph the model
+  // through the same sections in the same way.
+  featureFocus: { eyebrow: "Designed around you", caption: "A closer look." },
+  // scale 0.7 rather than DOMINATOR's 0.5: a bar this thin at 0.5 rendered as
+  // a ~4%-tall sliver next to the Overview copy. 0.7 matches DOMINATOR's
+  // on-screen WIDTH here (~15%), which is the dimension that reads for EDGE.
+  overviewModel: { x: 0.32, ry: -0.6, scale: 0.7 },
+  featuresBackground: true,
+  // Scroll-scrubbed exploded-view sequence, same treatment as DOMINATOR.
+  // 121 frames extracted from the supplied Edge_Exploded.mp4 (24fps, 5.04s)
+  // into public/products/edge/legend-seq/{desktop,mobile}/. Captions left
+  // empty on purpose — the sequence plays with no copy over it until
+  // client-approved lines exist; adding entries slices them evenly.
+  sequenceReveal: { frameCount: 121, captions: [] },
+  technicalSplit: true,
+  // No featuresModel / specsModel / deepDiveModel — same as DOMINATOR. Their
+  // ABSENCE is what hides the model: FeatureGrid, SpecsSection and
+  // FeatureDeepDive each take an explicit pushHide() branch when their field
+  // is unset, so the speaker stays at opacity 0 for those sections.
   landingStage: { eyebrow: "Cinematic by design", caption: "That's EDGE." },
   featureStops: [
-    { title: "Twin Drivers", copy: "Two 15W main drivers keep vocals and mids crystal-clear.", rx: 0.05, ry: -0.35, x: -0.3 },
-    { title: "Twin Tweeters", copy: "Twin 10W tweeters add air to every high — cymbals, strings, breath.", rx: 0.15, ry: 0.4, x: 0.3 },
+    { title: "Twin Drivers", copy: "Two 15W main drivers keep vocals and mids crystal-clear.", rx: 0.05, ry: -0.35, x: 0 },
+    { title: "Twin Tweeters", copy: "Twin 10W tweeters add air to every high — cymbals, strings, breath.", rx: 0.15, ry: 0.4, x: 0 },
     { title: "5-in-1 Inputs", copy: "Bluetooth, AUX, USB, TWS, Optical — every source connects.", rx: -0.6, ry: 0, x: 0 },
   ],
   spinStage: { eyebrow: "Every angle", caption: "See it from all sides." },
-  highlights: [
-    { value: "50W", label: "Total Output" },
-    { value: "10000 mAh", label: "Battery" },
-    { value: "16h+", label: "Playtime" },
-    { value: "5-in-1", label: "Inputs" },
-  ],
-  parallax: {
-    image: "/products/edge/orange/edge-orange-front.png",
-    eyebrow: "Cinematic by design",
-    caption: "Unstoppable sound, anywhere.",
-  },
+  // `highlights` and `parallax` were dropped when EDGE moved onto the shared
+  // page. `highlights` only ever fed the bespoke stat ribbon — Highlights.tsx
+  // exists but ProductExperience never renders it, so the data would have gone
+  // nowhere. `parallax` would have gone the other way and added a ParallaxBreak
+  // section DOMINATOR doesn't have, breaking the section-placement parity this
+  // change is for. Both are recoverable from git if the sections come back.
+  // DOMINATOR's roam track verbatim, so the flow matches the other pages. The
+  // old EDGE track carried z-tilts (rz) and an s:1.3 spike that were fine for
+  // the bespoke layer's model-on-top layering, but a 500 mm bar swings a much
+  // bigger area than a boxy speaker for the same tilt, which is what threw it
+  // diagonally off-frame here. Flat track = no tilt, scale capped at 1.05.
   track: [
-    { at: 0.0, x: -0.26, y: 0.0, rz: 0.0, ry: 0.0, s: 1.0, o: 1 },
-    { at: 0.1, x: -0.26, y: 0.0, rz: 0.0, ry: 0.0, s: 1.0, o: 1 },
-    { at: 0.3, x: -0.12, y: 0.04, rz: -0.05, ry: 0.5, s: 0.8, o: 1 },
-    { at: 0.55, x: 0.3, y: 0.0, rz: 0.06, ry: -0.4, s: 0.95, o: 1 },
-    { at: 0.75, x: 0.0, y: 0.0, rz: 0.0, ry: 0.2, s: 1.3, o: 1 },
-    { at: 0.9, x: -0.3, y: 0.03, rz: -0.06, ry: 0.55, s: 0.95, o: 1 },
-    { at: 1.0, x: 0.0, y: 0.0, rz: 0.0, ry: 0.0, s: 1.1, o: 1 },
+    { at: 0.0, x: -0.28, y: 0.0, rz: 0.0, ry: 0.0, s: 1.0, o: 1 },
+    { at: 0.08, x: -0.28, y: 0.0, rz: 0.0, ry: 0.0, s: 1.0, o: 1 },
+    { at: 0.3, x: 0.3, y: 0.0, rz: 0.0, ry: -0.3, s: 1.05, o: 1 },
+    { at: 0.5, x: -0.3, y: 0.0, rz: 0.0, ry: 0.35, s: 1.05, o: 1 },
+    { at: 0.7, x: 0.3, y: 0.0, rz: 0.0, ry: -0.3, s: 1.05, o: 1 },
+    { at: 0.88, x: -0.28, y: 0.0, rz: 0.0, ry: 0.25, s: 1.0, o: 1 },
+    { at: 1.0, x: 0.0, y: 0.0, rz: 0.0, ry: 0.0, s: 1.0, o: 1 },
   ],
   overview:
     "Experience the perfect blend of elegance and acoustic brilliance with the Leisure Edge. Designed to complement modern living spaces, it delivers immersive, room-filling sound with deep bass and crystal-clear detail. Whether you're gaming, watching movies, or streaming music, Edge transforms everyday entertainment into a cinematic experience.",
+  // features / deepDives / faq were authored when EDGE moved onto the shared
+  // page — the bespoke layout never had these three sections, so there was no
+  // copy for them and FeatureGrid/FeatureDeepDive/FAQ would each render
+  // nothing (which also means the model would NOT get hidden through them).
+  // Every line below is derived strictly from EDGE's own specs/technical
+  // values further down this object — no new product claims. Worth a copy
+  // review before shipping, same as CORE/LEGEND/ELEVATE's derived copy.
+  features: [
+    { icon: "sound", label: "50W Total Output", sub: "15W×2 + 10W×2" },
+    { icon: "battery", label: "10,000 mAh", sub: "16+ hours playtime" },
+    { icon: "bluetooth", label: "5-in-1 Inputs", sub: "BT / AUX / USB / TWS / Optical" },
+    { icon: "speaker", label: "Dual 58 MM Bass", sub: "Plus twin tweeters" },
+    { icon: "bolt", label: "Fast Charge", sub: "3:30 hrs to full" },
+    { icon: "feather", label: "Slim Profile", sub: "500×94×93 mm" },
+  ],
   specs: [
     { k: "Battery Capacity", v: "10000 mAh" },
     { k: "Output Power", v: "15W×2 + 10W×2" },
@@ -279,6 +352,12 @@ const edge: ProductExperience = {
     { k: "Playtime", v: "> 16 hours" },
     { k: "Charging Time", v: "3:30 hours" },
     { k: "Charging Input", v: "DC 20V 2A 40W" },
+  ],
+  deepDives: [
+    { title: "Built for the screen", copy: "A 500 mm slim profile that sits under a TV without crowding it, plus a lossless optical input — the reason the Edge reads as cinematic rather than just loud." },
+    { title: "Twin drivers, twin tweeters", copy: "Two 15W main drivers carry vocals and mids while twin 10W tweeters open up the highs, for 50W that stays clean across 20Hz – 20KHz." },
+    { title: "Every source connects", copy: "Bluetooth, AUX, USB, TWS and Optical — five ways in, so the console, the TV and the phone all land on the same speaker." },
+    { title: "All-evening battery", copy: "10,000 mAh runs past 16 hours between charges, and a 40W adaptor puts it back to full in 3:30." },
   ],
   technical: [
     { k: "Frequency Response", v: "20Hz – 20KHz" },
@@ -293,6 +372,12 @@ const edge: ProductExperience = {
     { name: "Optical Audio Cable", note: "Lossless digital input." },
     { name: "Warranty Card", note: "Coverage for peace of mind." },
     { name: "Power Adaptor", note: "40W fast charge." },
+  ],
+  faq: [
+    { q: "Can I connect the EDGE to my TV?", a: "Yes — an optical audio cable is included in the box for a lossless digital connection, and AUX and Bluetooth both work as alternatives." },
+    { q: "How long does the battery last?", a: "Over 16 hours of playtime from the 10,000 mAh battery, depending on volume. A full recharge takes about 3:30 hours on the included 40W adaptor." },
+    { q: "Can I pair two EDGE speakers together?", a: "Yes — TWS pairing links two units for synced stereo sound across the room." },
+    { q: "Is there a warranty?", a: "Yes — EDGE comes with 12-month coverage. Keep the included warranty card for your records." },
   ],
 };
 
@@ -438,7 +523,7 @@ const dominator: ProductExperience = {
   // Captions intentionally empty — the sequence plays with no copy over it
   // until client-approved lines are supplied. Add entries here and they slice
   // themselves evenly across the playback phase; no component change needed.
-  sequenceReveal: { frameCount: 120, captions: [] },
+  sequenceReveal: { frameCount: 121, captions: [] },
   technicalSplit: true, // sticky spec list left, model angles per spec on the right
   landingStage: { eyebrow: "Turn it up", caption: "That's DOMINATOR." },
   featureStops: [
@@ -497,17 +582,16 @@ const dominator: ProductExperience = {
   ],
 };
 
-// CORE/LEGEND/ELEVATE have no GLB yet (public/products/{slug}/ only has 2D
-// color photography), so `model` is intentionally left unset — the page falls
-// back to the 2D ProductPlane. modelBaseRy/modelScale and the stage-placement
-// fields (overviewModel etc.) are still filled in with independent literal
-// values per user request, so they're already separate and ready the moment a
-// GLB is dropped in — just add `model: "/products/{slug}/{slug}-model.glb"`.
-// NOTE: ProductPlane.tsx does not read holdX/holdY/holdS, so overviewModel/
-// featuresModel/specsModel/deepDiveModel/featureStops are inert until a GLB
-// model is set — harmless placeholders for now. Feature/deep-dive copy below
-// is derived from the real specs (products.ts), not fabricated — worth a
-// copy review before shipping.
+// CORE/LEGEND/ELEVATE now each have per-colour GLBs wired via `model` +
+// `colorModels`, so their modelBaseRy/modelScale and stage-placement fields are
+// live — edits to them take effect. (This comment previously said the opposite;
+// it predated the GLBs landing.)
+// NOTE: the inert-placeholder caveat only still applies to a product with NO
+// `model` at all — drift2 — because ProductPlane.tsx reads productHide but not
+// holdX/holdY/holdS. So there, an ABSENT *Model field still hides the plane,
+// while a PRESENT one does nothing.
+// Feature/deep-dive copy below is derived from the real specs (products.ts),
+// not fabricated — worth a copy review before shipping.
 const core: ProductExperience = {
   slug: "core",
   name: "CORE",
@@ -524,23 +608,33 @@ const core: ProductExperience = {
     { id: "white", name: "White", hex: "#f3efe6", images: ["/products/core/white/1.jpg", "/products/core/white/2.jpg"] },
     { id: "green", name: "Green", hex: "#2f4a3a", images: ["/products/core/green/1.jpg", "/products/core/green/2.jpg"] },
   ],
-  // No GLB yet — placeholder values, independent per product, ready to use once one is added.
+  model: "/products/core/Core-Black.glb", // black — fallback
+  colorModels: {
+    black: "/products/core/Core-Black.glb",
+    brown: "/products/core/Core-Brown.glb",
+    white: "/products/core/Core-White.glb",
+    green: "/products/core/Core-Green.glb",
+  },
   modelBaseRy: -Math.PI / 2 + 0.42,
   modelScale: 1,
-  skipPlaneAnimation: true,
   spinStage: { eyebrow: "Every angle", caption: "See it from all sides." },
   featureFocus: { eyebrow: "Designed around you", caption: "A closer look." },
   overviewModel: { x: 0.32, ry: -0.6, scale: 0.6 },
   featuresBackground: true,
-  featuresModel: { x: -0.32, ry: 0, scale: 0.48 },
-  specsModel: { x: 0.04, ry: 0, scale: 0.38 },
-  deepDiveModel: { x: 0.34, ry: 1.45, scale: 0.46 },
+  // No featuresModel / specsModel / deepDiveModel — see DOMINATOR; their
+  // absence is what keeps the model hidden through those three sections.
+  // Scroll-scrubbed exploded-view sequence, same treatment as DOMINATOR.
+  // 121 frames extracted from the supplied Core_Exploded.mp4 (24fps, 5.04s)
+  // into public/products/core/legend-seq/{desktop,mobile}/. Captions left
+  // empty on purpose — the sequence plays with no copy over it until
+  // client-approved lines exist; adding entries slices them evenly.
+  sequenceReveal: { frameCount: 121, captions: [] },
   technicalSplit: true,
   landingStage: { eyebrow: "Power meets precision", caption: "That's CORE." },
   featureStops: [
-    { title: "Room-Filling Sound", copy: "40W + dual 10W tweeters deliver deep, room-filling sound.", rx: 0, ry: 0, x: -0.3 },
+    { title: "Room-Filling Sound", copy: "40W + dual 10W tweeters deliver deep, room-filling sound.", rx: 0, ry: 0, x: 0 },
     { title: "CORE Controls", copy: "Bass, mid, treble and volume — tactile controls right where you need them.", rx: 1.1, ry: 0, x: 0 },
-    { title: "Home-Ready Design", copy: "A refined silhouette built to complement any room, wherever you set it down.", rx: -0.3, ry: -0.7, x: 0.15 },
+    { title: "Home-Ready Design", copy: "A refined silhouette built to complement any room, wherever you set it down.", rx: -0.3, ry: -0.7, x: 0 },
   ],
   perspective: { heroVariant: "split" },
   track: [
@@ -610,22 +704,34 @@ const legend: ProductExperience = {
     { id: "white", name: "White", hex: "#f3efe6", images: ["/products/legend/white/1.jpg", "/products/legend/white/2.jpg"] },
     { id: "orange", name: "Orange", hex: "#c1502e", images: ["/products/legend/orange/1.jpg", "/products/legend/orange/2.jpg"] },
   ],
-  model: "/products/legend/legend-model.glb",
+  model: "/products/legend/Legend-Black.glb", // black — fallback
+  colorModels: {
+    black: "/products/legend/Legend-Black.glb",
+    brown: "/products/legend/Legend-Brown.glb",
+    green: "/products/legend/Legend-Green.glb",
+    white: "/products/legend/Legend-White.glb",
+    orange: "/products/legend/Legend-Orange.glb",
+  },
   modelBaseRy: -Math.PI / 2 + 0.42,
   modelScale: 1,
   spinStage: { eyebrow: "Every angle", caption: "See it from all sides." },
   featureFocus: { eyebrow: "Designed around you", caption: "A closer look." },
   overviewModel: { x: 0.32, ry: -0.6, scale: 0.58 },
   featuresBackground: true,
-  featuresModel: { x: -0.32, ry: 0, scale: 0.46 },
-  specsModel: { x: 0.04, ry: 0, scale: 0.36 },
-  deepDiveModel: { x: 0.34, ry: 1.45, scale: 0.44 },
+  // No featuresModel / specsModel / deepDiveModel — see DOMINATOR; their
+  // absence is what keeps the model hidden through those three sections.
+  // Scroll-scrubbed exploded-view sequence, same treatment as DOMINATOR.
+  // 121 frames extracted from the supplied Legend_Exploded.mp4 (24fps, 5.04s)
+  // into public/products/legend/legend-seq/{desktop,mobile}/. Captions left
+  // empty on purpose — the sequence plays with no copy over it until
+  // client-approved lines exist; adding entries slices them evenly.
+  sequenceReveal: { frameCount: 121, captions: [] },
   technicalSplit: true,
   landingStage: { eyebrow: "Take the stage", caption: "That's LEGEND." },
   featureStops: [
-    { title: "Signature Sound", copy: "A 30W driver plus dual 10W tweeters fill any room with clean, punchy sound.", rx: 0, ry: 0, x: -0.3 },
+    { title: "Signature Sound", copy: "A 30W driver plus dual 10W tweeters fill any room with clean, punchy sound.", rx: 0, ry: 0, x: 0 },
     { title: "LEGEND Controls", copy: "Bass, mid, treble and volume dials, plus a mic input, right on top.", rx: 1.1, ry: 0, x: 0 },
-    { title: "Grab & Go", copy: "A built-in handle makes it easy to carry your karaoke setup anywhere.", rx: -0.3, ry: -0.7, x: 0.15 },
+    { title: "Grab & Go", copy: "A built-in handle makes it easy to carry your karaoke setup anywhere.", rx: -0.3, ry: -0.7, x: 0 },
   ],
   perspective: { heroVariant: "split" },
   track: [
@@ -694,23 +800,34 @@ const elevate: ProductExperience = {
     { id: "brown", name: "Brown", hex: "#5a3b28", images: ["/products/elevate/brown/1.jpg", "/products/elevate/brown/2.jpg"] },
     { id: "orange", name: "Orange", hex: "#c1502e", images: ["/products/elevate/orange/1.jpg", "/products/elevate/orange/2.jpg"] },
   ],
-  // No GLB yet — placeholder values, independent per product, ready to use once one is added.
+  // An Elevate-White.glb was also supplied but there's no "white" color
+  // entry above (and no product photos for it) — left unwired for now.
+  model: "/products/elevate/Elevate-Black.glb", // black — fallback
+  colorModels: {
+    black: "/products/elevate/Elevate-Black.glb",
+    brown: "/products/elevate/Elevate-Brown.glb",
+    orange: "/products/elevate/Elevate-Orange.glb",
+  },
   modelBaseRy: -Math.PI / 2 + 0.42,
   modelScale: 1,
-  skipPlaneAnimation: true,
   spinStage: { eyebrow: "Every angle", caption: "See it from all sides." },
   featureFocus: { eyebrow: "Designed around you", caption: "A closer look." },
   overviewModel: { x: 0.32, ry: -0.6, scale: 0.55 },
   featuresBackground: true,
-  featuresModel: { x: -0.32, ry: 0, scale: 0.44 },
-  specsModel: { x: 0.04, ry: 0, scale: 0.34 },
-  deepDiveModel: { x: 0.34, ry: 1.45, scale: 0.42 },
+  // No featuresModel / specsModel / deepDiveModel — see DOMINATOR; their
+  // absence is what keeps the model hidden through those three sections.
+  // Scroll-scrubbed exploded-view sequence, same treatment as DOMINATOR.
+  // 121 frames extracted from the supplied Elevate_Exploded.mp4 (24fps, 5.04s)
+  // into public/products/elevate/legend-seq/{desktop,mobile}/. Captions left
+  // empty on purpose — the sequence plays with no copy over it until
+  // client-approved lines exist; adding entries slices them evenly.
+  sequenceReveal: { frameCount: 121, captions: [] },
   technicalSplit: true,
   landingStage: { eyebrow: "Raise the energy", caption: "That's ELEVATE." },
   featureStops: [
-    { title: "Signature Sound", copy: "A 50W driver plus dual 10W tweeters deliver powerful, thumping sound.", rx: 0, ry: 0, x: -0.3 },
+    { title: "Signature Sound", copy: "A 50W driver plus dual 10W tweeters deliver powerful, thumping sound.", rx: 0, ry: 0, x: 0 },
     { title: "ELEVATE Controls", copy: "Bass, mid, treble and volume dials, plus dual mic inputs, right on top.", rx: 1.1, ry: 0, x: 0 },
-    { title: "Grab & Go", copy: "A rugged, tour-ready build made to power every performance.", rx: -0.3, ry: -0.7, x: 0.15 },
+    { title: "Grab & Go", copy: "A rugged, tour-ready build made to power every performance.", rx: -0.3, ry: -0.7, x: 0 },
   ],
   perspective: { heroVariant: "split" },
   track: [
