@@ -55,6 +55,26 @@ html.lenis, html.lenis body { height: auto; }
 /* ---------- Layout ---------- */
 .leisure-xp .content { position: relative; }
 .leisure-xp section { position: relative; padding: clamp(4rem, 12vh, 10rem) clamp(1.2rem, 6vw, 6rem); }
+/* Mobile: the 12vh middle term wins at 375x812, giving EVERY section 97.44px of
+   padding top and bottom - 194.9px, 24% of the viewport, per section (the
+   marquee spends 194.9px around 48px of text).
+   Scoped to the FLOWING sections on purpose. GSAP's pin does copy padding
+   inline onto every pinned section (verified in the DOM - featureseq/spinstage/
+   specs/techsplit/packshot/landing carry `padding: 97.44px 22.5px`, seqreveal
+   `padding: 0px`), but it copies the COMPUTED value
+   (gsap/ScrollTrigger.js:665, `pinStyle[_padding] = cs[_padding]`), so a media
+   rule is already reflected on first paint - there is no load-vs-refresh
+   divergence. The narrow scope is simply to leave the pinned stages' internal
+   composition alone; widening it later is safe, just untested. */
+@media (max-width: 640px) {
+  .leisure-xp .hero, .leisure-xp .overview, .leisure-xp .features, .leisure-xp .deepdive, .leisure-xp .faq { padding-block: clamp(3rem, 7vh, 4.5rem); }
+  /* `.loop { padding-left: 0; padding-right: 0 }` (0,1,0) has always lost to
+     `.leisure-xp section` (0,1,1), so the marquee has never actually been
+     full-bleed - measured padding 22.5px, not 0. Honour the intent at mobile,
+     where the inset is most visible. The same bug exists at desktop; left alone
+     there so this stays a mobile-only change. */
+  .leisure-xp .loop { padding-block: clamp(2rem, 5vh, 3rem); padding-inline: 0; }
+}
 
 .leisure-xp .eyebrow {
   display: inline-block; font-size: 0.78rem; letter-spacing: 0.28em;
@@ -67,7 +87,12 @@ html.lenis, html.lenis body { height: auto; }
   display: grid; grid-template-columns: 0.95fr 1.05fr;
   gap: clamp(2rem, 6vw, 5rem); align-items: center; flex: 1;
 }
-@media (max-width: 860px) { .hero__grid { grid-template-columns: 1fr; } }
+/* `1fr` is `minmax(auto, 1fr)`, so the track inflates to the widest child's
+   min-content. .hero__thumbs (6 x 56px + gaps = 384px, nowrap) blew the track
+   past the 330px content box, silently clipping the title, copy, swatches and
+   buy buttons against .leisure-xp's overflow-x:hidden. The strip itself is
+   handled below, after .hero__thumb's own rules. */
+@media (max-width: 860px) { .hero__grid { grid-template-columns: minmax(0, 1fr); } }
 .hero__title { font-family: var(--font-globe), var(--display); font-size: 3rem; font-weight: 600; line-height: 1; text-transform: uppercase; letter-spacing: 0.01em; }
 .hero__sub { max-width: 42ch; margin-top: 1.4rem; font-size: clamp(1rem, 1.5vw, 1.2rem); color: var(--muted); line-height: 1.6; }
 /* keep the hero copy + Buy/Add-to-Cart above the roaming 3D model */
@@ -85,6 +110,14 @@ html.lenis, html.lenis body { height: auto; }
 .hero__thumb:hover { transform: translateY(-2px); border-color: var(--accent); }
 .hero__thumb.is-active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
 .hero__thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
+/* Mobile: scroll the thumb strip rather than wrapping it - works for any image
+   count, keeps the hero compact, and the part-visible last thumb reads as the
+   scroll affordance. Must sit after the .hero__thumb rules above to win. */
+@media (max-width: 860px) {
+  .hero__thumbs { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; -ms-overflow-style: none; gap: 0.5rem; }
+  .hero__thumbs::-webkit-scrollbar { display: none; }
+  .hero__thumb { flex: 0 0 auto; width: 50px; height: 50px; }
+}
 .hero__frame { position: relative; width: clamp(220px, 70%, 420px); aspect-ratio: 1 / 1; }
 .hero__still { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; will-change: opacity; }
 .hero__scroll { margin-top: 2.5rem; font-size: 0.78rem; letter-spacing: 0.3em; color: var(--muted); }
@@ -146,6 +179,16 @@ html.lenis, html.lenis body { height: auto; }
 .swatch-dot { width: 34px; height: 34px; border-radius: 50%; cursor: pointer; background: var(--c); border: 1px solid var(--line); padding: 0; outline-offset: 3px; transition: transform 0.2s ease, box-shadow 0.2s ease; }
 .swatch-dot:hover { transform: scale(1.08); }
 .swatch-dot.is-active { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent); }
+/* Touch: the dot renders 34x34, the only sub-44px target on the page. Grow the
+   HIT AREA, not the dot - widening the dot would widen .swatches__row's
+   min-content and feed straight back into the hero track blowout fixed above. */
+@media (max-width: 640px) {
+  .swatch-dot { position: relative; }
+  /* -6px, not -5: the dot is border-box with a 1px border, so its padding box
+     is 32px and inset resolves against that. 32 + 12 = exactly 44. Consumes
+     6px of the row's 12.8px gap, leaving 0.8px - neighbours never overlap. */
+  .swatch-dot::after { content: ''; position: absolute; inset: -6px; border-radius: 50%; }
+}
 
 /* ---------- Buy bar ---------- */
 .buybar { margin-top: 2.2rem; }
@@ -199,6 +242,25 @@ html.lenis, html.lenis body { height: auto; }
 @media (max-width: 720px) {
   .pk-callout { max-width: 8.5rem; }
   .pk-callout__name { font-size: 0.95rem; }
+}
+/* The callout anchors are viewport percentages (15-22% / 78-85%) centred by
+   translate(-50%). At 375px the 15% anchor is only 56px from the edge, so a
+   full-width 8.5rem callout ("Warranty Card") put its left edge at -12px and
+   .leisure-xp's overflow-x:hidden ate the first character. 6.5rem is the widest
+   cap that clears the edge (measured left: 4px) and it costs nothing - the
+   callouts already wrap to the same 49px height at 8.5rem.
+   NOTE: the anchors themselves are inline styles from BoxContents.tsx, so they
+   cannot be re-pointed from CSS without !important; capping the width is the
+   self-contained fix. Raising the callouts above the 3D model is NOT possible
+   either - while pinned, .packshot carries inline position:fixed, which creates
+   a stacking context that traps .packshot__callouts below .webgl-wrap. */
+@media (max-width: 640px) {
+  .pk-callout { max-width: 6.5rem; }
+  /* The cap leaves ~89px of content box after the 0.9rem side padding, and a
+     single long token can exceed that on its own - DOMINATOR's "Wireless
+     Microphone (2 Nos.)" measured a 104px min-content and pushed its span to
+     x=386 on a 375px viewport. Let long accessory names break. */
+  .pk-callout__name { overflow-wrap: anywhere; }
 }
 
 /* ---------- Box contents — packing-slip tickets ---------- */
@@ -346,7 +408,13 @@ html.lenis, html.lenis body { height: auto; }
 .deepdive-row__title { font-family: var(--display); font-size: clamp(1.8rem, 5vw, 3.4rem); text-transform: uppercase; line-height: 1; }
 .deepdive-row__copy { margin-top: 1rem; max-width: 52ch; color: var(--muted); line-height: 1.7; font-size: 1.05rem; }
 .deepdive-row--flip .deepdive-row__copy { margin-left: auto; }
-@media (max-width: 640px) { .deepdive-row, .deepdive-row--flip { grid-template-columns: 1fr; } .deepdive-row--flip .deepdive-row__body { text-align: left; } .deepdive-row--flip .deepdive-row__n { grid-column: 1; } .deepdive-row--flip .deepdive-row__copy { margin-left: 0; } }
+/* Mobile: the flip rules above pin BOTH children to grid-row 1 (lines with
+   .deepdive-row--flip .deepdive-row__n / __body). This block used to reset only
+   grid-column, so on rows 02/04/06 the index and the body landed in the same
+   cell and the accent number was painted over by the title (confirmed in the
+   DOM: identical top, both at 1/1). grid-row:auto restores source-order
+   placement, matching the non-flipped rows. */
+@media (max-width: 640px) { .deepdive-row, .deepdive-row--flip { grid-template-columns: 1fr; } .deepdive-row--flip .deepdive-row__body { text-align: left; grid-column: 1; grid-row: auto; } .deepdive-row--flip .deepdive-row__n { grid-column: 1; grid-row: auto; } .deepdive-row--flip .deepdive-row__copy { margin-left: 0; } .deepdive-row__body::before { inset: -1rem 0; } }
 
 /* ---------- Scroll-scrubbed frame sequence (before Specifications) ---------- */
 /* The section itself is one viewport tall; GSAP pins .seqreveal__stage and adds
@@ -419,6 +487,21 @@ html.lenis, html.lenis body { height: auto; }
 .techsplit__v { font-family: var(--display); font-weight: 700; font-size: clamp(1.1rem, 2.4vw, 1.9rem); text-transform: uppercase; text-align: right; color: var(--ink); }
 .techsplit__row.is-active .techsplit__v { color: var(--accent); }
 @media (max-width: 820px) { .techsplit__inner { width: min(92%, 640px); } }
+/* Mobile: the desktop row is `3rem 1fr auto` with a 2rem gap - 48 + 70 + 102 +
+   two 32px gaps = 284px inside a 265px content box, so the longest spec value
+   ("500x94x93 mm") broke out of its gutter. Tighten the number column and the
+   gaps, and floor the key column at 4.5rem so a wide value can never collapse
+   the label to 0. Also 80px shorter overall. */
+@media (max-width: 640px) {
+  /* __inner's own clamp padding doubles up with the section's 22.5px, costing
+     65px of the 330px content box for no gain - the section padding already
+     provides the gutter. Reclaiming it plus tightening the number column and
+     gaps drops the list from 479px to 378px with nothing clipped. The 4.5rem
+     floor on the key stops a wide value ("2x treble + 2x58 mm bass") from
+     collapsing the label to 0. */
+  .techsplit__inner { width: 100%; padding: 0; }
+  .techsplit__row { grid-template-columns: 1.6rem minmax(4.5rem, 1fr) minmax(0, auto); gap: 0.8rem; }
+}
 
 /* ---------- Landing finale (model rests centre, before footer) ---------- */
 .landing { position: relative; height: 100vh; display: flex; align-items: flex-start; justify-content: center; background: var(--bg); overflow: hidden; }
@@ -452,7 +535,14 @@ html.lenis, html.lenis body { height: auto; }
 .stickybuy__price { font-family: var(--display); font-size: 1.4rem; }
 .stickybuy__off { color: var(--accent); font-weight: 600; font-size: 0.8rem; letter-spacing: 0.1em; }
 .stickybuy__btn { padding: 0.8rem 1.8rem; }
-@media (max-width: 640px) { .stickybuy__off { display: none; } .stickybuy__btn { padding: 0.7rem 1.3rem; font-size: 0.85rem; } }
+/* `.leisure-xp .stickybuy__btn`, not the bare class: the button is
+   `btn btn--primary stickybuy__btn`, and `.leisure-xp .btn` (0,2,0) outranks
+   (0,1,0) - so this whole mobile compaction was DEAD. Measured proof: the
+   button reported padding 16px 33.6px / font 15.2px, i.e. `.leisure-xp .btn`'s
+   1rem 2.1rem / 0.95rem, never the 0.7rem/0.85rem below. min-height keeps it a
+   44px tap target. The unconditional `.stickybuy__btn { padding: .8rem 1.8rem }`
+   above is left alone on purpose - raising ITS specificity would change desktop. */
+@media (max-width: 640px) { .stickybuy { padding-bottom: max(0.9rem, env(safe-area-inset-bottom)); } .stickybuy__off { display: none; } .leisure-xp .stickybuy__btn { padding: 0.75rem 1.4rem; font-size: 0.9rem; min-height: 44px; white-space: nowrap; } }
 
 /* ---------- SpecRail (horizontal-scroll specs) ---------- */
 .specrail { padding: 0; height: 100svh; overflow: hidden; display: flex; align-items: center; background: var(--bg); }

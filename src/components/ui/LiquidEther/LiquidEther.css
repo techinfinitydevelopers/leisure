@@ -3,5 +3,15 @@
   overflow: hidden;
   width: 100%;
   height: 100%;
-  touch-action: none;
+  /* LOCAL MODIFICATION to the vendored React Bits component (upstream ships
+     `touch-action: none`). Its only consumer here is LiquidEtherHero, which
+     renders full-screen behind the home page's scroll-scrubbed hero, so
+     `none` told the browser the canvas owned every touch gesture and killed
+     vertical page scrolling on phones outright — a finger swipe anywhere on
+     the hero did nothing. Desktop never showed it because `touch-action` does
+     not apply to wheel events. `pan-y` gives the page back the vertical pan it
+     needs while the sim still receives horizontal drags; its own touch
+     listeners are `{ passive: true }`, so they were never the blocker.
+     Note the sim also runs `autoDemo`, so it stays animated without input. */
+  touch-action: pan-y;
 }

@@ -93,8 +93,17 @@ export default function SequenceReveal() {
       ctx2d.fillRect(0, 0, cw, ch);
       const ir = img.naturalWidth / img.naturalHeight;
       const cr = cw / ch;
+      // The "mobile" set is the SAME 16:9 composition as desktop, just smaller
+      // (828x462 vs 1600x892) - it is a bandwidth optimisation, not a portrait
+      // re-crop. Cover-fitting it into a portrait stage draws it 1455px wide in
+      // a 375px canvas, so only 25.8% of the frame survives (source x 307-521
+      // of 828) and the speaker loses its right third on every one of the 121
+      // frames, on all six products. Contain-fit that set instead; the frames
+      // are black-on-black and the canvas is already cleared to #000 above, so
+      // the letterbox is invisible.
+      const matchWidth = set === "mobile" ? cr < ir : cr > ir;
       let dw: number, dh: number;
-      if (cr > ir) {
+      if (matchWidth) {
         dw = cw;
         dh = cw / ir;
       } else {

@@ -74,11 +74,11 @@ Declared in `src/app/layout.tsx`, tokens in `src/app/globals.css` `@theme inline
 - **Omitting `featuresModel` / `specsModel` / `deepDiveModel` is what HIDES the model** through Feature Grid / Specifications / the deep-dive ("Made for the move") section. Each component takes an explicit `pushHide()` branch when its field is unset — verified in source, not just from comments.
 - **Two traps that do NOT follow that convention** (absent ≠ hidden — the model keeps roaming visibly): `overviewModel` (the whole ScrollTrigger is inside `if (om)`) and `technicalSplit` (falsy renders a static section with zero scroll wiring).
 - All six products now omit the three hide-fields. Verified at runtime, not by reading config: temporarily expose the module-scoped store (`window.__scroll = scroll` in `scrollStore.ts`), scroll-sample `productHide` across the specs→deep-dive span, confirm it never drops to 0, then revert the instrumentation. Much more reliable than screenshots on these pages.
-- `sequenceReveal` is **DOMINATOR-only and will stay that way** — it needs 240 rendered WebP frames per product and only DOMINATOR has them. That one section legitimately differs across pages.
+- `sequenceReveal` (“Exploded View”) is now on **all six products** — `frameCount: 121`, `captions: []`. Frames live at `public/products/{slug}/legend-seq/{desktop|mobile}/frame_001.webp` … `frame_121.webp`; `SequenceReveal.tsx` picks the set once on mount at `window.innerWidth <= 768`. Total 33 MB across all six (desktop 3.0–5.1 MB, mobile 1.4–2.2 MB per product).
 
 ## Home page (`/`) — sections top to bottom
 1. Preloader, Nav (global, from `layout.tsx`)
-2. **Hero** — scroll-scrubbed video rendered as a 180-frame JPG sequence (`public/frames/frame_0001.jpg` … `frame_0180.jpg`, 1600×900), drawn to canvas via GSAP ScrollTrigger + Lenis (`src/components/landing/LandingExperience.tsx`). `FRAME_VERSION` const bumped (currently 3) to cache-bust whenever frames are re-exported.
+2. **Hero** — scroll-scrubbed video rendered as a canvas frame sequence, drawn via GSAP ScrollTrigger + Lenis (`src/components/landing/LandingExperience.tsx`). **Two independent sources since 2026-08-26**: `public/frames/desktop/frame_0001.jpg` … `frame_0179.jpg` (179, 1600×900 landscape, 19 MB) and `public/frames/mobile/frame_0001.webp` … `frame_0179.webp` (179, 720×1280 **portrait, a different video**, 7.1 MB). The set is chosen **once on mount** at `window.innerWidth <= MOBILE_MAX_W (768)` — deliberately not re-picked on rotate/resize, since swapping mid-scroll would restart the whole preload. `FRAME_VERSION` (currently **6**) cache-busts via `?v=` whenever frames are re-exported — bump it or Railway/CDN serves stale frames.
 3. **MarqueeBand** — scrolling brand text band, now in THE GLOBE font.
 4. **RevolveShowcase** — 3D speaker turn/recolour/side-swap showcase.
 5. **ParallaxGrid** ("Six Ways to Sound Wild") — sticky stacking deck, one full-height card per product, images at `public/products/{slug}.png`. Alternating image left/right, watermark, specs, price, Add to Cart.
@@ -102,7 +102,7 @@ Declared in `src/app/layout.tsx`, tokens in `src/app/globals.css` `@theme inline
 ## Build log
 
 ### 2026-08-26 — EDGE onto the shared page, model hidden in Specs/deep-dive, per-colour GLBs, big asset cleanup
-**Not committed at end of session** (per the standing "never commit unless asked" agreement) — all of the below is in the working tree.
+**Committed and pushed** as `b611e8b` (1917 files changed) — see the follow-up entry below for the exploded-view / mobile-hero work that shipped in the same commit.
 
 - **EDGE migrated off its bespoke page.** Removed the `if (slug === "edge")` branch; deleted `EdgeExperience.tsx` / `EdgeSections.tsx` / `edge-experience.css`. Dropped now-orphaned `highlights` (nothing renders `Highlights.tsx` — it has zero importers repo-wide) and `parallax` (would have added a section DOMINATOR lacks). Authored EDGE's missing `features`/`deepDives`/`faq` from its own specs.
 - **Model now hidden in Specifications + deep-dive on all six products** by removing `featuresModel`/`specsModel`/`deepDiveModel`. Verified at runtime via the `window.__scroll` instrumentation trick (see the section above), then reverted the instrumentation.
@@ -120,6 +120,176 @@ Declared in `src/app/layout.tsx`, tokens in `src/app/globals.css` `@theme inline
 - **A colour-agnostic "cover" image that shows first and survives colour switches already works, no code needed**: `shopify.ts` treats any product image whose **filename contains no colour name** as a `sharedImage` and prepends it to every colour's list; `handleColor` does `setViewIndex(0)`, so switching colour returns to it. Caveat: the matcher also splits multi-word colour names, so `light`/`grey`/`silver`/`gold` etc. anywhere in the filename will bind it to a colour. Also note `next: { revalidate: 30 }` on the Shopify fetch — new uploads take ~30s to appear locally.
 - **Hero still + zoom panel need a SQUARE source image.** `.hero__frame` is `aspect-ratio: 1/1` with `object-fit: cover` (crops, never distorts), but `.zoom-panel` uses `background-size: 220% 220%` which **does** distort a non-square image — and `object-fit` can't help it because the panel is a `background-image`. A 535×355 cover the user uploaded looked wrong for exactly this reason; correct fix is a 1000×1000 source, not a CSS change (user is re-exporting).
 
+
+### 2026-08-26 (part 4) — Home hero was unscrollable on ALL touch devices
+
+**One CSS line.** `src/components/ui/LiquidEther/LiquidEther.css` shipped
+`.liquid-ether-container { touch-action: none }` (upstream React Bits default).
+`LiquidEtherHero` renders that container **full-screen** (measured 0,0,375,812)
+behind the home page's scroll-scrubbed hero, so the browser treated the canvas
+as owning every touch gesture: **a finger swipe anywhere on the hero did
+nothing**. Changed to `touch-action: pan-y`.
+
+- **Desktop never showed it**: `touch-action` does not apply to wheel events.
+  That is also why my own `computer{action:"scroll"}` probe "passed" - it
+  dispatches wheel, not touch. Wheel-scrolling is NOT a test for this bug class.
+- The component's own `touchstart`/`touchmove` listeners are `{ passive: true }`,
+  so they never called `preventDefault` - the CSS was the sole blocker.
+- Losing touch-reactivity costs nothing: `LiquidEtherHero` passes
+  `autoDemo={true} autoSpeed={0.5}`, so the sim animates without input. `pan-y`
+  still delivers horizontal drags to it.
+- Verified by walking the ancestor chain from `elementFromPoint` at 7 points
+  across the hero (top/middle/bottom/left/right) and collecting every computed
+  `touch-action` that is not `auto`/`pan-y`: **zero blockers** after the fix.
+- **`touch-action: none` appears nowhere else in `src/`.** Product pages
+  re-verified clean at top and mid-page; their `.webgl-wrap` is
+  `pointer-events: none` / `touch-action: auto`.
+
+**Technique worth reusing:** to prove touch scrolling is or is not blocked, do
+NOT dispatch synthetic touch events (untrusted events never drive native
+scrolling). Instead walk up from `document.elementFromPoint(x, y)` and collect
+any computed `touch-action` other than `auto`/`pan-y`. That is the whole
+mechanism - the effective value is the intersection along the hit-test chain.
+
+**Separate, still-open UX problem found while measuring (NOT fixed - design
+decision).** The hero pin is `TOTAL_VH = FADE_VH 700 + HOLD_VH 50 +
+TRANSITION_VH 100 = 850`, i.e. **8.5 viewport heights = 6902px at 375x812 =
+38.5% of the whole 17948px page**. The video scrub ends at `SCRUB_VH` 6.44vh, so
+the last **2.06 viewport heights (1673px) show no frame change at all** - fade to
+black, hold, then the unpin transition; the next section only appears at 8.0vh.
+A phone swipe covers ~500-800px, so that is roughly 9-12 swipes to clear the
+hero with the final 2-3 landing on a static black screen. Even with touch fixed
+this reads as "stuck". Reducible knobs are `SCRUB_VH` and `HOLD_VH`;
+`TRANSITION_VH` is documented in-file as needing to stay exactly 100.
+**DECISION 2026-08-26: the user was shown these numbers and chose to LEAVE THE
+HERO LENGTH AS IS.** Only the `touch-action` fix shipped. Do not shorten the pin
+unprompted - re-raise it only if they complain about hero pacing again.
+
+### 2026-08-26 (part 3) — Product-page mobile pass (375x812), verified in-browser
+
+Scope: `/product/edge` at 375x812, but every fix lands in the SHARED tree
+(`product-experience.css` + two components), so all six products get it. Desktop
+(>=861px) was held frozen and re-verified afterwards at 1440x900 - hero grid,
+thumb strip, techsplit tracks, swatch pseudo, deepdive scrim and sticky button
+all measured byte-identical to before. `tsc --noEmit`, `eslint` and
+`next build` all clean. **Not committed.**
+
+**The big one - hero was silently truncating its own copy.** `.hero__thumbs` is
+`display:flex; flex-wrap:nowrap`, and at 6 thumbs x 56px + 5 x 9.6px gaps its
+min-content is exactly 384px. `.hero__grid`'s mobile `1fr` is `minmax(auto,1fr)`,
+so the track inflated to 384px inside a 330px content box and dragged
+`.hero__info`, the title, the description, the swatches and BOTH buy buttons out
+with it. `.leisure-xp { overflow-x: hidden }` meant no scrollbar ever appeared -
+the copy was just cut mid-word. Fix: `minmax(0, 1fr)` plus a scrolling thumb
+strip (50px thumbs, 0.5rem gap, hidden scrollbar).
+- Scroll, not wrap, and that is now evidence-based: thumb count is DB-driven
+  (DRIFT 6, LEGEND and DOMINATOR 7), so wrapping would give a per-product,
+  per-colour hero height. Scrolling is one row at any count, and the part-visible
+  last thumb is its own affordance.
+- The hero image was 27px right of centre for the same reason
+  (`.hero__frame`'s `clamp(220px, 70%, 420px)` resolving against the inflated
+  slot). It now centres exactly.
+- **The scroll fix introduced its own bug**, caught by a reviewer: changing colour
+  resets `viewIndex` to 0 while the strip keeps its `scrollLeft`, leaving the
+  active thumb off-screen. `Thumbnails.tsx` now nudges it back - via the
+  element's own `scrollLeft`, deliberately NOT `scrollIntoView()`, which walks up
+  to the window and would fight Lenis/ScrollTrigger.
+
+**Exploded-view frames were cropping the product on every mobile device.** The
+`legend-seq/mobile/` sets are **828x462 - the same 16:9 composition as desktop
+(1600x892), just downscaled**. They are a bandwidth optimisation, NOT a portrait
+re-crop (unlike the home hero's mobile set, which really is 720x1280 portrait).
+`SequenceReveal.tsx` cover-fits, so it drew them 1455px wide into a 375px canvas:
+**25.8% of the frame survived, source x 307-521 of 828** - the speaker lost its
+right third on all 121 frames, on all six products. Now contain-fits the mobile
+set only (`set === "mobile" ? cr < ir : cr > ir`); the canvas is already cleared
+to #000 and the frames' edge pixels sample as exactly (0,0,0), so the letterbox
+is invisible. Desktop is provably inert - `set` is only "mobile" at <=768px.
+**Better long-term fix: re-export the six exploded videos in portrait**, the way
+the home hero video was done. Then cover-fit could be restored and the speaker
+would fill the screen instead of sitting in a letterbox.
+
+**Two dead-rule bugs, both the same cascade trap** (a bare class losing to a
+`.leisure-xp X` descendant selector). Worth grepping for more:
+- `.stickybuy__btn` (0,1,0) loses to `.leisure-xp .btn` (0,2,0), so the ENTIRE
+  mobile compaction had never applied - measured padding `16px 33.6px` / font
+  `15.2px`, i.e. the desktop values. Fixed by matching specificity; bar 85->75px,
+  button 46px (>=44 tap target).
+- `.loop { padding-left: 0; padding-right: 0 }` (0,1,0) loses to
+  `.leisure-xp section` (0,1,1), so the marquee has NEVER been full-bleed -
+  measured 22.5px, not 0. Honoured at mobile only; **the same bug is still live
+  at desktop**, left alone to keep this a mobile-only change.
+- My own first hero patch hit this too: I put the `.hero__thumb` overrides in a
+  media block ABOVE the base `.hero__thumb` rule, so `width: 56px` won on source
+  order. Moved below. **In this stylesheet, check source order AND specificity
+  before assuming a mobile rule applies - several already did not.**
+
+**Deepdive flipped rows hid their own index.** Lines ~334-335 pin BOTH
+`.deepdive-row--flip .deepdive-row__n` and `__body` to `grid-row: 1`. The 640px
+block reset only `grid-column`, so on rows 02/04/06 the number and the body
+landed in the same cell and the accent index was painted over by the title
+(confirmed: identical `top`, both at `1/1`). `grid-row: auto` on both restores
+source-order placement. Verify this with `offsetTop`, not
+`getBoundingClientRect` - GSAP's `.reveal` holds these at `opacity:0` +
+`translateY(50)` until their trigger fires, which reads as a false overlap.
+
+**Smaller, all measured:**
+- `.techsplit__row` was `3rem 1fr auto` + 2rem gaps = 284px of demand in a 265px
+  box. Now `1.6rem minmax(4.5rem,1fr) minmax(0,auto)` + 0.8rem gaps, and
+  `__inner` drops its own padding (it was doubling the section's 22.5px gutter
+  for no gain). List 479px -> 378px. The 4.5rem floor matters: plain
+  `minmax(0,1fr)` collapsed the key label to **0px** on the widest-value row.
+- Section vertical padding: `clamp(4rem, 12vh, 10rem)` resolves to 97.44px top
+  AND bottom at 375x812 - 24% of the viewport per section. Reduced on the six
+  FLOWING sections only; ~520px of dead space gone.
+- `.pk-callout` capped to 6.5rem at <=640px (the 15% anchor is 56px from the
+  edge, so a full 8.5rem callout centred by `translate(-50%)` sat at left=-12
+  and lost its first character), plus `overflow-wrap: anywhere` on the name -
+  DOMINATOR's "Wireless Microphone (2 Nos.)" has a 104px min-content token that
+  overflowed the capped box on its own.
+- `.swatch-dot` hit area 34 -> 44px via a transparent `::after`. **`inset: -6px`,
+  not -5**: the dot is border-box with a 1px border, so `inset` resolves against
+  its 32px PADDING box. -5px measured 42px.
+- `.stickybuy` got `padding-bottom: max(0.9rem, env(safe-area-inset-bottom))`.
+
+**Confirmed NON-issues** (measured, so they do not get re-litigated):
+`.buybar__actions` fits 330px on one row; FloatingSoundToggle overlaps the
+swatch *band* but occludes no control (worst case clears the dots by 47px);
+`.hero__title` does not clip even for DOMINATOR; `.deepdive-row__body::before`'s
+24px bleed is a decorative `z-index:-1` scrim; `.techsplit__row.is-active`'s
+`translateX(8px)` renders fine (every ancestor is `overflow: visible` and its
+right edge lands at 361 < 375). Sections `featureseq / spinstage / overview /
+features / seqreveal / specs / faq / landing` audited clean at 375px.
+
+**Still open (flagged, not fixed):**
+- The hero blowout still exists in the 861-1080px band: 7 thumbs give a 449.6px
+  min-content against a ~350px `0.95fr` share, overflowing `.hero__grid` by 7px.
+  One-line fix is `minmax(0, 0.95fr) minmax(0, 1.05fr)` on the base rule, but
+  that changes 861-1080px rendering, so it needs a decision.
+- `.loop`'s desktop full-bleed bug (above).
+- Packshot on mobile is mostly empty - the model is small and the callouts are
+  low-contrast against it. **Raising the callouts above the model is NOT
+  possible**: while pinned, `.packshot` carries inline `position: fixed`, which
+  creates a stacking context that traps `.packshot__callouts` below
+  `.webgl-wrap`. A real fix means restructuring the section at mobile.
+
+### 2026-08-26 (part 2) — Exploded View on all six, split desktop/mobile home hero, per-colour GLBs pushed
+
+Shipped in the same commit `b611e8b` (pushed to `origin/main`, triggers the Railway auto-deploy).
+
+- **"Exploded View" (`SequenceReveal`) added to all six product pages.** Was DOMINATOR-only. User supplied six MP4s (`{Product}_Exploded.mp4`); DOMINATOR's old 120-frame set was regenerated from the new video and the previous frames deleted, so all six are now identical in shape: `frameCount: 121`, `captions: []`, frames at `public/products/{slug}/legend-seq/{desktop,mobile}/frame_001.webp` … `frame_121.webp`.
+- **Separate mobile video for the home hero.** User's `home_hero_mobile_video.mp4` (720×1280 portrait, 374 source frames) was sampled evenly down to 179 WebP frames to match the desktop set's count 1:1, so the same scroll-scrub math drives both. Desktop's existing flat `public/frames/frame_NNNN.jpg` set was `git mv`'d into `public/frames/desktop/`. `FRAME_VERSION` bumped to **6**.
+  - Verified live, not assumed: at a 375px viewport the page requested **175 mobile frames / 0 desktop**; at 1440px, **179 desktop / 0 mobile**, 0 non-200 responses, 20.1 MB total.
+- **Push footprint: 755 MB** (721 MB GLBs + 33 MB frames). GitHub accepted it with warnings only — the four Elevate GLBs are 71–72 MB each, over GitHub's *recommended* 50 MB but under the 100 MB hard limit. Flagged to the user beforehand; they chose to push as-is rather than compress or move to LFS. **If more per-colour GLBs get added, the next one over 100 MB will hard-fail the push** — Draco via `gltf-transform` or Git LFS will be needed then. The GLBs currently use only `KHR_mesh_quantization`, no Draco, so there is real headroom.
+- `Elevate-White.glb` (72 MB) is committed but **unreferenced** by `colorModels` — dead weight, left in place on the user's instruction.
+
+**ffmpeg → WebP pipeline (reusable; several dead ends worth not repeating)**
+- This ffmpeg build has **no `libwebp` encoder**. Two-step instead: `ffmpeg` → PNG, then `cwebp -q 72` per file.
+- `xargs` blew up twice with `command line cannot be assembled, too long` — caused by a long absolute path baked into the `sh -c` string, not by the file count. Fixes: pass the path via an exported env var, and for the largest batch drop `xargs` entirely for a Python `ThreadPoolExecutor`.
+- `xargs -I%` silently mangles `${1%.png}` (it substitutes the `%` inside the parameter expansion → `bad substitution`). Use `-I@` plus `basename`.
+
+**Verification lesson**
+- A first pass reported 404s on product images that were actually fine — the bug was my own shell script (`for u in $urls` treats a multi-line block as one word). Rewrote with `while IFS= read -r`; re-run was clean at 23 requests / 0 failures. **Say "my script was wrong", not "the images are broken"** — and re-verify before reporting a regression.
 
 ### 2026-08-06
 - Cloned `techinfinitydevelopers/leisure` (GitHub) fresh to `C:\Users\Lenovo\OneDrive\Desktop\leisure` (Windows machine). Prior memory entries below reference Mac paths (`/Users/apple/Downloads/leisure-web`) from earlier sessions — same repo, different local checkout. `main` branch checked out, tracking `origin/main`, working tree clean at commit `cf59343`.
